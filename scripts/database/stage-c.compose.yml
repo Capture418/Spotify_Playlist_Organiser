@@ -1,0 +1,51 @@
+# D033 only: independent of compose.yml and never reads the owner's .env.
+services:
+  db:
+    image: postgres:16.16-alpine3.24@sha256:a2f7e20374cd8fd8ed4a588b79549e10589bea7b1686e77922f5ac741b80b8a1
+    platform: linux/amd64
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: invented-local-admin-only
+    volumes:
+      - music-db:/var/lib/postgresql/data
+      - ../../db/init/10-app-role.sql:/docker-entrypoint-initdb.d/10-app-role.sql:ro
+    ports: ["127.0.0.1:55434:5432"]
+    mem_limit: 512m
+    cpus: 1.0
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  app:
+    image: spotify-organiser-verification:phase2
+    pull_policy: never
+    platform: linux/amd64
+    entrypoint: ["node", "/app/verification/stage-c.mjs"]
+    command: ["serve"]
+    environment:
+      STAGE_C_DISPOSABLE: spotify-organiser-verify
+    volumes:
+      - ./stage-c.mjs:/app/verification/stage-c.mjs:ro
+    ports: ["127.0.0.1:3000:3000"]
+    user: "1000:1000"
+    read_only: true
+    tmpfs: ["/tmp:size=67108864,mode=1777"]
+    mem_limit: 512m
+    cpus: 1.0
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health',{signal:AbortSignal.timeout(3000)}).then(r=>{if(r.status!==200)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+networks:
+  default:
+    internal: true
+volumes:
+  music-db:
+    labels:
+      organiser.purpose: stage-c-disposable

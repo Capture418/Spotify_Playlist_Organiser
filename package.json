@@ -1,0 +1,48 @@
+{
+  "name": "spotify-playlist-organiser",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Private Spotify playlist organiser: invented-data interface, no live integration.",
+  "engines": {
+    "node": ">=22.18.0 <23 || >=26.0.0 <27"
+  },
+  "scripts": {
+    "dev": "vite",
+    "preview": "vite preview",
+    "lint": "oxlint --deny-warnings src scripts server vite.config.ts",
+    "typecheck": "tsc -b",
+    "test": "node --test scripts/*.test.mjs scripts/spotify/*.test.ts src/domain/*.test.ts src/data/*.test.ts server/*.test.ts",
+    "check:project": "node scripts/check-project.mjs",
+    "check:lockfile": "node scripts/check-lockfile.mjs",
+    "check:foundation": "npm run check:project && npm run test:foundation",
+    "build": "tsc -b && vite build && npm run build:server",
+    "check": "npm run check:project && npm run check:lockfile && npm run lint && npm run typecheck && npm test && npm run build",
+    "test:foundation": "node --test scripts/*.test.mjs",
+    "spotify:verify": "node scripts/spotify/server.ts",
+    "db:init": "node scripts/database/local.mjs init",
+    "db:start": "node scripts/database/local.mjs start",
+    "db:stop": "node scripts/database/local.mjs stop",
+    "db:prepare": "node scripts/database/prepare.mjs",
+    "synthetic": "node scripts/database/synthetic.ts",
+    "test:database": "node --test --test-concurrency=1 scripts/database/*.integration.mjs",
+    "check:synthetic": "npm run check && npm run test:database",
+    "build:server": "node scripts/build-server.mjs",
+    "start": "node .work/runtime/server/production.js"
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "pg": "8.23.1"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.2.1",
+    "oxlint": "1.92.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.6",
+    "@types/pg": "8.23.1"
+  }
+}

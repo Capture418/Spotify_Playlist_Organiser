@@ -1,0 +1,51 @@
+# Preparation only. Do not run until image downloads/database creation are approved.
+# The app currently exits deliberately; it is not a live-login demo.
+name: spotify-organiser-local
+services:
+  db:
+    image: postgres:16.16-alpine3.24@sha256:a2f7e20374cd8fd8ed4a588b79549e10589bea7b1686e77922f5ac741b80b8a1
+    platform: linux/amd64
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: invented-local-admin-only
+    volumes:
+      - music-db:/var/lib/postgresql/data
+      - ./db/init/10-app-role.sql:/docker-entrypoint-initdb.d/10-app-role.sql:ro
+    ports:
+      - "127.0.0.1:55434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  app:
+    build: .
+    platform: linux/amd64
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://music_app:invented-local-app-only@db:5432/music
+      MIGRATION_DATABASE_URL: postgres://music_migrator:invented-local-migrator-only@db:5432/music
+      JOURNAL_DATABASE_URL: postgres://music_journal_app:invented-local-journal-app-only@db:5432/music_journal
+      JOURNAL_MIGRATION_DATABASE_URL: postgres://music_journal_migrator:invented-local-journal-migrator-only@db:5432/music_journal
+      PORT: "3000"
+      NODE_ENV: production
+    ports:
+      - "127.0.0.1:3000:3000"
+    user: "1000:1000"
+    read_only: true
+    tmpfs:
+      - /tmp:size=67108864,mode=1777
+    mem_limit: 512m
+    cpus: 1.0
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:'+process.env.PORT+'/health',{signal:AbortSignal.timeout(3000)}).then(r=>{if(r.status!==200)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+volumes:
+  music-db:

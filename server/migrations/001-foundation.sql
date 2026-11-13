@@ -1,0 +1,15 @@
+CREATE TABLE accounts (id uuid PRIMARY KEY, binding text UNIQUE NOT NULL, revision bigint NOT NULL DEFAULT 0 CHECK (revision>=0), generation uuid NOT NULL, status text NOT NULL DEFAULT 'active' CHECK(status IN ('active','suspended')));
+CREATE TABLE sessions (token_hash text PRIMARY KEY, account_id uuid NOT NULL REFERENCES accounts ON DELETE CASCADE, csrf text NOT NULL, created_ms bigint NOT NULL, activity_ms bigint NOT NULL, absolute_ms bigint NOT NULL);
+CREATE TABLE connections (account_id uuid PRIMARY KEY REFERENCES accounts ON DELETE CASCADE, credential jsonb NOT NULL, version integer NOT NULL CHECK(version>0));
+CREATE TABLE items (account_id uuid REFERENCES accounts ON DELETE CASCADE, kind text CHECK(kind IN ('album','playlist')), spotify_id text CHECK(length(spotify_id) BETWEEN 1 AND 128), available boolean NOT NULL DEFAULT false, PRIMARY KEY(account_id,kind,spotify_id));
+CREATE TABLE metadata_cache (account_id uuid, kind text, spotify_id text, payload jsonb NOT NULL, expires_ms bigint NOT NULL, PRIMARY KEY(account_id,kind,spotify_id), FOREIGN KEY(account_id,kind,spotify_id) REFERENCES items ON DELETE CASCADE);
+CREATE TABLE tags (account_id uuid REFERENCES accounts ON DELETE CASCADE, tag_id uuid, name text NOT NULL CHECK(length(name) BETWEEN 1 AND 256), canonical text NOT NULL, PRIMARY KEY(account_id,tag_id), UNIQUE(account_id,canonical));
+CREATE TABLE assignments (account_id uuid, kind text, spotify_id text, tag_id uuid, PRIMARY KEY(account_id,kind,spotify_id,tag_id), FOREIGN KEY(account_id,kind,spotify_id) REFERENCES items ON DELETE CASCADE, FOREIGN KEY(account_id,tag_id) REFERENCES tags ON DELETE CASCADE);
+CREATE TABLE mutation_receipts (account_id uuid REFERENCES accounts ON DELETE CASCADE, request_id uuid, digest text NOT NULL, result jsonb NOT NULL, expires_ms bigint NOT NULL, PRIMARY KEY(account_id,request_id));
+CREATE TABLE restore_snapshots (account_id uuid REFERENCES accounts ON DELETE CASCADE, id uuid, payload jsonb NOT NULL, digest text NOT NULL, revision bigint NOT NULL, created_ms bigint NOT NULL, PRIMARY KEY(account_id,id));
+CREATE TABLE restore_previews (account_id uuid REFERENCES accounts ON DELETE CASCADE, id uuid, session_hash text NOT NULL REFERENCES sessions ON DELETE CASCADE, payload jsonb NOT NULL, digest text NOT NULL, revision bigint NOT NULL, expires_ms bigint NOT NULL, PRIMARY KEY(account_id,id));
+CREATE TABLE collection_generations (account_id uuid REFERENCES accounts ON DELETE CASCADE, kind text CHECK(kind IN ('album','playlist')), generation uuid NOT NULL, PRIMARY KEY(account_id,kind));
+CREATE TABLE deletion_records (binding text PRIMARY KEY, deleted_ms bigint NOT NULL);
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM PUBLIC;
+GRANT USAGE ON SCHEMA public TO organiser_app;
+GRANT SELECT,INSERT,UPDATE,DELETE ON accounts,sessions,connections,items,metadata_cache,tags,assignments,mutation_receipts,restore_snapshots,restore_previews,collection_generations,deletion_records TO organiser_app;

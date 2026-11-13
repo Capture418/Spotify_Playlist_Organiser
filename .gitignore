@@ -1,0 +1,29 @@
+# Operating system and editors
+.DS_Store
+.idea/
+*.swp
+
+# Dependencies and generated application output
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+*.log
+
+# Local secrets; a future .env.example must contain placeholders only
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local-only data, investigations and exports
+.local/
+.work/
+exports/
+
+# Hosting-provider working directories (no provider selected)
+.vercel/
+.netlify/

@@ -1,0 +1,15 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { randomBytes } from 'node:crypto';
+import { seal,unseal,OAuthGate,SCOPES,cookie,bounded } from './security.ts';
+test('credential encryption binds account, version and key; wrong/missing keys fail closed',()=>{const key=randomBytes(32),keys=new Map([['one',key]]);const value=seal('invented-refresh',key,'one','owner',1);assert.equal(unseal(value,keys,'owner',1),'invented-refresh');assert.notEqual(value.body,'invented-refresh');for(const [account,version]of [['other',1],['owner',2]] as const)assert.throws(()=>unseal(value,keys,account,version));assert.throws(()=>unseal(value,new Map(),'owner',1));assert.throws(()=>unseal({...value,tag:randomBytes(16).toString('base64')},keys,'owner',1));});
+test('OAuth state/verifier is browser-bound, single-use, expires and validates owner/grants',async()=>{let now=0;const gate=new OAuthGate('invented-owner','https://example.invalid/callback',()=>now);const exchange=async()=>({binding:'invented-owner',scopes:SCOPES,refreshToken:'fake-refresh',accessToken:'fake-access'});let pending=gate.begin('browser');assert.equal(pending.challenge.length,43);assert.equal(pending.callback,'https://example.invalid/callback');await assert.rejects(gate.finish('other',pending.state,'fake-code',exchange));await gate.finish('browser',pending.state,'fake-code',exchange);await assert.rejects(gate.finish('browser',pending.state,'fake-code',exchange));pending=gate.begin('browser');await assert.rejects(gate.finish('browser','wrong','fake-code',exchange));await assert.rejects(gate.finish('browser',pending.state,'fake-code',exchange));pending=gate.begin('browser');now=300001;await assert.rejects(gate.finish('browser',pending.state,'fake-code',exchange));pending=gate.begin('browser');await assert.rejects(gate.finish('browser',pending.state,'fake-code',async()=>({...await exchange(),binding:'wrong'})));pending=gate.begin('browser');await assert.rejects(gate.finish('browser',pending.state,'fake-code',async()=>({...await exchange(),scopes:[...SCOPES,'extra']})));});
+test('production cookies retain secure host-only scope',()=>{assert.match(cookie('opaque',true),/^__Host-organiser=.*HttpOnly; SameSite=Lax; Secure;/);assert.doesNotMatch(cookie('opaque',true),/Domain=/);assert.match(cookie('opaque',false),/^organiser-synthetic=/);});
+
+test('canonical payload digest survives JSONB object ordering but distinguishes payload changes',async()=>{const {digest}=await import('./validation.ts');assert.equal(digest({b:2,a:{y:1,x:0}}),digest({a:{x:0,y:1},b:2}));assert.notEqual(digest({a:[1,2]}),digest({a:[2,1]}));});
+
+test('bounded provider work rejects cancellation even when the provider ignores the signal',async()=>{
+ const controller=new AbortController();
+ await assert.rejects(bounded(controller.signal,()=>{controller.abort();return new Promise(()=>{});}),/timed out/);
+ await assert.rejects(bounded(controller.signal,async()=>{throw Error('Must not start');}),/timed out/);
+});
