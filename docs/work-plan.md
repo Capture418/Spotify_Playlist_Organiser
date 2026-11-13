@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D055: D054 accepted. Production process lifecycle and operator setup preparation complete locally, awaiting owner review; mocked tests passed on `codex/startup-operator-preparation`. No activation or operational execution. Real data/credentials, installations, provisioning, merging, settings and deployment remain gated.
+D056: same-image setup mode implemented and verified with invented data/mocked Spotify and disposable PostgreSQL; awaiting owner review on `codex/setup-mode`. Production executable, real credentials/data, installations, provisioning, merging, settings and deployment remain gated.
 
 ## Existing implementation
 
@@ -229,3 +229,25 @@ Next: owner review/accept D055 and obtain operator answers before implementing t
 ### D055 timing follow-up
 
 Owner confirmed the operator contract:180 seconds to become healthy including migrations;20 seconds shutdown after SIGTERM. The local README lacked that contract section, so it now records the supplied limits with an attribution/verification boundary. Updated the current setup package; historical proposal above remains a record of the earlier question. App startup150 seconds and shutdown10 seconds already fit; no source/runtime change needed. No remote README or server setting independently inspected, fetched or changed. D055 acceptance and temporary setup callback/access decisions remain outstanding. Documentation/foundation and whitespace checks passed; no application tests or operational checks repeated for this documentation-only clarification. No push, merge, deployment or other gated action.
+
+
+## D056 scope and acceptance
+
+Build token/session/PKCE/identity/confirmation setup flow, isolate normal routes, retain honest health and durable one-time ownership semantics. Reuse existing persisted accounts plus retained deletion records as the completion latch, checked transactionally under the bootstrap lock; independent journal/recovery checks prevent restoration bypass. This avoids a schema change and preserves prior-image compatibility. No automatic journal initialisation or recovery approval. Test unit/session/HTTP security, actual PostgreSQL setup-to-normal/restart/deletion refusal and resource cleanup. Expected files: setup service/HTTP, application mode composition, tests and operator docs.
+
+
+## D056 actual result — 13 November 2026
+
+Implemented prepared same-image setup mode with token POST and constant-time hashed comparison, five-minute Secure/HttpOnly/SameSite=Lax session, CSRF-protected forms, session-bound state/PKCE, exact configured account-ID check and explicit confirmation. Token is never a URL parameter; query strings on non-callback routes are rejected. Unauthenticated view is a generic token form, not privileged setup details. Normal app routes are not mounted. Setup stores no Spotify grants or metadata; completion/close clears all in-memory sessions/proofs. Global unlock limits are five attempts/minute then15-minute lockout, plus120 general requests/minute. This bounded global lockout avoids an indefinite lockout; LAN/VPN users could still deliberately cause temporary denial of service.
+
+Durable closure uses any existing account or retained deletion record, plus independent journal refusal, instead of a new table/migration. Atomic completion takes the existing bootstrap advisory lock and recovery-guard row lock and rechecks all local ownership/deletion state. This keeps existing migration checksums/version unchanged and previous normal source compatible. Restore to stale database state still requires independent journal reconciliation; no claim to infer lost deletion records. Setup requires an explicitly initialised journal and approved recovery state. Setup health reports minimal200 only when both database queries succeed (503 otherwise); completed setup remains healthy but closed until the operator returns it to normal.
+
+Actual host quality gate PASS184 tests, zero failures/skips, project/lockfile validation, lint, types and frontend/server builds. Six added tests cover token/session/state/PKCE/identity, proof/confirmation, expiry/lockout, form/HTTP/health/error boundaries and invalid/leftover mode settings before resources. An initial strip-only TypeScript incompatibility in the new constructor was corrected before the passing gate. No dependency installation/change.
+
+Actual disposable Node22/PostgreSQL16 run PASS with current compiled source mounted read-only into the cached runtime, mocked Spotify and internal networking/no published ports. Added setup checks to the guarded existing runner via explicit `setup` argument and independent D056 receipt/labels. Observed: unauthenticated callback/normal-route rejection; token cookie and CSRF enforcement; wrong owner rejection; successful verification and explicit completion; no stored connection grants; setup closed immediately and after restart with restored setup configuration; normal-mode library/login/import/conflict/restore/restart flows passed; deleted owner could not be recreated with setup configuration restored. This simulates configuration rollback, not a real deploy or old-image execution. Previous normal schema compatibility follows no schema change; no new old-image rehearsal claimed.
+
+Final scoped cleanup reported an empty receipt/resources inventory; separate Docker queries confirmed zero task-labelled containers, volumes and networks. No unrelated resources changed. Evidence `.work/d056-e2e.log`, `.work/setup-e2e/scenarios.log`, `.work/setup-e2e/receipt.json`, `.work/d056-quality-final.log`. About13GiB disk available before execution; cached artifacts only, no pulls/build/install. Normal executable remains blocked and cached runtime verification confirms refusal. No real Spotify, credentials, server provisioning, settings, push, merge or deployment.
+
+Self-review covered token placement, session/CSRF binding, identity enforcement, expiry, concurrent completion checks, shutdown invalidation, persisted refusal and secret-free error handling. Not an independent security audit. No live proxy/log inspection, browser/iPhone/Secure-cookie enforcement test, actual server timeout/rollback or backup drill in this task. Owner accepts residual callback exposure in operator-restricted error logs; do not claim those logs can never contain codes.
+
+Constitution review: bounded approved implementation/resource use, existing semantics and guards retained, scope/results documented truthfully, private evidence preserved. Next: owner acceptance of D056, then bounded release-readiness preparation/rehearsal for the gated executable, exact image and operator initial journal/recovery procedure. Actual keys/token/configuration, initial storage/server actions, real OAuth/device acceptance and setup-to-normal deployments remain separate approvals. Remove setup mode and token together during that later return; failed normal deployment remains urgent.

@@ -79,3 +79,8 @@ Owner accepts D054 and authorises production startup and operator setup preparat
 ### D055 operator timing clarification
 
 Owner reports operator confirmation:180 seconds to become healthy, migrations included;20 seconds to shut down after SIGTERM, also documented in the operator README contract. Record these limits in this checkout's README/setup package. Existing app limits of150 seconds startup and10 seconds shutdown remain within that budget; no code/settings change required. This does not accept D055 or approve activation. Temporary setup callback/access questions remain outstanding.
+
+
+## D056 — Same-image setup mode and disposable verification
+
+Owner approves setup mode using invented data/mocked Spotify and disposable local PostgreSQL. Same image/slot/callback; token POST, Secure HttpOnly SameSite session, session-bound state/PKCE, exact configured Spotify owner ID, bounded guessing, explicit confirmation and durable refusal after completion. Normal routes unavailable in setup. Real data/credentials, installations, server provisioning, merging, settings and deployment remain gated. Remove setup mode/token together when later returning to normal; failed return is urgent because rollback may restore secrets. Operator reports path-only access logs without Referer and restricted error logs; owner accepts residual callback-query exposure there. Do not claim independent server verification or that secret deletion removes rollback copies.

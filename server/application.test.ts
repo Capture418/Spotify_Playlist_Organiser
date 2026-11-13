@@ -60,3 +60,10 @@ test('listener wait rejects cancellation and removes temporary event listeners',
  const listening=listener.listen(3000,'0.0.0.0',c.signal);c.abort();await assert.rejects(listening,/cancelled/);
  assert.equal(server.listenerCount('error'),0);await listener.close();
 });
+
+
+test('setup mode rejects invalid or leftover settings before creating resources',async()=>{
+ let calls=0;const dependencies={pool:()=>{calls++;throw Error('No pool allowed');},transport:async()=>{calls++;throw Error('No transport allowed');}};
+ for(const settings of [{SETUP_MODE:'0'},{SETUP_MODE:'1'},{SETUP_MODE:'1',SETUP_TOKEN:'short'},{SETUP_TOKEN:'a'.repeat(43)}])await assert.rejects(startIntegratedApplication({...env(),...settings},dependencies),/setup/i);
+ assert.equal(calls,0);
+});

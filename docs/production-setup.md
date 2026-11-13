@@ -1,6 +1,6 @@
 # Production startup and operator setup preparation
 
-D055 preparation only. This is a review package, not permission or a runnable deployment guide. No real setting values belong here. D054 verified the connected composition with invented data; it did not provision the server or verify backups. `npm start` and the image command still refuse activation.
+D055/D056 preparation and synthetic implementation only. This is a review package, not permission or a runnable deployment guide. No real setting values belong here. D054 verified the connected composition with invented data; it did not provision the server or verify backups. `npm start` and the image command still refuse activation.
 
 ## Proposed executable wiring
 
@@ -14,7 +14,7 @@ Do not add a magic activation environment flag in this preparation. Release appr
 
 ## Configuration handoff
 
-Use the existing `.env.example` as a names/formats contract, not as a file to populate in this task. Server-owned DATABASE_URL, PORT and NODE_ENV stay server-owned. The14 app-owned settings cover canonical origin/callback, account UUID, verified owner binding, public client ID, three additional role URLs and three versioned key rings/current versions. APP_NAME is the deployment helper's secret naming convention; the app receives NAME. No client secret, VITE_ secret, bootstrap bypass or operational R2/age credential belongs in the app.
+Use the existing `.env.example` as a names/formats contract, not as a file to populate in this task. Server-owned DATABASE_URL, PORT and NODE_ENV stay server-owned. The14 normal app-owned settings cover canonical origin/callback, account UUID, verified owner binding, public client ID, three additional role URLs and three versioned key rings/current versions. APP_NAME is the deployment helper's secret naming convention; the app receives NAME. No client secret, VITE_ secret, bootstrap bypass or operational R2/age credential belongs in the app.
 
 Operator prepares real settings only after approval, in approved secret custody. Never paste them into chat, commands recorded in shell history, PRs or logs. GitHub secrets cannot be read back; independently recoverable owner-held key copies are required. Keep credential/snapshot/journal material independent and retain old versions needed by database ciphertext, backups and rollback images. Key creation, custody locations and rotation remain separate operational actions.
 
@@ -25,16 +25,26 @@ Operator prepares real settings only after approval, in approved secret custody.
 3. Run versioned application/journal migrations as their distinct migration roles using the reviewed image. Check checksums/schema versions and previous-release compatibility. Application startup must not be exposed yet.
 4. For verified first-ever empty storage only, an explicit operator initialisation operation creates the encrypted empty journal. Existing `PostgresJournal` has no automatic empty fallback. A missing journal on an existing installation is recovery failure, not permission to initialise. This operation needs a reviewed operator command and confirmation; none is activated by this package.
 5. Keep recovery guard blocked while verifying independent inventory. Use `reconcileRecovery` then `approveRecovery` with the fresh in-process receipt and explicit confirmation, in the same process/pool. This clears sessions/credentials; do not run it on an ordinary restart. An inventory digest must come from independently checked operator evidence, not be computed from suspect restored storage and called authoritative.
-6. Verify the intended Spotify identity with the existing `BootstrapPreparation` PKCE flow, then explicitly confirm it within its five-minute proof window. `bootstrapOwner` remains operator-only, refuses replacement and refuses a deleted binding. No first-visitor owner creation. The operator UI/callback entry is still an activation design checkpoint below, not a public route in this source.
+6. Verify the intended Spotify identity through the D056 token-checked setup session and PKCE flow, then explicitly confirm it within the five-minute session window. `bootstrapOwner` remains operator-only, refuses replacement and refuses a deleted binding. No first-visitor owner creation. D056 supplies the token/session-bound setup UI and callback in the prepared same-image factory; the executable remains gated.
 7. Only after owner creation and readiness evidence, approve the production executable and deployment. Validate health/startup budget, VPN-only HTTPS routing and Secure-cookie behaviour. Then separately approve the real account connection and pilot; check imports, reconnect, tagging across devices and iPhone standalone/link behaviour.
 
 Steps4–6 are privileged one-time operations and must not be embedded in normal container startup. Keep app stopped and operator access exclusive. Do not expose migration, journal initialisation, recovery approval or owner replacement endpoints to ordinary users.
 
-## Operator entry checkpoint
+## Same-image setup mode — D056
 
-Recommend a short-lived, operator-invoked setup mode, available only during an explicit approved maintenance window. It should reuse the exact canonical HTTPS callback and PKCE/state/browser binding, verify the configured owner and require a second explicit confirmation before owner creation; no token or proof persistence. The normal application cannot start before the owner exists, so this needs a separately reviewed callback handler, routing/access restriction and lifecycle. Do not improvise by pasting an OAuth code into a shell or disabling callback guards.
+Operator confirms one image/slot behind the existing proxy; all paths including `/callback` reach that slot. Prepared composition selects setup only for `SETUP_MODE=1` with a43–128-character base64url `SETUP_TOKEN`. An invalid mode, missing token or token left in normal-mode settings is rejected before pools open. These correspond to APP_SETUP_MODE/APP_SETUP_TOKEN in the deployment helper. The production executable still refuses activation.
 
-Before implementation/activation, obtain the operator's answer: can a temporary setup process use the existing HTTPS proxy while ordinary app traffic is unavailable, restricted to the owner/operator over VPN? What additional access restriction can be enforced during setup? If not, propose and approve another verified identity-bootstrap delivery method. This package deliberately does not introduce an unapproved public setup endpoint. Existing `BootstrapPreparation` is the tested primitive, not a completed operator UI.
+Before token verification, only the generic password-token form and minimal health status are available. POST the token in the form body, never a URL. Hash-to-hash constant-time comparison handles all token lengths. Five global unlock attempts per minute (including successful attempts) are allowed; the sixth starts a15-minute lockout. This bounds guessing without an indefinite family-triggered denial of service; restart clears this in-memory limit. A global120-requests/minute guard protects other setup routes. No client-IP allowlist or forwarded-IP trust.
+
+A successful unlock issues a random five-minute Secure/HttpOnly/SameSite=Lax cookie; its lookup key is hashed in server memory. No browser storage. Each session has a separate CSRF token. Spotify state/PKCE and verified proof bind to that token-checked session; normal routes are absent. Only the configured Spotify owner account ID can verify, regardless of display name/email. A second explicit confirmation creates the owner; setup never stores the Spotify grant or imports the library. Session and proof expiry requires starting again. Shutdown/success invalidates all setup sessions/proofs.
+
+Durable closure uses existing persisted ownership/deletion state rather than a new schema: any account or any retained deletion record closes setup, regardless of configured ID; a nonempty independent journal also closes it. Final account creation checks global state again under the existing bootstrap advisory lock and recovery-guard row lock, and commits atomically. Account deletion retains its deletion record. Restart or restoring old setup configuration cannot reopen ownership. A database restored to an earlier time still requires independent journal reconciliation; no mechanism can infer lost intent from a stale database alone. The existing operator bootstrap primitive is not exposed as a route.
+
+Setup startup still requires migrated schemas, an explicitly initialised journal and cleared recovery guard. It does not automatically initialise missing storage or approve recovery. A completed setup can serve health200 when both databases are reachable, but rejects all privileged setup work; health must remain usable after successful setup until return to normal.
+
+Later approved return to normal: delete setup mode and token secrets together and redeploy. A failed return is urgent because rollback may restore the old configuration/secrets; database closure still prevents setup reuse. Do not claim all retained secret copies vanish.
+
+Logging: responses carry no-store/no-referrer and restrictive CSP. Setup writes no application logs, including on errors; error responses use fixed text. Operator reports path-only access logs without Referer and restricted error logs that may contain callback query strings. Owner accepts that residual error-log exposure; this is reported assurance, not independently tested server configuration. No setup token is placed in any URL.
 
 ## Restart, rollback and recovery
 
@@ -46,10 +56,10 @@ For database restore/server loss: keep access offline; preserve current independ
 
 ## Evidence and decisions needed before activation
 
-- Owner acceptance of this preparation; separately approve the temporary operator bootstrap delivery design after the operator answers above.
+- Owner acceptance of D056 synthetic results; separately approve real configuration and activation.
 - Operator timing is confirmed:180 seconds to become healthy including migrations,20 seconds after SIGTERM. Actual databases/roles, proxy isolation/header overwrite and secret delivery still need verification. No credential values requested.
 - Verify backup schedule/retention for both databases, encrypted off-site copies, independent inventory, key custody and a restore/deletion reconciliation drill. Prior policy approval is not proof of implementation.
-- Approve a bounded synthetic rehearsal of the future executable/operator mode and exact release image. Its initialisation, signals/timeouts, interrupted setup, backup recovery and previous-image compatibility need execution evidence.
+- The D056 rehearsal covers prepared setup-to-normal composition with mocked Spotify and current code mounted into a cached runtime. An exact release image/executable rehearsal, real signal delivery, initial storage provisioning and backup recovery still need their own evidence.
 - Separately approve real settings/owner verification, publication, provisioning/settings and deployment. PR merges/required checks remain their own gates; no automatic main-push deployment inferred.
 
 This is technical-lead preparation/self-review, not an independent security audit or live-system acceptance.

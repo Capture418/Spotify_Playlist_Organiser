@@ -53,3 +53,6 @@ D053 connects the shared library UI to session/login/callback/refresh routes. Th
 
 
 D055 adds `process-preparation.ts`, an injected process lifecycle with fixed status categories, idempotent signal handling and a bounded shutdown deadline. It has no operational defaults or executable caller. `docs/production-setup.md` specifies the operator sequence and separate callback/setup design checkpoint; normal startup cannot initialise a missing journal, create an owner or approve recovery.
+
+
+D056 adds the prepared same-image setup branch to application composition. `setup.ts` provides token/session-bound PKCE and exact-owner confirmation; `setup-http.ts` serves isolated forms, strict proxy/origin checks and minimal database health, with no application logging. Existing account/deletion records and the independent journal form the durable one-time latch without a migration. Normal executable activation remains blocked; setup requires previously prepared journal/recovery state. See `docs/production-setup.md` for operational limits and accepted restricted error-log risk.

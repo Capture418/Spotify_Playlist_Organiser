@@ -1,3 +1,5 @@
+import { Setup, setupStore } from './setup.ts';
+import { setupServer } from './setup-http.ts';
 import type { Server } from 'node:http';
 import type { Pool, PoolConfig } from 'pg';
 import { productionConfig } from './runtime-config.ts';
@@ -43,7 +45,9 @@ export async function startIntegratedApplication(env: NodeJS.ProcessEnv, depende
   start?: typeof startPreparedHome;
   application?: typeof preparedApplication;
 }) {
-  const config = productionConfig(env); // All settings validated before any side effects.
+  const config = productionConfig(env);
+  if (env.SETUP_MODE !== undefined && env.SETUP_MODE !== '1') throw Error('Invalid setup mode');
+  if (env.SETUP_MODE === '1' ? !/^[A-Za-z0-9_-]{43,128}$/.test(env.SETUP_TOKEN ?? '') : env.SETUP_TOKEN !== undefined) throw Error('Invalid setup configuration'); // All settings validated before any side effects.
   const snapshots = new JsonCipher(config.snapshots.keys, config.snapshots.current, 'snapshot');
   const journal = new JsonCipher(config.journal.keys, config.journal.current, 'journal');
   const spotify = new SpotifyTransport(config.clientId, config.callback, dependencies.transport);
@@ -51,6 +55,11 @@ export async function startIntegratedApplication(env: NodeJS.ProcessEnv, depende
     pool: dependencies.pool,
     compose: async (runtime, journalStore, signal) => {
       signal.throwIfAborted();
+      if (env.SETUP_MODE === '1') {
+        const setup = new Setup(env.SETUP_TOKEN!, config.owner, spotify, setupStore(runtime, config.owner, journalStore));
+        const server = setupServer(setup, config.origin, () => Promise.all([runtime.query('SELECT 1'), journalStore.pool.query('SELECT 1')]));
+        return preparedListener(server, () => setup.close());
+      }
       const store = new Store(runtime, config.owner.account);
       store.snapshotsCipher = snapshots;
       const vault = new CredentialStore(runtime, config.credentials.keys, config.credentials.current);
