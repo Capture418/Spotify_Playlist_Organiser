@@ -59,3 +59,8 @@ Owner instruction: “I accept D050 and approve normal PR CI, including push/PR,
 ## D052 — D051 acceptance and review/roadmap request
 
 Owner accepts D051 and requests PR #4 review, proposed merge sequence for PRs #1/#4, required-check settings and a product-readiness assessment. Merging, settings changes and deployment remain separately gated. Review/proposals only; no new implementation, public review posting, push or resource operation inferred.
+
+
+## D053 — Invented-data production integration
+
+Owner authorises production integration using invented data first. Real data, credentials, server provisioning, merging, required-check settings and deployment remain separately gated. This implementation connects the existing interface to prepared production authentication/API and composes validated startup, store, keys, journal and maintenance with explicit injected transports. No dependency installation, database creation, live Spotify connection, implicit owner bootstrap or production executable activation is inferred. Existing approved interaction/security/lifecycle designs remain unchanged.

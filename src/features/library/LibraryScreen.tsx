@@ -10,7 +10,7 @@ import type { RemoteLibrary } from '../../data/remote-library.ts';
 
 type EditorTarget = { mode: 'single' | 'bulk'; itemIds: readonly string[] };
 
-export function LibraryScreen({ remote }: { remote?: RemoteLibrary }) {
+export function LibraryScreen({ remote, connected = false }: { remote?: RemoteLibrary; connected?: boolean }) {
   const [library, setLibrary] = useState(() => remote?.state.library ?? createDemoLibrary());
   useEffect(() => { if (remote) setLibrary(remote.state.library); }, [remote?.state]);
   const [query, setQuery] = useState('');
@@ -65,7 +65,7 @@ export function LibraryScreen({ remote }: { remote?: RemoteLibrary }) {
       <a className="skip-link" href="#library">Skip to library</a>
       <header className="app-header">
         <div className="brand"><span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>Music Library Organiser</div>
-        <span className="demo-badge"><span aria-hidden="true" />{remote ? 'Synthetic library' : 'Local demo'}</span>
+        <span className="demo-badge"><span aria-hidden="true" />{connected ? 'Connected library' : remote ? 'Synthetic library' : 'Local demo'}</span>
       </header>
       <main id="library" tabIndex={-1}>
         <div className="page-intro">
@@ -75,7 +75,7 @@ export function LibraryScreen({ remote }: { remote?: RemoteLibrary }) {
         </div>
         <div className="demo-notice" id="demo-notice">
           <span className="notice-symbol" aria-hidden="true">i</span>
-          <p><strong>{remote ? 'Synthetic library.' : 'Try the demo.'}</strong> These playlists and albums are invented. {remote ? 'Changes save to the local database after confirmation.' : 'Changes reset on reload.'} Spotify isn’t connected.</p>
+          {connected ? <p>Spotify access is read-only. Your tags are saved to your private library.</p> : <p><strong>{remote ? 'Synthetic library.' : 'Try the demo.'}</strong> These playlists and albums are invented. {remote ? 'Changes save to the local database after confirmation.' : 'Changes reset on reload.'} Spotify isn’t connected.</p>}
         </div>
         <section className="filter-panel" aria-label="Find items">
           <div className="library-views" role="group" aria-label="Library type">
@@ -145,9 +145,9 @@ export function LibraryScreen({ remote }: { remote?: RemoteLibrary }) {
         <details className="install-guide">
           <summary>Use on your iPhone</summary>
           <p>Once your private HTTPS address is ready, open it in Safari, tap Share, then Add to Home Screen. Choose Open as Web App if offered.</p>
-          <p>The online library will need your VPN and home server. This preview uses invented data; iPhone installation and private access are not ready yet.</p>
+          <p>{connected ? 'Keep your VPN connected and home server available. The library needs a connection to browse and save changes.' : 'The online library will need your VPN and home server. This preview uses invented data; iPhone installation and private access are not ready yet.'}</p>
         </details>
-        <footer className="app-footer"><span>Made for finding. Spotify stays your player.</span><span>{remote ? 'Synthetic · Local database' : 'Prototype · Memory only'}</span></footer>
+        <footer className="app-footer"><span>Made for finding. Spotify stays your player.</span><span>{connected ? 'Private library · Online' : remote ? 'Synthetic · Local database' : 'Prototype · Memory only'}</span></footer>
       </main>
       {selecting && (
         <section className="selection-bar" aria-label="Bulk tagging">

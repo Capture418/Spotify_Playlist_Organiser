@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D052: D051 owner-accepted. PR #4 review and merge/settings/product-readiness proposals complete locally; awaiting owner decisions. No merge, required-check/settings change or deployment authorised. D051 eligible normal CI authorisation remains; no new run needed for this review.
+D053: invented-data production integration implemented locally on `codex/production-integration`; awaiting owner review. Real data, credentials, server provisioning, merging, required-check settings and deployment remain separately gated. D051 normal CI authorisation remains; no push or new hosted run in this task.
 
 ## Existing implementation
 
@@ -165,3 +165,18 @@ Remaining delivery slices:
 No honest completion percentage/date follows from current evidence: integration and server/device acceptance are substantial remaining work. CI setup is now established; future effort should concentrate on the production user journey and operational readiness, not further rehearsals without a concrete gap. This roadmap is a proposal, not approval to connect real data, provision services or deploy.
 
 D052 constitution check: acceptance recorded, exact PR/source and real evidence distinguished, no merge/settings/deploy action, private history retained. Documentation/foundation and whitespace checks validate this local handover. No public PR comment/review submitted or source changed.
+
+
+## D053 implementation and verification — 13 November 2026
+
+Scope/acceptance: connect the existing production-facing user journey and prepared startup composition using invented inputs, preserve approved tagging/conflict/recovery semantics and all authentication/proxy guards, keep synthetic controls out of connected mode, validate with installed-host tests and browser review. Likely files were the shared library UI, API mapping, HTTP/prepared application/startup composition and their tests. No design change or new dependency was needed.
+
+Implemented a server-selected connected interface, validated Spotify PKCE sign-in/reconnect navigation, session loading and initial import after callback, catalogue refresh, existing server-confirmed editing/recovery/deletion controls and connected-mode wording. The connected interface cannot mount synthetic authentication/harness controls. Callback redirect carries only a non-sensitive completion marker. Added explicit application composition connecting configuration, purpose-separated keys, store/vault, independent journal and transport to the migration/readiness startup sequence. Listener shutdown disposes maintenance even when startup fails before listening. No owner is created implicitly; existing bootstrap/recovery gates remain. `npm start` still deliberately refuses activation.
+
+Installed-host full quality gate: 173 tests passed, zero failures/skips; project/lockfile validation, lint, TypeScript and client/server builds passed. Seven new mocked tests cover OAuth destination validation, composition/key separation, listener failure/cancellation/disposal, secure cookie/callback/CSRF routing and synthetic-control exclusion. No installations, database/container creation, real credentials or live Spotify calls. This is mocked integration evidence, not a new PostgreSQL16 or hosted-CI execution.
+
+Browser review used the built connected UI against an ignored, memory-only invented API preview on loopback. Observed initial refresh then library load, tag save confirmation, retained tag after catalogue refresh, combined title/tag search, sign-out clearing the library and a deliberately disabled login returning a safe error without navigation. Desktop layout and 390×844 narrow viewport inspected. Found and fixed stale synthetic wording in the shared connected screen. Actual production HTML title is now changed at the HTTP boundary; preview served the demo title and is not evidence for that title change. Preview request log showed local assets/session/library/edit/refresh/signout/login paths; this was not a comprehensive browser network audit. Preview stopped and viewport override reset. No actual iPhone/standalone, 200% zoom, live OAuth or HTTPS-cookie browser test is claimed.
+
+Technical-lead self-review, including a separate pass over auth boundaries and startup cleanup, found no intended weakening of existing guards. Not an independent security audit. No lockfile, dependency, workflow, migration or deployment change. Private history/evidence preserved; no remote push, merge, rule setting or provisioning. Constitution review: bounded approved scope, invented data, honest evidence and operational gates retained.
+
+Next proposed bounded task: exercise this new composition against disposable local PostgreSQL16 and mocked Spotify end to end (including reconnect, failed initial import, cross-session edits, shutdown and recovery), under explicit approval for synthetic database/container execution. Then prepare the executable/operator bootstrap and immutable-image release package for review. Real owner bootstrap, keys, server readiness/backups, live OAuth, deployment and Mac/iPhone acceptance remain separate gates. Do not remove the production guard merely because the local UI and unit tests pass.

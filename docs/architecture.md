@@ -14,7 +14,7 @@ The PWA has a same-origin manifest, local generated icons, standalone display me
 
 - `src/domain`: pure filtering/tagging and edit-attempt rules.
 - `src/data`: invented fixtures and remote API mapping.
-- `src/features/library`: library/editor and explicitly synthetic interface.
+- `src/features/library`: library/editor and separate connected/synthetic modes.
 - `scripts/spotify`: separately gated memory-only verification helper and reusable validated mapping.
 - `server`: HTTP, store, migrations, auth preparation, encrypted lifecycle/journal and startup seams.
 - `scripts/database`: explicit disposable-resource tools and integration scenarios.
@@ -29,7 +29,7 @@ PostgreSQL stores account-scoped catalogue/organisation, sessions, receipts and 
 
 Owner login is PKCE with explicit configured binding and exactly the approved read scopes. There is no first-visitor owner creation or implicit bootstrap. Production sessions use Secure/HttpOnly/SameSite cookies; state/CSRF/origin checks and bounded transport remain mandatory. Credentials are never browser-persistent. Versioned credential, snapshot and journal keys are separate purposes; retained versions support recovery. See the [foundation](s04b-foundation-spec.md) and [lifecycle plan](s04c-operational-plan.md).
 
-`runtime-config.ts` validates explicit settings before side effects; the prepared startup seam migrates using separate pools, retires them, verifies schemas/journal/recovery/readiness, then composes an injected listener. Production entry and root deliberately remain blocked pending operational approval. No synthetic-login bypass is allowed in production.
+`runtime-config.ts` validates explicit settings before side effects; the prepared startup seam migrates using separate pools, retires them, verifies schemas/journal/recovery/readiness, then composes an injected listener. Production entry remains blocked pending operational approval. The prepared authenticated application explicitly enables the connected root; other production server construction still blocks it. `application.ts` composes validated configuration, separate keys, store/vault, journal, injected Spotify transport and startup listener; it has no default network transport or implicit owner creation. No synthetic-login bypass is allowed in production.
 
 Production application requests require canonical Host and a single forwarded HTTPS scheme. Forwarded origin/host/client-IP headers cannot determine trusted origins or rate-limit identity. Exact GET /health bypasses Host/scheme checks for container-local probes and returns bounded database readiness only. Actual proxy isolation must be verified before use; a scheme header does not authenticate its sender.
 
@@ -47,3 +47,6 @@ D048 adds a test-only cancellation probe: resource setup followed by a fixed120-
 
 
 D050 restores normal synthetic integration execution in the draft and prepares normal PR event coverage. Exact-byte workflow policy now uses normal-pr for a future activated inventory; inactive still requires no workflow files. Event tests evaluate the exact draft condition with synthetic contexts, not the actual GitHub scheduler. Required-check/settings recommendations remain separate from workflow source.
+
+
+D053 connects the shared library UI to session/login/callback/refresh routes. The server supplies the connected mode marker; the client validates the exact Spotify PKCE destination, callback and approved read scopes before navigation. Callback completion requests an initial catalogue import; failure preserves saved organisation and allows retry. Synthetic login/test controls remain excluded from production. Sign-out, conflicts and recovery reuse the established API adapter. The executable gate remains intact; operator bootstrap and actual deployment are separate work.

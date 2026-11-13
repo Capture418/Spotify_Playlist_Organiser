@@ -112,9 +112,10 @@ export async function preparedApplication(store: Store, owner: OwnerConfig, spot
   store.deletion = new DeletionCoordinator(store.pool,journal,()=>integration.cancel());
   const sweeper=await maintenance(store.pool,()=>{integration.cancel();void store.pool.query('UPDATE recovery_guard SET blocked=true').catch(()=>server.close());});
   const origin = new URL(spotify.callback).origin;
-  const server = appServer(store, { origin, production: true, auth: integration, refresh: s => integration.refresh(s), disconnected: () => integration.cancel() });
-  server.on('close', () => {sweeper.stop();integration.cancel();});
-  return { server, integration };
+  const server = appServer(store, { origin, production: true, connectedInterface: true, auth: integration, refresh: s => integration.refresh(s), disconnected: () => integration.cancel() });
+  const dispose = () => { sweeper.stop(); integration.cancel(); };
+  server.on('close', dispose);
+  return { server, integration, dispose };
 }
 
 /** Memory-only operator verification. No executable or public route invokes this preparation helper. */

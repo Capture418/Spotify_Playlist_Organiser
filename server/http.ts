@@ -9,9 +9,10 @@ import type { Session } from './store.ts';
 import { Fault,record,uuid } from './validation.ts';
 import { cookie,equal } from './security.ts';
 type Auth={begin:(browser:string)=>Promise<string>;finish:(browser:string,state:string,code:string,oldToken?:string)=>Promise<{token:string;csrf:string}>;cancelLogin:(browser:string)=>void};
-type Options={harness?:boolean;auth?:Auth;disconnected?:()=>void;origin:string;production:boolean;syntheticLogin?:()=>Promise<{token:string;csrf:string}>;refresh?:(s:Session)=>Promise<void>};
+type Options={connectedInterface?:boolean;harness?:boolean;auth?:Auth;disconnected?:()=>void;origin:string;production:boolean;syntheticLogin?:()=>Promise<{token:string;csrf:string}>;refresh?:(s:Session)=>Promise<void>};
 async function body(req:IncomingMessage){if(req.headers['content-type']!=='application/json')throw new Fault(422,'JSON required');let size=0;const chunks:Buffer[]=[];for await(const chunk of req){size+=chunk.length;if(size>10*1024*1024)throw new Fault(422,'Request too large');chunks.push(chunk);}try{return JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw new Fault(422,'Invalid JSON');}}
 export function appServer(store:Store,options:Options){
+ if(options.connectedInterface&&(!options.production||!options.auth||options.harness||options.syntheticLogin))throw Error('Connected interface requires production authentication');
  if(options.production&&options.harness)throw Error('Synthetic harness cannot be mounted in production');
  if(options.production&&options.syntheticLogin)throw Error('Synthetic auth cannot be mounted in production');
  const origin=new URL(options.origin);if(options.production&&(origin.protocol!=='https:'||origin.origin!==options.origin))throw Error('Production HTTPS origin required');if(options.auth&&!options.production)throw Error('OAuth requires production factory');if(!options.production&&(origin.hostname!=='127.0.0.1'||origin.protocol!=='http:'))throw Error('Synthetic server must be loopback');
@@ -54,16 +55,16 @@ export function appServer(store:Store,options:Options){
     const previous=cookies('__Host-organiser');
     const login=await options.auth.finish(browser,query.get('state')!,query.get('code')!,previous.length===1?previous[0]!.slice('__Host-organiser='.length):undefined);
     res.setHeader('Set-Cookie',[cookie(login.token,true),'__Host-organiser-login=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0']);
-    res.writeHead(303,{Location:'/'});res.end();return;
+    res.writeHead(303,{Location:options.connectedInterface?'/?connected=1':'/'});res.end();return;
    }
    if(!path.startsWith('/api/')){
     if(req.method!=='GET')throw new Fault(405,'Method rejected');
-    if(options.production&&path==='/')throw new Fault(503,'Production interface activation is not approved');
+    if(options.production&&!options.connectedInterface&&path==='/')throw new Fault(503,'Production interface activation is not approved');
     const publicType=pwaAssetType(path);
     if(publicType){const data=await readFile(new URL('../dist'+path,import.meta.url));res.setHeader('Content-Type',publicType);res.end(data);return;}
     const asset=/^\/assets\/[a-zA-Z0-9_-]+\.(js|css)$/.exec(path);if(path!=='/'&&!asset)throw new Fault(404,'Not found');
     const data=await readFile(new URL('../dist'+(path==='/'?'/index.html':path),import.meta.url));
-    res.setHeader('Content-Type',path==='/'?'text/html':path.endsWith('.js')?'text/javascript':'text/css');res.end(path==='/'&&!options.production?data.toString().replace('<head>',`<head><meta name="organiser-mode" content="${options.harness?'harness':'synthetic'}">`):data);return;
+    res.setHeader('Content-Type',path==='/'?'text/html':path.endsWith('.js')?'text/javascript':'text/css');res.end(path==='/'&&(!options.production||options.connectedInterface)?data.toString().replace('Music Library Organiser — demo library',options.connectedInterface?'Music Library Organiser':'Music Library Organiser — demo library').replace('<head>',`<head><meta name="organiser-mode" content="${options.connectedInterface?'connected':options.harness?'harness':'synthetic'}">`):data);return;
    }
    rateLimit('ip:'+(req.socket.remoteAddress??'unknown'),240);
    if(req.headers['sec-fetch-site']==='cross-site')throw new Fault(403,'Cross-site request rejected');
@@ -81,7 +82,7 @@ export function appServer(store:Store,options:Options){
    if(write&&!equal(String(req.headers['x-csrf-token']??''),session.csrf))throw new Fault(403,'Form verification failed');
    if(path==='/api/session'&&!write){json(res,200,{csrf:session.csrf});return;}
    if(path==='/api/library'&&!write){json(res,200,await store.library(session));return;}
-   if(path==='/api/export'&&!write){res.setHeader('Content-Disposition','attachment; filename="organiser-synthetic.json"');json(res,200,await store.export(session));return;}
+   if(path==='/api/export'&&!write){res.setHeader('Content-Disposition','attachment; filename="music-library-organisation.json"');json(res,200,await store.export(session));return;}
    if(path==='/api/snapshots'&&!write){json(res,200,await store.snapshots(session));return;}
    if(!write)throw new Fault(404,'Not found');const input=await body(req);
    if(path==='/api/test/expire'&&options.harness){record(input,[]);await store.signOut(session,true);json(res,200,{ok:true});return;}
