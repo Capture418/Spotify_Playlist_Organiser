@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D044 sanitised public snapshot preparation. The snapshot excludes private evidence/history and personal infrastructure/account details. Source publication, CI activation, credentials, installations, provisioning, spending and deployment remain separately gated. Production remains deliberately blocked.
+D046 local CI rehearsal readiness preparation, following acceptance/publication of the sanitised snapshot as PR #1 (D045). Work is on local `codex/ci-rehearsal`, descended only from the public snapshot. Private history/evidence are preserved separately. Pushes, merging, CI activation, installations, provisioning, spending and deployment remain gated. Production remains deliberately blocked.
 
 ## Existing implementation
 
@@ -24,6 +24,22 @@ The public Git candidate is based only on the README seed, without private ances
 
 13 November 2026: the exported snapshot passed `npm run check` using the existing host Node 26 runtime and installed dependencies: 157 tests passed, zero failures or skips; project/lockfile checks, lint, TypeScript, client and server builds passed. No installation was performed. A limited source privacy/secret-pattern review of all 111 allowlisted files found no recognised secrets or targeted personal details. This is a technical-lead self-review, not an independent security audit. Actual Docker/PG16, GitHub CI, production activation and device checks were not repeated in this task.
 
+## D046 scope and acceptance
+
+Replace the preparation-only workflow absence test with an exact reviewed-content policy; keep the real policy inactive. Add safe cancellation/cleanup markers and verify the receipt and job-labelled resource inventory before claiming cleanup. Exercise normal, failure and interruption paths with injected executors only. Update public approval summaries, prepare the exact later activation diff, run installed-host checks and stop for owner review.
+
+## D046 implementation and verification
+
+Completed locally. The exact-byte SHA256 policy rejects all active workflows while mode is inactive; mocked rehearsal mode accepts only the named byte-identical reviewed draft. Tests reject extra/renamed workflows, changed permissions/triggers/runners and simultaneous draft/content changes without digest review. The policy file itself is review-controlled, not a security boundary against source editors.
+
+Cleanup retains receipt/identity-based deletion, then verifies an empty receipt and exact job-labelled container/volume/network inventories. Fixed markers report the database-start checkpoint and verified cleanup. Mock scenarios cover normal cleanup, resumption after cancellation, create-before-receipt remnants, remove-before-receipt stale state, unavailable inventories and ownership changes. Unknown resources are never deleted by inference. Missing receipts cannot claim cleanup success.
+
+**Actual checks: PASS.** Full installed-host `npm run check`:161 tests, zero failures/skips; project/lockfile, lint, type checks, client/server builds. An initial documentation-fixture failure exposed the new checklist link missing from the disposable foundation fixture; added that document to the fixture and reran the full gate successfully. No package or lockfile change. Final documentation/foundation checks passed25 tests; whitespace and unapplied activation-patch applicability checks passed. Evidence stays ignored in `.work/d046-quality.log` and `.work/d046-foundation.log`.
+
+Prepared but did not apply `.work/d046-activation.patch`: change policy mode and copy the exact reviewed draft to its active path. Actual policy remains inactive and no active workflow exists. No Docker command, database, GitHub job, browser/device test, installation or advisory query was performed. GitHub cancellation timing and actual cleanup semantics remain unverified until separately approved execution. Technical-lead self-review, not independent security review. Private history/evidence and public PR #1 remain unchanged.
+
+Constitution review: bounded approved local source/mocked verification only, production/security guards retained, actual results and limitations recorded; no operational approval inferred.
+
 ## Next gate
 
-Review the sanitised content and exact candidate diff/manifest. A public branch push and PR require separate approval. CI activation additionally requires reviewed runner installations/resources, cost controls, cancellation cleanup and intended trigger scope. No dependency installation, database command or workflow activation is implied by accepting this snapshot. Deployment, real identity/credentials, backups/key custody and actual-device checks remain later gates.
+Review this local change and the [rehearsal checklist](ci/rehearsal-readiness.md). Any push/PR, temporary workflow activation, runner installation/downloads, disposable database/container creation and included-allowance execution needs explicit approval. No merge is required to conduct a separately approved rehearsal PR against main. Real credentials/data, paid spending and deployment remain excluded.

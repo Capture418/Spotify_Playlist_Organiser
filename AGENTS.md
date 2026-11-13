@@ -9,7 +9,7 @@ Before planning or editing, read:
 
 These are the source of truth for this snapshot. Surface conflicts before affected work. Work only in this project and inspect Git status before changes. Preserve user work; never initialise or alter another repository. Use one package and small reviewable changes, without a multi-agent hierarchy. Follow the canonical constitution rather than inventing competing rules.
 
-**Current boundary:** sanitised public snapshot preparation is authorised. Source publication, CI activation, credentials, installations, database/container execution, provisioning, spending and deployment need their applicable separate approval. Production entry/root remain blocked. No live Spotify access or private data in this snapshot's tests.
+**Current boundary (D046):** local CI rehearsal readiness preparation and mocked tests are approved. D045 accepted/published the sanitised snapshot as PR #1. This local follow-up is not approved for push. Pushes, merging, CI activation, credentials, installations, database/container execution, provisioning, spending and deployment remain separately gated. Production entry/root remain blocked. No live Spotify access or private data in this snapshot's tests.
 
 Use a descriptive `codex/` branch. Never push directly to main or merge without owner approval. Do not install the inactive workflow or execute the disposable CI/database launcher as part of an ordinary check. Do not weaken environment, resource-ownership, proxy or production guards to make a test pass.
 

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync, lstatSync } from 'node:fs';
+import { verifyWorkflows } from './ci/workflow-policy.mjs';
 import { plan, launcher, postgres } from './ci/launcher.mjs';
 const env = { CI: 'true', GITHUB_ACTIONS: 'true', CI_DISPOSABLE_APPROVED: 'synthetic-only', GITHUB_RUN_ID: '123', GITHUB_RUN_ATTEMPT: '1' };
 const image = 'sha256:' + 'a'.repeat(64);
@@ -14,11 +15,17 @@ function fake() {
       if (kind === 'image') return JSON.stringify([{ Id: args[2], Architecture: 'amd64', Os: 'linux', Config: { User: 'node', Cmd: ['node', 'runtime/server/production.js'] } }]);
       assert.ok(objects.has(args[2]), 'Missing mock resource'); return JSON.stringify([objects.get(args[2])]);
     }
-    if (action === 'ls' || kind === 'ps') return '';
+    if (action === 'ls' || kind === 'ps') {
+      if (!args.includes('--filter')) return '';
+      const type = kind === 'ps' ? 'container' : kind;
+      assert.equal(args[args.indexOf('--filter') + 1], `label=organiser.ci=${config().owner}`);
+      assert.equal(args.at(-1), type === 'volume' ? '{{.Name}}' : '{{.ID}}');
+      return [...objects.values()].filter(o => o.kind === type && (o.Config?.Labels ?? o.Labels)?.['organiser.ci'] === config().owner).map(o => o.Id).join('\n');
+    }
     if (action === 'create') {
       const id = kind === 'volume' ? args.at(-1) : (++next).toString(16).padStart(64, '0');
       const labels = { 'organiser.ci': config().owner };
-      objects.set(id, { Id: id, Name: id, CreatedAt: 'invented-time', Labels: labels, Config: { Labels: labels }, Image: image,
+      objects.set(id, { kind, Id: id, Name: id, CreatedAt: 'invented-time', Labels: labels, Config: { Labels: labels }, Image: image,
         HostConfig: { ReadonlyRootfs: true, Memory: 536870912, NanoCpus: 1000000000, PortBindings: {} },
         State: { ExitCode: 0 }, Mounts: [{ Destination: '/var/lib/postgresql/data', Name: config().volume }] });
       return id;
@@ -88,7 +95,14 @@ test('receipt from another job and replaced volume cannot authorise cleanup', as
 });
 test('inactive draft preserves read-only PR boundaries and immutable action/image pins', () => {
   const draft = readFileSync(new URL('../docs/ci/pr-checks.yml.example', import.meta.url), 'utf8');
-  assert.equal(existsSync(new URL('../.github/workflows/pr-checks.yml', import.meta.url)), false);
+  const directory = new URL('../.github/workflows/', import.meta.url);
+  const files = {};
+  if (existsSync(directory)) for (const name of readdirSync(directory)) {
+    const file = new URL(name, directory);
+    assert.ok(lstatSync(file).isFile() && !lstatSync(file).isSymbolicLink());
+    files[name] = readFileSync(file, 'utf8');
+  }
+  verifyWorkflows(JSON.parse(readFileSync(new URL('../docs/ci/workflow-policy.json', import.meta.url))), draft, files);
   assert.match(draft, /pull_request:\s+branches: \[main\]/); assert.match(draft, /contents: read/);
   assert.match(draft, /persist-credentials: false/); assert.match(draft, /runs-on: ubuntu-24.04/);
   assert.doesNotMatch(draft, /pull_request_target|self-hosted|secrets\.|packages: write|docker login|request-deploy|workflow_dispatch/);
@@ -126,4 +140,58 @@ test('wrong candidate architecture refuses all creation and runtime check failur
   await assert.rejects(broken.setup(), /runtime check failed/);
   assert.equal(f.calls.some(c => c.args.includes(postgres) && c.args[1] === 'create'), false);
   await broken.cleanup(); assert.equal(f.objects.size, 0);
+});
+
+test('workflow policy accepts only inactive inventory or byte-exact reviewed rehearsal', () => {
+  const draft = readFileSync(new URL('../docs/ci/pr-checks.yml.example', import.meta.url), 'utf8');
+  const policy = JSON.parse(readFileSync(new URL('../docs/ci/workflow-policy.json', import.meta.url)));
+  verifyWorkflows({ ...policy, mode: 'inactive' }, draft, {});
+  const active = { ...policy, mode: 'rehearsal' };
+  verifyWorkflows(active, draft, { 'pr-checks.yml': draft });
+  assert.throws(() => verifyWorkflows({ ...policy, mode: 'inactive' }, draft, { 'pr-checks.yml': draft }));
+  for (const files of [{}, { 'other.yml': draft }, { 'pr-checks.yml': draft, 'extra.yaml': draft }]) assert.throws(() => verifyWorkflows(active, draft, files));
+  for (const changed of [draft.replace('contents: read', 'contents: write'), draft.replace('pull_request:', 'pull_request_target:'), draft.replace('ubuntu-24.04', 'self-hosted'), draft + '\n# unexpected change\n']) {
+    assert.throws(() => verifyWorkflows(active, draft, { 'pr-checks.yml': changed }));
+    assert.throws(() => verifyWorkflows(active, changed, { 'pr-checks.yml': changed }));
+  }
+  assert.throws(() => verifyWorkflows({ ...active, mode: 'anything' }, draft, {}));
+});
+
+test('cleanup reports verified success and a safe cancellation checkpoint only after operations', async () => {
+  const f = fake(), reports = [];
+  const job = launcher(config(), f.execute, f.save, undefined, message => reports.push(message));
+  await job.setup();
+  assert.deepEqual(reports, ['PHASE synthetic database started; cancellation checkpoint']);
+  await job.cleanup(); await job.cleanup();
+  assert.equal(f.objects.size, 0);
+  assert.equal(reports.filter(x => x.startsWith('PASS cleanup:')).length, 2);
+});
+
+test('create-before-receipt interruption detects unrecorded remnants without deleting them', async () => {
+  const f = fake(), reports = [];
+  const broken = launcher(config(), async (args, input) => {
+    const output = await f.execute(args, input);
+    if (args[0] === 'volume' && args[1] === 'create') throw Error('Interrupted after create');
+    return output;
+  }, f.save);
+  await assert.rejects(broken.setup(), /Interrupted/);
+  const resumed = launcher(config(), f.execute, f.save, structuredClone(f.saved.at(-1)), m => reports.push(m));
+  await assert.rejects(resumed.cleanup(), /Unrecorded/);
+  assert.ok(f.objects.has(config().volume));
+  assert.equal(f.calls.some(c => c.args[0] === 'volume' && c.args[1] === 'rm'), false);
+  assert.deepEqual(reports, []);
+});
+
+test('remove-before-receipt interruption and inventory failures never claim cleanup success', async () => {
+  const f = fake(); const job = launcher(config(), f.execute, f.save);
+  await job.setup(); const durable = structuredClone(f.saved.at(-1));
+  const reports = [];
+  const broken = launcher(config(), f.execute, () => { throw Error('Receipt write interrupted'); }, structuredClone(durable), m => reports.push(m));
+  await assert.rejects(broken.cleanup(), /Receipt write/);
+  const resumed = launcher(config(), f.execute, f.save, durable, m => reports.push(m));
+  await assert.rejects(resumed.cleanup(), /Missing mock resource/);
+  assert.deepEqual(reports, []);
+  const empty = launcher(config(), async () => { throw Error('Inventory unavailable'); }, f.save, undefined, m => reports.push(m));
+  await assert.rejects(empty.cleanup(), /Inventory unavailable/);
+  assert.deepEqual(reports, []);
 });

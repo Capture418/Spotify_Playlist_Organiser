@@ -18,7 +18,7 @@ export function plan(env, root, image, platform = process.platform) {
 }
 
 /** Injected command executor and receipt writer make safety branches testable without Docker. */
-export function launcher(config, execute, save, state = { owner: config.owner, resources: [] }) {
+export function launcher(config, execute, save, state = { owner: config.owner, resources: [] }, report = () => {}) {
   assert.equal(state.owner, config.owner);
   let serial = state.resources.filter(r => r.kind === 'container').length;
   const run = async (args, input) => String(await execute(args, input)).trim();
@@ -48,6 +48,14 @@ export function launcher(config, execute, save, state = { owner: config.owner, r
     for (const kind of ['container', 'volume', 'network']) {
       for (const resource of [...state.resources].reverse().filter(r => r.kind === kind)) await remove(resource);
     }
+    assert.equal(state.resources.length, 0, 'Recorded resources remain');
+    // Detect create-before-receipt gaps. Inspect only; never delete unknown resources.
+    for (const kind of ['container', 'volume', 'network']) {
+      const args = kind === 'container' ? ['ps', '-a'] : [kind, 'ls'];
+      const remaining = await run([...args, '--filter', `label=${label}=${config.owner}`, '--format', kind === 'volume' ? '{{.Name}}' : '{{.ID}}']);
+      assert.equal(remaining, '', 'Unrecorded job resources remain; cleanup unverified');
+    }
+    report('PASS cleanup: receipt empty; no job-labelled containers, volumes or networks remain');
   }
   async function preflight() {
     assert.equal(state.resources.length, 0, 'Existing receipt requires reviewed cleanup');
@@ -73,6 +81,7 @@ export function launcher(config, execute, save, state = { owner: config.owner, r
       '--mount', `type=bind,src=${resolve(config.root, 'db/init/10-app-role.sql')},dst=/docker-entrypoint-initdb.d/10-app-role.sql,readonly`,
       '-e', 'POSTGRES_PASSWORD=invented-local-admin-only', '-e', 'POSTGRES_USER=postgres', '-e', 'POSTGRES_DB=postgres', postgres]);
     state.db = db.id; save(state); await run(['start', db.id]);
+    report('PHASE synthetic database started; cancellation checkpoint');
   }
   function resource(id) { const r = state.resources.find(r => r.id === id); assert.ok(r, 'Unrecorded resource'); return r; }
   async function sql(database, statement, input) {

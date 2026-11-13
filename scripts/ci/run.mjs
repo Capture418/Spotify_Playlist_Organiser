@@ -29,8 +29,8 @@ try {
     state = { owner: config.owner, resources: [] };
     writeFileSync(receipt, JSON.stringify(state), { flag: 'wx', mode: 0o600 });
   } else if (existsSync(receipt)) state = JSON.parse(readFileSync(receipt, 'utf8'));
-  else { console.log('No CI receipt; nothing to clean'); process.exit(0); }
-  const job = launcher(config, execute, save, state);
+  else { throw Error('Missing receipt; cleanup cannot be verified'); }
+  const job = launcher(config, execute, save, state, message => console.log(message));
   if (mode === 'cleanup') await job.cleanup();
   else {
     try { await job.setup(); await job.exercise(); console.log('PASS synthetic CI database/health/restore checks for ' + image); }

@@ -38,3 +38,6 @@ Production application requests require canonical Host and a single forwarded HT
 Host tests cover domain, validation, mocked HTTP/configuration/startup, security/lifecycle mechanics and CI resource plans. Actual disposable database tests are separate from the ordinary gate. The inactive CI draft targets a single same-repository rehearsal branch on GitHub-hosted Linux; no publishing/deploy job exists. Local image IDs are not registry digests or deployment approval.
 
 No personal operational history, live-data verification counts, actual endpoint or recovery-custody location is part of this public summary. Deployment requires separately approved configuration, restricted access, backups/recovery, credentials, dependency review and device checks. See [deployment preparation](home-deployment.md).
+
+
+D046 preparation adds an exact-byte workflow review policy and mocked inactive/rehearsal inventory checks. The launcher reports a safe database-start checkpoint and verifies empty receipts plus exact job-labelled resource inventories before cleanup success. Unknown resources are reported, never removed by inference. This does not activate CI or prove cancellation behaviour on GitHub.

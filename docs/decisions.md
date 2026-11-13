@@ -17,5 +17,9 @@ This is a sanitised summary of decisions supporting the current source. It delib
 | D042 | One-time README-only public bootstrap; exception completed, not standing main-push approval. |
 | D043 | Use Git and checkpoint existing approved work locally; no automatic push or server activation. |
 | D044 | Prepare this sanitised public snapshot while preserving private local history/evidence. No push, CI activation, installation, provisioning, spending or deployment. |
+| D045 | Sanitised snapshot accepted; named public branch push and PR #1 authorised and completed. No merge or CI activation. |
+| D046 | CI rehearsal readiness preparation approved: local workflow policy, safe cleanup evidence and mocked tests. Pushes, merging, activation, installations, provisioning, spending and deployment remain gated. |
+
+D046 owner approval: “I approve CI rehearsal readiness preparation. Go ahead with the local changes and mocked tests. Keep pushes, merging, CI activation, installations, provisioning, spending and deployment behind separate approval.”
 
 All implementation remains bounded by the [constitution](../.ai/constitution.md). Future approvals must state exact scope and preserve the distinction between source preparation, installation/resource use, credentials, public push, workflow activation and deployment. No approval is inferred from silence or a successful test.
