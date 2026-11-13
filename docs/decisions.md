@@ -84,3 +84,8 @@ Owner reports operator confirmation:180 seconds to become healthy, migrations in
 ## D056 — Same-image setup mode and disposable verification
 
 Owner approves setup mode using invented data/mocked Spotify and disposable local PostgreSQL. Same image/slot/callback; token POST, Secure HttpOnly SameSite session, session-bound state/PKCE, exact configured Spotify owner ID, bounded guessing, explicit confirmation and durable refusal after completion. Normal routes unavailable in setup. Real data/credentials, installations, server provisioning, merging, settings and deployment remain gated. Remove setup mode/token together when later returning to normal; failed return is urgent because rollback may restore secrets. Operator reports path-only access logs without Referer and restricted error logs; owner accepts residual callback-query exposure there. Do not claim independent server verification or that secret deletion removes rollback copies.
+
+
+## D057 — D056 acceptance and release/initialisation rehearsal preparation
+
+Owner accepts D056 and approves preparation of the release-image and operator-initialisation rehearsal. This permits local source, mocked tests and an execution approval package, not Docker builds/downloads, installations, database creation or operational execution. Real data/credentials, server provisioning, merging, settings and deployment remain gated. Production executable stays blocked; no registry publication or push implied.

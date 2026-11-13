@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D056: same-image setup mode implemented and verified with invented data/mocked Spotify and disposable PostgreSQL; awaiting owner review on `codex/setup-mode`. Production executable, real credentials/data, installations, provisioning, merging, settings and deployment remain gated.
+D057: D056 accepted. Exact-image/operator-initialisation rehearsal preparation complete locally; awaiting owner review and execution approval on `codex/release-rehearsal-preparation`. No image build/resource execution/installation or operational activation.
 
 ## Existing implementation
 
@@ -251,3 +251,23 @@ Final scoped cleanup reported an empty receipt/resources inventory; separate Doc
 Self-review covered token placement, session/CSRF binding, identity enforcement, expiry, concurrent completion checks, shutdown invalidation, persisted refusal and secret-free error handling. Not an independent security audit. No live proxy/log inspection, browser/iPhone/Secure-cookie enforcement test, actual server timeout/rollback or backup drill in this task. Owner accepts residual callback exposure in operator-restricted error logs; do not claim those logs can never contain codes.
 
 Constitution review: bounded approved implementation/resource use, existing semantics and guards retained, scope/results documented truthfully, private evidence preserved. Next: owner acceptance of D056, then bounded release-readiness preparation/rehearsal for the gated executable, exact image and operator initial journal/recovery procedure. Actual keys/token/configuration, initial storage/server actions, real OAuth/device acceptance and setup-to-normal deployments remain separate approvals. Remove setup mode and token together during that later return; failed normal deployment remains urgent.
+
+
+## D057 scope and acceptance
+
+Add an exact cached-image verification mode with no compiled-runtime bind overlay, a first-ever-empty journal initialisation primitive with explicit operator attestations and no recovery approval, and mocked safety tests. Prepare the later build/install/resource approval package and identify how the no-shell server will run privileged initialisation. Expected files: guarded runner/plan tests, operator primitive/tests, rehearsal fixture and docs. Full installed-host gate; no Docker/DB/build/publish execution.
+
+
+## D057 actual results — 13 November 2026
+
+Prepared `release <sha256:image-id>` mode in the existing local runner with a pure validated argument/mount plan. It rejects tags/unknown arguments, inspects exact image identity and omits the host compiled-runtime overlay for both runtime inspection and connected scenarios. Uses separate D057 resource names/receipt; existing internal network, role fixtures, restrictions and scoped cleanup remain. No release mode was executed. Added planned explicit journal-initialisation assertions to the existing invented setup-to-normal scenario; those assertions are not claimed as database-tested yet.
+
+Added `initialiseEmptyJournal`, an operator-only injected-pool primitive with no executable/HTTP caller or default connections. Requires first-ever/app-stopped/independent-inventory attestations, distinct pools, journal-purpose cipher, verified schemas, blocked recovery guard and empty application/journal storage. Locks bootstrap/guard and journal table; inserts encrypted empty journal only, never resets data or clears the guard. Cross-database partial commit is explicitly surfaced and requires operator inspection; retries never overwrite an existing journal. No migration/schema/role change. External first-use evidence remains necessary because empty SQL tables cannot prove absence of lost history.
+
+Prepared `docs/release-rehearsal.md` with exact artifact evidence, proposed Linux-amd64 Docker build and its explicit in-container npm installation/download approval requirement, immutable-ID execution, scoped cleanup, failure boundaries and remaining release gates. No image built/pulled/published, no Docker/database command run, no dependency installation, real credentials/data, server provisioning, settings change, push, merge or deployment. Production executable and workflow unchanged.
+
+Validation PASS: full installed-host gate191 tests, zero failures/skips, project/lockfile checks, lint, TypeScript and frontend/server builds. Seven new mocked tests cover exact-image/no-overlay plan and rejected arguments, initialisation confirmation/purpose/empty-state checks, encrypted payload/blocked guard, insert rollback and cross-database partial commit. Evidence `.work/d057-quality-final.log`; final documentation/foundation `.work/d057-foundation.log`; diff whitespace passed. Technical-lead separate self-review of role boundary, partial failure, no implicit recovery and image identity; not independent security audit or actual image/database rehearsal.
+
+Operator checkpoint: no user shell and one app slot mean a supported operator-run one-time maintenance job must be agreed before real initialisation. No public initialisation endpoint or automatic startup bypass added. Ask the operator whether a reviewed-image maintenance job can run with app stopped, injected secret-safe configuration and all required roles; ask for the supported invocation and first-use/inventory/backup evidence, not secret values or immediate changes.
+
+Next approval proposal: accept D057 and separately approve one bounded local candidate Docker build (including its locked in-container dependency installations and any explicitly permitted downloads), exact-image runtime/initialisation/setup-to-normal verification and disposable local resources with cleanup. No automatic retry on failed execution; retain evidence and report. Real operator invocation, credentials, registry publication, executable activation, server provisioning, deployment and device acceptance remain gated. Constitution check confirms bounded preparation, truthful evidence, preserved private history and approval gates.

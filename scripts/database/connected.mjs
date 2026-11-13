@@ -72,7 +72,15 @@ async function start(){const before=pools.length;const result=await startIntegra
 try{
  for(const p of [admin,jadmin,runtime,jp]){const row=(await p.query("SELECT current_setting('server_version_num') AS v,(SELECT rolsuper FROM pg_roles WHERE rolname=current_user) AS super")).rows[0];assert.match(row.v,/^16\d{4}$/);assert.equal(row.super,false);}
  await migrate(admin,3,snapshots);await migrateJournal(jadmin);
- await jadmin.query('INSERT INTO deletion_journal(singleton,payload) VALUES(true,$1)',[cipher.encrypt([],'deletions')]);
+ if(process.env.INITIALISATION_DISPOSABLE==='synthetic-only'){
+  const {initialiseEmptyJournal}=await import('../runtime/server/operator-initialisation.js');
+  const approval={firstEver:true,appStopped:true,inventoryVerified:true};
+  await assert.rejects(initialiseEmptyJournal(admin,jadmin,cipher,{...approval,firstEver:false}));
+  await initialiseEmptyJournal(admin,jadmin,cipher,approval);
+  await assert.rejects(initialiseEmptyJournal(admin,jadmin,cipher,approval));
+  assert.equal((await runtime.query('SELECT blocked FROM recovery_guard')).rows[0].blocked,true);
+  console.log('PASS explicit first-use journal initialisation, repeat refusal and recovery remains blocked');
+ }else await jadmin.query('INSERT INTO deletion_journal(singleton,payload) VALUES(true,$1)',[cipher.encrypt([],'deletions')]);
  const recovery=await reconcileRecovery(runtime,journal,digest(await journal.read()),true);await approveRecovery(runtime,journal,recovery.receipt,true);
  if(process.env.SETUP_DISPOSABLE==='synthetic-only')await setupVerification();
  else await bootstrapOwner(admin,config.owner,config.owner.binding,true); // Explicit invented operator fixture.

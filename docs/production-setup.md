@@ -63,3 +63,6 @@ For database restore/server loss: keep access offline; preserve current independ
 - Separately approve real settings/owner verification, publication, provisioning/settings and deployment. PR merges/required checks remain their own gates; no automatic main-push deployment inferred.
 
 This is technical-lead preparation/self-review, not an independent security audit or live-system acceptance.
+
+
+D057 follow-up: `docs/release-rehearsal.md` provides the exact-image rehearsal approval package and operator first-use initialisation design. `initialiseEmptyJournal` is an unactivated operator primitive; its actual one-time invocation on the no-shell server remains to be agreed. No production startup fallback or public initialisation route is introduced.

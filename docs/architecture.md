@@ -56,3 +56,6 @@ D055 adds `process-preparation.ts`, an injected process lifecycle with fixed sta
 
 
 D056 adds the prepared same-image setup branch to application composition. `setup.ts` provides token/session-bound PKCE and exact-owner confirmation; `setup-http.ts` serves isolated forms, strict proxy/origin checks and minimal database health, with no application logging. Existing account/deletion records and the independent journal form the durable one-time latch without a migration. Normal executable activation remains blocked; setup requires previously prepared journal/recovery state. See `docs/production-setup.md` for operational limits and accepted restricted error-log risk.
+
+
+D057 prepares exact-image verification without the host runtime overlay and an operator-only empty-journal initialisation primitive. The primitive requires explicit external first-use evidence, empty storage and a blocked recovery guard; it never resets existing journal data or approves recovery. No executable/HTTP initialisation entry is activated. `docs/release-rehearsal.md` defines the later execution package and no-shell operator checkpoint.
