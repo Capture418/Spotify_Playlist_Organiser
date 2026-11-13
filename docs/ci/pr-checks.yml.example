@@ -20,6 +20,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1; public metadata reviewed D041
         with:
           persist-credentials: false
+          fetch-depth: 2
           allow-unsafe-pr-checkout: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0; public metadata reviewed D041
         with:
@@ -29,12 +30,17 @@ jobs:
         run: npm ci --ignore-scripts
       - name: Quality gate
         run: npm run check
+      - name: Determine runtime verification requirement
+        id: runtime
+        run: node scripts/ci/image-required.mjs
       - name: Build candidate once and prepare PostgreSQL image
+        if: steps.runtime.outputs.required == 'true'
         run: |
           mkdir -p .work/ci/docker-config
           docker --config .work/ci/docker-config --host unix:///var/run/docker.sock build --platform linux/amd64 --iidfile .work/ci/candidate.id .
           docker --config .work/ci/docker-config --host unix:///var/run/docker.sock pull --platform linux/amd64 postgres:16.16-alpine3.24@sha256:a2f7e20374cd8fd8ed4a588b79549e10589bea7b1686e77922f5ac741b80b8a1
       - name: Disposable integration and runtime checks
+        if: steps.runtime.outputs.required == 'true'
         run: node scripts/ci/run.mjs run
       - name: Scoped cleanup
         if: ${{ always() }}
