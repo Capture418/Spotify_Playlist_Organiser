@@ -1,0 +1,245 @@
+{
+  "schemaVersion": 1,
+  "mode": "demo",
+  "notice": "Invented test data only. Not a Spotify export, API response or approved production schema. No playlist can be launched.",
+  "tags": [
+    {
+      "id": "tag-evening",
+      "name": "Evening"
+    },
+    {
+      "id": "tag-slow",
+      "name": "Slow"
+    },
+    {
+      "id": "tag-soul",
+      "name": "Soul"
+    },
+    {
+      "id": "tag-dance",
+      "name": "Dance"
+    },
+    {
+      "id": "tag-upbeat",
+      "name": "Upbeat"
+    },
+    {
+      "id": "tag-focus",
+      "name": "Focus"
+    },
+    {
+      "id": "tag-ambient",
+      "name": "Ambient"
+    },
+    {
+      "id": "tag-dinner",
+      "name": "Dinner"
+    },
+    {
+      "id": "tag-jazz",
+      "name": "Jazz"
+    }
+  ],
+  "playlists": [
+    {
+      "id": "demo-001",
+      "title": "Quiet Corners",
+      "source": "demo",
+      "ownerLabel": "Demo collection",
+      "spotifyPlaylistId": null,
+      "spotifyUrl": null,
+      "artworkUrl": null
+    },
+    {
+      "id": "demo-002",
+      "title": "Late-Night Soul",
+      "source": "demo",
+      "ownerLabel": "Demo collection",
+      "spotifyPlaylistId": null,
+      "spotifyUrl": null,
+      "artworkUrl": null
+    },
+    {
+      "id": "demo-003",
+      "title": "Kitchen Disco",
+      "source": "demo",
+      "ownerLabel": "Demo collection",
+      "spotifyPlaylistId": null,
+      "spotifyUrl": null,
+      "artworkUrl": null
+    },
+    {
+      "id": "demo-004",
+      "title": "After Hours",
+      "source": "demo",
+      "ownerLabel": "Demo collection",
+      "spotifyPlaylistId": null,
+      "spotifyUrl": null,
+      "artworkUrl": null
+    },
+    {
+      "id": "demo-005",
+      "title": "Weekend Warm-Up",
+      "source": "demo",
+      "ownerLabel": "Demo collection",
+      "spotifyPlaylistId": null,
+      "spotifyUrl": null,
+      "artworkUrl": null
+    },
+    {
+      "id": "demo-006",
+      "title": "Deep Focus",
+      "source": "demo",
+      "ownerLabel": "Demo collection",
+      "spotifyPlaylistId": null,
+      "spotifyUrl": null,
+      "artworkUrl": null
+    },
+    {
+      "id": "demo-007",
+      "title": "Dinner at Home",
+      "source": "demo",
+      "ownerLabel": "Demo collection",
+      "spotifyPlaylistId": null,
+      "spotifyUrl": null,
+      "artworkUrl": null
+    },
+    {
+      "id": "demo-008",
+      "title": "New Finds",
+      "source": "demo",
+      "ownerLabel": "Demo collection",
+      "spotifyPlaylistId": null,
+      "spotifyUrl": null,
+      "artworkUrl": null
+    }
+  ],
+  "annotations": [
+    {
+      "playlistId": "demo-001",
+      "tagIds": [
+        "tag-evening",
+        "tag-slow",
+        "tag-ambient"
+      ]
+    },
+    {
+      "playlistId": "demo-002",
+      "tagIds": [
+        "tag-evening",
+        "tag-slow",
+        "tag-soul"
+      ]
+    },
+    {
+      "playlistId": "demo-003",
+      "tagIds": [
+        "tag-dance",
+        "tag-upbeat"
+      ]
+    },
+    {
+      "playlistId": "demo-004",
+      "tagIds": [
+        "tag-evening",
+        "tag-slow",
+        "tag-jazz"
+      ]
+    },
+    {
+      "playlistId": "demo-005",
+      "tagIds": [
+        "tag-dance",
+        "tag-upbeat"
+      ]
+    },
+    {
+      "playlistId": "demo-006",
+      "tagIds": [
+        "tag-focus",
+        "tag-ambient",
+        "tag-slow"
+      ]
+    },
+    {
+      "playlistId": "demo-007",
+      "tagIds": [
+        "tag-evening",
+        "tag-dinner",
+        "tag-jazz"
+      ]
+    },
+    {
+      "playlistId": "demo-008",
+      "tagIds": []
+    }
+  ],
+  "proposedSearchExamples": [
+    {
+      "name": "Evening and slow chips",
+      "selectedTagIds": [
+        "tag-evening",
+        "tag-slow"
+      ],
+      "query": "",
+      "expectedPlaylistIds": [
+        "demo-001",
+        "demo-002",
+        "demo-004"
+      ]
+    },
+    {
+      "name": "Dance chip",
+      "selectedTagIds": [
+        "tag-dance"
+      ],
+      "query": "",
+      "expectedPlaylistIds": [
+        "demo-003",
+        "demo-005"
+      ]
+    },
+    {
+      "name": "No matching tag combination",
+      "selectedTagIds": [
+        "tag-dance",
+        "tag-slow"
+      ],
+      "query": "",
+      "expectedPlaylistIds": []
+    },
+    {
+      "name": "Case-insensitive words across tag names",
+      "selectedTagIds": [],
+      "query": "EVENING slow",
+      "expectedPlaylistIds": [
+        "demo-001",
+        "demo-002",
+        "demo-004"
+      ]
+    },
+    {
+      "name": "Title search",
+      "selectedTagIds": [],
+      "query": "kitchen",
+      "expectedPlaylistIds": [
+        "demo-003"
+      ]
+    },
+    {
+      "name": "Clear filters includes untagged records",
+      "selectedTagIds": [],
+      "query": "",
+      "expectedPlaylistIds": [
+        "demo-001",
+        "demo-002",
+        "demo-003",
+        "demo-004",
+        "demo-005",
+        "demo-006",
+        "demo-007",
+        "demo-008"
+      ]
+    }
+  ]
+}

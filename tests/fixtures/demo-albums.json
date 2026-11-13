@@ -1,0 +1,8 @@
+[
+  { "id": "demo-001", "title": "Amber Windows", "artists": ["Mira Vale"], "available": true, "tagIds": ["tag-evening", "tag-slow"] },
+  { "id": "demo-002", "title": "Amber Windows (Expanded Edition)", "artists": ["Mira Vale"], "available": true, "tagIds": ["tag-evening"] },
+  { "id": "demo-003", "title": "Paper Satellites", "artists": ["North Arcade", "Lena Field"], "available": true, "tagIds": ["tag-dance", "tag-upbeat"] },
+  { "id": "demo-004", "title": "Tidal Rooms", "artists": ["The Still Hours"], "available": true, "tagIds": ["tag-focus", "tag-ambient", "tag-slow"] },
+  { "id": "demo-005", "title": "Sunday Sketches", "artists": ["Ellis Harbour"], "available": true, "tagIds": [] },
+  { "id": "demo-006", "title": "Faded Maps", "artists": ["Mira Vale"], "available": false, "tagIds": ["tag-evening", "tag-soul"] }
+]

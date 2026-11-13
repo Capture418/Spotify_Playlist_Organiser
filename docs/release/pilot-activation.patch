@@ -1,0 +1,18 @@
+--- a/server/production.ts
++++ b/server/production.ts
+@@ -1,3 +1,12 @@
+-import { executable } from './executable.ts';
+-// No live dependencies are supplied until separate execution/credential approval.
+-executable(process.env);
++import { executable, processHost } from './executable.ts';
++import { releaseDependencies } from './release-dependencies.ts';
++// Apply only under the consolidated pilot execution approval.
++try {
++  executable(process.env, {
++    dependencies: releaseDependencies((url, init) => fetch(url, init)),
++    host: processHost(process),
++  });
++} catch {
++  process.stderr.write('Application configuration-failed\n');
++  process.exitCode = 1;
++}

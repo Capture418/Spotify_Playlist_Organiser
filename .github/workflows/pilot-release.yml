@@ -1,0 +1,60 @@
+name: Pilot image release
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pilot-image-release
+  cancel-in-progress: false
+jobs:
+  release:
+    if: ${{ github.repository == 'Capture418/Spotify_Playlist_Organiser' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    env:
+      CI_DISPOSABLE_APPROVED: synthetic-only
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1; public metadata reviewed D041
+        with:
+          persist-credentials: false
+          allow-unsafe-pr-checkout: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0; public metadata reviewed D041
+        with:
+          node-version: 22.23.5
+          package-manager-cache: false
+      - name: Locked dependency install
+        run: npm ci --ignore-scripts
+      - name: Quality gate
+        run: npm run check
+      - name: Build candidate once and prepare PostgreSQL image
+        run: |
+          mkdir -p .work/ci/docker-config
+          docker --config .work/ci/docker-config --host unix:///var/run/docker.sock build --platform linux/amd64 --iidfile .work/ci/candidate.id .
+          docker --config .work/ci/docker-config --host unix:///var/run/docker.sock pull --platform linux/amd64 postgres:16.16-alpine3.24@sha256:a2f7e20374cd8fd8ed4a588b79549e10589bea7b1686e77922f5ac741b80b8a1
+      - name: Disposable integration and runtime checks
+        run: node scripts/ci/run.mjs run
+      - name: Scoped cleanup
+        if: ${{ always() }}
+        run: |
+          if test -f .work/ci/receipt.json; then
+            node scripts/ci/run.mjs cleanup
+          fi
+      - name: Publish the verified image without rebuilding
+        env:
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+          image="$(cat .work/ci/candidate.id)"
+          target="ghcr.io/capture418/spotify-playlist-organiser:$GITHUB_SHA"
+          printf '%s' "$REGISTRY_TOKEN" | docker --config .work/ci/docker-config --host unix:///var/run/docker.sock login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker --config .work/ci/docker-config --host unix:///var/run/docker.sock tag "$image" "$target"
+          docker --config .work/ci/docker-config --host unix:///var/run/docker.sock push "$target"
+          digest="$(docker --config .work/ci/docker-config --host unix:///var/run/docker.sock image inspect "$target" --format '{{index .RepoDigests 0}}')"
+          docker --config .work/ci/docker-config --host unix:///var/run/docker.sock pull "$digest"
+          actual="$(docker --config .work/ci/docker-config --host unix:///var/run/docker.sock image inspect "$digest" --format '{{.Id}}')"
+          test "$actual" = "$image"
+          printf 'Verified image: `%s`\nSource: `%s`\n' "$digest" "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          docker --config .work/ci/docker-config --host unix:///var/run/docker.sock logout ghcr.io
