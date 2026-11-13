@@ -50,3 +50,6 @@ D050 restores normal synthetic integration execution in the draft and prepares n
 
 
 D053 connects the shared library UI to session/login/callback/refresh routes. The server supplies the connected mode marker; the client validates the exact Spotify PKCE destination, callback and approved read scopes before navigation. Callback completion requests an initial catalogue import; failure preserves saved organisation and allows retry. Synthetic login/test controls remain excluded from production. Sign-out, conflicts and recovery reuse the established API adapter. The executable gate remains intact; operator bootstrap and actual deployment are separate work.
+
+
+D055 adds `process-preparation.ts`, an injected process lifecycle with fixed status categories, idempotent signal handling and a bounded shutdown deadline. It has no operational defaults or executable caller. `docs/production-setup.md` specifies the operator sequence and separate callback/setup design checkpoint; normal startup cannot initialise a missing journal, create an owner or approve recovery.

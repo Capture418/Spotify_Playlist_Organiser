@@ -69,3 +69,8 @@ Owner authorises production integration using invented data first. Real data, cr
 ## D054 — D053 acceptance and disposable end-to-end verification
 
 Owner accepts D053 and approves end-to-end verification with disposable local PostgreSQL databases and mocked Spotify responses. Only invented fixture identities, encryption material and database passwords are used. Real data/credentials, installations, server provisioning, merging, settings and deployment remain separately gated. No push or hosted run is needed.
+
+
+## D055 — D054 acceptance and startup/operator preparation
+
+Owner accepts D054 and authorises production startup and operator setup preparation. Implement/test preparation with injected dependencies and invented inputs; prepare the operator runbook and activation review. Real data, credentials, installations, provisioning, merging, settings and deployment remain separately gated. No production executable activation, live transport, public operator route or resource creation is inferred.

@@ -4,7 +4,7 @@ This public document intentionally omits actual infrastructure identifiers, oper
 
 ## Runtime target
 
-One Node application and PostgreSQL16, Linux amd64. Explicit canonical HTTPS origin/callback, owner binding and configuration; no inferred first-use bootstrap. Existing production entry/root stay blocked. The Docker image declares uid1000, compiled runtime assets and a Node health probe; synthetic runtime verification checks read-only root, bounded tmpfs/resources and absence of dev/source material.
+One Node application and PostgreSQL16, Linux amd64. Explicit canonical HTTPS origin/callback, owner binding and configuration; no inferred first-use bootstrap. Production entry stays blocked; the prepared authenticated factory can serve the connected root. The Docker image declares uid1000, compiled runtime assets and a Node health probe; synthetic runtime verification checks read-only root, bounded tmpfs/resources and absence of dev/source material.
 
 Database URLs are runtime-only settings. The application and independent deletion journal have separate databases and distinct runtime/migration roles. Migrations finish before listening, never run under runtime ownership, and preserve previous-version compatibility. Runtime filesystem is not durable custody. Existing PostgreSQL fixtures use invented values and must never be applied to operational databases.
 
@@ -34,3 +34,6 @@ Receipts record job ownership and resource identities. Cleanup verifies those be
 4. Review results before permanent CI activation, merge, publishing or deployment. No active workflow or deployment automation is supplied by this snapshot.
 
 No actual endpoint, token, backup location, remote runner path or operator account should be added to this public document. Keep private operational evidence in separately controlled local records. See [lifecycle requirements](s04c-operational-plan.md) and [work plan](work-plan.md).
+
+
+D055 startup/operator preparation is in `docs/production-setup.md`. It defines the proposed activation wiring, first-time setup versus recovery and the unresolved operator callback delivery checkpoint. No deployment or public setup route is activated.

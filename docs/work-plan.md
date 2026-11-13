@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D054: D053 accepted. Connected composition end-to-end verification passed with disposable local PostgreSQL16 and mocked Spotify; awaiting owner acceptance. Work on `codex/connected-e2e`. Real data/credentials, installations, provisioning, merging, settings and deployment remain gated.
+D055: D054 accepted. Production process lifecycle and operator setup preparation complete locally, awaiting owner review; mocked tests passed on `codex/startup-operator-preparation`. No activation or operational execution. Real data/credentials, installations, provisioning, merging, settings and deployment remain gated.
 
 ## Existing implementation
 
@@ -206,3 +206,21 @@ Final run evidence: `.work/d054-e2e.log`, `.work/connected-e2e/scenarios.log`, `
 Limits: HTTP client supplied the trusted proxy headers inside the isolated container; no real HTTPS proxy, browser cookie enforcement, live Spotify or iPhone test. The independent journal and snapshot recovery paths were exercised, but this task did not repeat the older pg_dump/server-loss backup restoration suite. No claim that server backups/roles/keys exist. No real data/credentials, operational provisioning, installation, spending, push, merge, settings change or deployment. Production executable refusal still verified by runtime check.
 
 Technical-lead self-review of test resource boundaries, assertions and cleanup; not an independent security audit. Constitution review confirms approved synthetic-only execution, truthful limits and preserved approval gates. **Next proposal:** bounded release preparation for the executable/operator bootstrap and deployment contract, with mocked tests and a reviewable configuration/rollback checklist. Actual credentials, image publication, server provisioning, installation, deployment and live/device acceptance require separate approvals.
+
+
+## D055 scope and acceptance
+
+Prepare a dependency-injected process lifecycle around the accepted startup composition, including safe status reporting, repeated signals, startup failure and bounded shutdown. Keep production.ts blocked and default real transports unavailable. Document exact initial setup versus recovery order, owner verification/confirmation, configuration custody, release artifact/rollback evidence and separate activation approvals. Expected files: server process preparation/tests and canonical/operator docs. Use host mocked tests and full quality gate only; no database/container operation or browser/live OAuth.
+
+
+## D055 actual results — 13 November 2026
+
+Added the dependency-injected `prepareProcess` lifecycle: readiness only after startup, SIGINT/SIGTERM handling, one close on repeated signals, sanitised fixed failure categories,10-second stop deadline and late-start disposal. There is no import-time process/network/database activity, no default pool/transport and no executable caller. `production.ts`, image command, workflow, schema, dependencies and lockfile remain unchanged.
+
+Prepared `docs/production-setup.md`: executable wiring proposal; setting names/custody; ordered first-time migration/journal/recovery/verified-owner setup; ordinary restart versus restore; immutable-image/previous-release compatibility evidence and separate approval gates. No runnable real setup command or public setup endpoint was introduced. The owner-bootstrap primitive exists, but its operator callback/UI delivery still requires an approved design and operator access contract; this is stated explicitly, not marked operationally complete. Proposed10-second app shutdown deadline requires an operator stop grace greater than10 seconds (recommend15), still to confirm.
+
+Actual checks: `npm run check` PASS178 tests, zero failures/skips, project/lockfile checks, lint, TypeScript and client/server builds. Five new mocked tests cover readiness/repeated signals, sanitised startup failure, stop during startup, deadline with late result and failed/hung close. No real signals, process exits, delays, listeners, database/container execution or live transport used by those tests. Evidence `.work/d055-quality.log`; final documentation checks `.work/d055-foundation.log`. Diff whitespace and a separate technical-lead self-review of process cleanup/status and operational boundaries passed. Not independent security review or executable/container acceptance.
+
+Constitution check: D054 acceptance recorded; one bounded preparation task; no installation, real data/credentials, provisioning, spending, push, merge, settings or deployment. Private evidence/history retained. Production activation still refuses; the initialisation/recovery design remains operator-confirmed and cannot silently recreate a missing journal or deleted owner.
+
+Next: owner review/accept D055 and obtain operator answers before implementing the temporary setup delivery. Exact questions: Can a short-lived setup process use the existing canonical HTTPS callback/proxy while ordinary app traffic is stopped? Can access during that window be restricted to the owner/operator beyond merely knowing the URL? Can container stop grace be at least15 seconds? Confirm the180-second healthy-start budget. Request answers only, no provisioning or settings change. Then propose a bounded synthetic implementation/rehearsal of that approved operator mode and executable wiring; real activation, credentials, immutable-image publication and deployment stay separate.
