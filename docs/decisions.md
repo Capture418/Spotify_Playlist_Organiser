@@ -124,3 +124,8 @@ Owner accepts D062 and approves preparing the real Spotify/server pilot as one a
 ## D064 — Consolidated pilot execution approved
 
 Owner approves the complete execution scope in docs/pilot-approval.md using included allowance only, with secure credential and Spotify consent guidance. Limits: three candidate builds, six synthetic verification attempts, setup and normal deployment plus one corrective normal deployment. Covers the reviewed release PR/merge, public tested-image publication and listed credential/real-data handoffs. No new infrastructure/scopes, destructive real-data operation or unrelated settings change.
+
+
+## D065 — Tested image registry alias and one setup retry
+
+Owner approves publishing the same tested image under spotify_playlist_organiser, verifying its digest and retrying setup once. No rebuild or new credentials. The existing short-lived release-job token is used; no server allowlist change. Workflow-only quality checks and reviewed PR/merge support this correction; no runtime/source-image change.

@@ -5,6 +5,7 @@ import { EventEmitter } from 'node:events';
 import { cancellationProbe, withCancellationSignals, holdMilliseconds } from './ci/cancellation.mjs';
 import { readFileSync, existsSync, readdirSync, lstatSync } from 'node:fs';
 import { verifyWorkflows } from './ci/workflow-policy.mjs';
+import { imageRequired } from './ci/image-required.mjs';
 import { plan, launcher, postgres } from './ci/launcher.mjs';
 const env = { CI: 'true', GITHUB_ACTIONS: 'true', CI_DISPOSABLE_APPROVED: 'synthetic-only', GITHUB_RUN_ID: '123', GITHUB_RUN_ATTEMPT: '1' };
 const image = 'sha256:' + 'a'.repeat(64);
@@ -321,4 +322,16 @@ test('pilot workflows are manual main-only; release has no app secrets; deployme
   const draft=readFileSync(new URL('../docs/ci/pr-checks.yml.example',import.meta.url),'utf8');
   const hashes=JSON.parse(readFileSync(new URL('../docs/ci/pilot-workflow-policy.json',import.meta.url),'utf8'));
   for(const name of Object.keys(files)) assert.throws(()=>verifyWorkflows(policy,draft,{'pr-checks.yml':draft,...files,[name]:files[name]+'\n'},hashes));
+});
+
+test('release-only changes avoid rebuilding; runtime, tests and unknown paths still require image verification', () => {
+ assert.equal(imageRequired(['docs/work-plan.md','.github/workflows/pilot-release.yml','scripts/ci/image-required.mjs']),false);
+ for(const path of ['server/production.ts','Dockerfile','package-lock.json','src/app/main.tsx','scripts/ci/launcher.mjs','scripts/database/connected.mjs','server/setup.test.ts','unknown']) assert.equal(imageRequired(['docs/work-plan.md',path]),true);
+ assert.equal(imageRequired([]),true);
+ const workflow=readFileSync(new URL('../.github/workflows/pilot-release.yml',import.meta.url),'utf8');
+ const copy=workflow.split('  republish:')[1];
+ assert.doesNotMatch(copy,/build|checkout|npm|APP_|toJSON/);
+ assert.match(copy,/destination=ghcr.io\/capture418\/spotify_playlist_organiser/);
+ assert.match(copy,/docker pull --platform linux\/amd64 "\$destination@\$digest"/);
+ assert.equal((copy.match(/--format '\{\{.Id\}\}'/g)??[]).length,2);
 });

@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       image:
-        description: Verified ghcr.io/capture418/spotify-playlist-organiser@sha256 digest
+        description: Verified ghcr.io/capture418/spotify_playlist_organiser@sha256 digest
         required: true
         type: string
 permissions:
