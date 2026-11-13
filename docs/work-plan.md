@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D049 completed: one cancellation-only attempt interrupted the bounded hold and independent cleanup verified no remaining job-labelled resources. PR #3 closed without merge. Temporary workflow is removed locally and policy inactive; publish retirement only after closure. No retries, merge or deployment.
+D049 completed: one cancellation-only attempt interrupted the bounded hold and independent cleanup verified no remaining job-labelled resources. PR #3 closed without merge. Temporary workflow retirement7ce338d is verified on the remote branch; policy inactive. No retries, merge or deployment.
 
 ## Existing implementation
 
@@ -91,6 +91,6 @@ No `CANCELLED hold` signal-handler marker or in-process cleanup marker appears. 
 
 Included-allowance standard GitHub runner used under the owner's confirmed paid-usage block; no billing change or paid service, though invoice-level costs were not independently audited. No app credentials, live data, local/server installations, operational provisioning, merge or deployment. Main and PR #1 remain untouched. Retain `.work/d049-local-check.log`, `d049-cancellation.log`, `d049-cancel-observation.json` and run-id evidence privately; no database dump/artifact upload. D047 baseline evidence remains separate and is not re-claimed as part of this cancellation-only mode.
 
-Closed PR #3 before publishing workflow retirement. Restore inactive policy and remove active file on the closed branch, then verify remote retirement and that this run has only attempt1. Preserve draft, history and evidence. Final local inactive gate and remote checks recorded after completion.
+Closed PR #3 before publishing workflow retirement. Restore inactive policy and remove active file on the closed branch, then verify remote retirement and that this run has only attempt1. Preserve draft, history and evidence. Final local inactive gate passed165 tests, zero failures/skips, lint/types/build and whitespace checks. Remote API confirms branch7ce338d has no workflow files; PR #3 CLOSED/unmerged; PR #1 OPEN at0bfeb55; main unchanged at3f54e32. New run43502865462 completed at attempt1; historical D047 run remains at attempt2, with no extra run.
 
 **Next:** owner review/accept D049 evidence, then propose a bounded normal PR-CI preparation task (restore baseline scenario command and define intended permanent trigger scope/required checks) without automatically activating or merging it. No further rehearsal or deployment is inferred. Constitution review: exact single-attempt authorisation honoured, truthful limits, scoped cleanup observed and temporary activation retired.
