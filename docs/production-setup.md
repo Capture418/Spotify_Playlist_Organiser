@@ -1,5 +1,8 @@
 # Production startup and operator setup preparation
 
+**D059 supersession:** `docs/platform-contract.md` is the current hosting target. Separate journal databases/roles and external operator jobs described below are historical implementation/preparation, not available infrastructure or launch requirements. No D058 rerun is planned. The single-database startup adaptation is not yet complete.
+
+
 D055/D056 preparation and synthetic implementation only. This is a review package, not permission or a runnable deployment guide. No real setting values belong here. D054 verified the connected composition with invented data; it did not provision the server or verify backups. `npm start` and the image command still refuse activation.
 
 ## Proposed executable wiring

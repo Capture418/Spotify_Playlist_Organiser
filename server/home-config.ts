@@ -33,3 +33,11 @@ export function homeDatabaseConfig(env: NodeJS.ProcessEnv) {
   if (users.size !== 4) throw new Error('Database runtime and migration roles must be distinct');
   return { runtime, migration, journal, journalMigration };
 }
+
+
+/** Fixed platform contract: one existing application database, no role/database provisioning.
+ * Separate from the historical four-pool rehearsal until startup adaptation is complete. */
+export function platformDatabaseConfig(env: NodeJS.ProcessEnv): PoolConfig {
+  for (const name of names.slice(1)) if (env[name] !== undefined) throw Error(`Unsupported platform setting: ${name}`);
+  return connection(env, 'DATABASE_URL', 'music');
+}

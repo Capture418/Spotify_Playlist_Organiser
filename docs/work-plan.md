@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D058: D057 accepted. Candidate image build passed; single exact-image rehearsal stopped at the required recovery fence. Cleanup verified. Fixture correction prepared locally; another execution awaits approval. Operational gates unchanged.
+D059: fixed platform contract received; previous separate-journal/external-job rehearsal direction superseded. Record contract and begin single-connection configuration. Continue backend adaptation within the existing platform; no outstanding platform question. Production remains blocked.
 
 ## Existing implementation
 
@@ -291,3 +291,14 @@ Prepared the missing explicit `UPDATE recovery_guard SET blocked=true` in the di
 Documentation/foundation gate32 tests passed for initial approval docs. Full installed-host gate after the fixture correction PASS191 tests, zero failures/skips, lint/types and both builds, recorded in `.work/d058-quality.log`; no additional database execution. Technical-lead self-review confirmed the fence is before privileged journal creation and remains blocked until separate reconciliation/approval. Constitution check: exact bounded execution, observed failure/cleanup, no hidden retries and no real data/credentials, server provisioning, push, merge, settings change or deployment.
 
 Next decision: approve one rerun using this same exact image and the corrected external harness, with disposable local resources and cleanup. No image rebuild or fresh installation is needed. The operator maintenance-job invocation question and production executable activation remain separate outstanding work.
+
+
+## D059 contract reconciliation — 13 November 2026
+
+Recorded authoritative fixed platform facts in `docs/platform-contract.md`, including no shell/one-off runner/extra container, app-owned startup, available single database, accepted4-hour backup loss and log risks. Earlier no-shell questions and proposed D058 rerun are no longer active. No request for provisioning of the planned journal database.
+
+Added pure `platformDatabaseConfig` and tests: only existing DATABASE_URL accepted; no TLS/options or unprovisioned role/journal overrides; errors identify names only. Historical four-pool implementation/tests retained as evidence, not selected as the fixed-platform target. This is the first configuration slice, not completed startup/deletion/migration adaptation or a deployable build.
+
+Next implementation: single-database migration/startup path using available role, transactional same-database deletion evidence and durable setup completion, first-start initialisation inside the app and operator-restored-data behaviour within the accepted loss model. Then test the matching candidate. No build/resource execution, real credentials/data, server change, push, merge/settings or deployment in this reconciliation.
+
+Validation for this contract/configuration slice: `npm run check` PASS193 tests, zero failures/skips, project/lockfile checks, lint/types and client/server builds. Evidence `.work/d059-quality.log`; whitespace review passed. Technical-lead self-review confirmed the new validator performs no connections and does not activate the old startup path. Constitution review: latest owner-supplied contract takes precedence, historical evidence preserved, no invented infrastructure or operational approval.

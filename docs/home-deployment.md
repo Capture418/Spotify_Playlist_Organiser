@@ -1,5 +1,8 @@
 # Deployment and CI preparation
 
+**D059 supersession:** `docs/platform-contract.md` is the current hosting target. Separate journal databases/roles and external operator jobs described below are historical implementation/preparation, not available infrastructure or launch requirements. No D058 rerun is planned. The single-database startup adaptation is not yet complete.
+
+
 This public document intentionally omits actual infrastructure identifiers, operator-specific procedures and private evidence. It is a development contract, not a deployable configuration or operational approval.
 
 ## Runtime target

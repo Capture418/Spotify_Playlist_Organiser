@@ -94,3 +94,8 @@ Owner accepts D056 and approves preparation of the release-image and operator-in
 ## D058 — D057 acceptance and local image rehearsal
 
 Owner accepts D057 and approves the local image build, container dependency installation and disposable verification with cleanup. Execute one bounded candidate build and the prepared exact-image rehearsal. Real data/credentials, server provisioning, merging, settings and deployment remain separately gated. No host installation, registry publication or push. Preserve failed evidence and report before another execution.
+
+
+## D059 — Fixed platform contract supersedes hosting assumptions
+
+Owner supplies the settled platform contract and directs work within it without further questions on covered facts. No shell, one-off runner or extra containers; startup owns migrations/initialisation. Only application PostgreSQL is available; music_journal is planned, not provisioned and must not be a build dependency. Backups every4 hours and residual logging/restore risks are accepted. Existing same-image setup design remains. See `docs/platform-contract.md`. Supersedes earlier external-job/four-role/separate-journal launch prerequisites and the D058 rerun proposal. No real data, credential, server, merge/settings or deployment approval is inferred. Current single-database target retains deletion evidence transactionally with app data and shares the accepted restore loss window; no independent restore-survival claim.

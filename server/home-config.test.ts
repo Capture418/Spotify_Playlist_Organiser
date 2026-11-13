@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { homeDatabaseConfig } from './home-config.ts';
+import { homeDatabaseConfig, platformDatabaseConfig } from './home-config.ts';
 const fixture = () => ({
   DATABASE_URL: 'postgres://music_app:invented%40password@db:5432/music',
   MIGRATION_DATABASE_URL: 'postgres://music_migrator:invented@db:5432/music',
@@ -38,4 +38,14 @@ test('URL overrides, malformed encoding and cross-server connections are rejecte
 test('role reuse or a journal pointed at the app database cannot weaken separation', () => {
   assert.throws(() => homeDatabaseConfig({ ...fixture(), MIGRATION_DATABASE_URL: fixture().DATABASE_URL }), /roles must be distinct/);
   assert.throws(() => homeDatabaseConfig({ ...fixture(), JOURNAL_DATABASE_URL: 'postgres://j:p@db/music' }), /JOURNAL_DATABASE_URL/);
+});
+
+
+test('fixed platform accepts only its existing database connection without invented roles or TLS',()=>{
+ const config=platformDatabaseConfig({DATABASE_URL:fixture().DATABASE_URL});
+ assert.equal(config.database,'music');assert.equal(config.user,'music_app');assert.equal(config.ssl,false);assert.equal(config.connectionString,undefined);
+ for(const name of ['MIGRATION_DATABASE_URL','JOURNAL_DATABASE_URL','JOURNAL_MIGRATION_DATABASE_URL'])assert.throws(()=>platformDatabaseConfig({DATABASE_URL:fixture().DATABASE_URL,[name]:'private-value'}),{message:`Unsupported platform setting: ${name}`});
+});
+test('fixed platform rejects malformed database URLs without exposing values',()=>{
+ for(const value of ['','private-value','postgres://user:private@db/music?sslmode=require','postgres://user:private@db/music_journal'])assert.throws(()=>platformDatabaseConfig({DATABASE_URL:value}),{message:'Missing or invalid setting: DATABASE_URL'});
 });
