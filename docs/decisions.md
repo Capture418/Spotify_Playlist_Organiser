@@ -54,3 +54,8 @@ Owner instruction: “I accept D049. Go ahead with local preparation for normal 
 ## D051 — D050 acceptance and normal PR CI activation
 
 Owner instruction: “I accept D050 and approve normal PR CI, including push/PR, activation, runner installations and synthetic resources for eligible PRs. Use included allowance only; keep merging, required-check settings and deployment separately gated.” Approves the reviewed same-repository PR/main event scope and recurring runner-only installations/synthetic resources within included allowance. No paid usage, operational data/credentials, Mac/server installs, merge, required-check settings or deployment. Preserve private history and production guards.
+
+
+## D052 — D051 acceptance and review/roadmap request
+
+Owner accepts D051 and requests PR #4 review, proposed merge sequence for PRs #1/#4, required-check settings and a product-readiness assessment. Merging, settings changes and deployment remain separately gated. Review/proposals only; no new implementation, public review posting, push or resource operation inferred.
