@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D046 local CI rehearsal readiness preparation, following acceptance/publication of the sanitised snapshot as PR #1 (D045). Work is on local `codex/ci-rehearsal`, descended only from the public snapshot. Private history/evidence are preserved separately. Pushes, merging, CI activation, installations, provisioning, spending and deployment remain gated. Production remains deliberately blocked.
+D047: readiness accepted; two-run CI rehearsal authorised and in progress on `codex/ci-rehearsal`. Apply only the reviewed activation change, run one baseline attempt and then one cancellation attempt if baseline/cleanup pass. Included allowance only. No merge, deployment, real data/application credentials or extra retries.
 
 ## Existing implementation
 
@@ -43,3 +43,8 @@ Constitution review: bounded approved local source/mocked verification only, pro
 ## Next gate
 
 Review this local change and the [rehearsal checklist](ci/rehearsal-readiness.md). Any push/PR, temporary workflow activation, runner installation/downloads, disposable database/container creation and included-allowance execution needs explicit approval. No merge is required to conduct a separately approved rehearsal PR against main. Real credentials/data, paid spending and deployment remain excluded.
+
+
+## D047 execution
+
+Preflight: repository public, main default, only PR #1 open, zero existing workflows and no repository webhooks. Actions enabled; reviewed checkout/setup-node release SHAs unchanged. Log retention is90 days (no setting changed). Owner-confirmed included allowance/paid-usage block retained. Temporary runner/image/database operations approved; no local installation. Activation changes policy mode to rehearsal and copies exact reviewed draft; no changes to pins, job permissions or triggers. Stop on baseline failure and report without a second attempt.

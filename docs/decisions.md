@@ -23,3 +23,8 @@ This is a sanitised summary of decisions supporting the current source. It delib
 D046 owner approval: “I approve CI rehearsal readiness preparation. Go ahead with the local changes and mocked tests. Keep pushes, merging, CI activation, installations, provisioning, spending and deployment behind separate approval.”
 
 All implementation remains bounded by the [constitution](../.ai/constitution.md). Future approvals must state exact scope and preserve the distinction between source preparation, installation/resource use, credentials, public push, workflow activation and deployment. No approval is inferred from silence or a successful test.
+
+
+## D047 — readiness acceptance and bounded CI rehearsal
+
+Owner accepts D046 and approves the two-run CI rehearsal: branch push/PR, temporary activation, runner installations and synthetic containers/databases. Included allowance only; no merging or deployment. Scope is one baseline attempt and, only after success with verified cleanup, one controlled cancellation attempt, with observation and rehearsal-PR closure per the accepted checklist. No automatic retries, real data/application credentials, Mac/server installations, paid spending or service provisioning.
