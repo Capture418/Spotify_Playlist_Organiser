@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D059: fixed platform contract received; previous separate-journal/external-job rehearsal direction superseded. Record contract and begin single-connection configuration. Continue backend adaptation within the existing platform; no outstanding platform question. Production remains blocked.
+D060: adapt startup, first-use initialisation and atomic deletion storage to the fixed single-database contract. Mocked tests and installed-host quality gate only; production execution remains blocked.
 
 ## Existing implementation
 
@@ -302,3 +302,25 @@ Added pure `platformDatabaseConfig` and tests: only existing DATABASE_URL accept
 Next implementation: single-database migration/startup path using available role, transactional same-database deletion evidence and durable setup completion, first-start initialisation inside the app and operator-restored-data behaviour within the accepted loss model. Then test the matching candidate. No build/resource execution, real credentials/data, server change, push, merge/settings or deployment in this reconciliation.
 
 Validation for this contract/configuration slice: `npm run check` PASS193 tests, zero failures/skips, project/lockfile checks, lint/types and client/server builds. Evidence `.work/d059-quality.log`; whitespace review passed. Technical-lead self-review confirmed the new validator performs no connections and does not activate the old startup path. Constitution review: latest owner-supplied contract takes precedence, historical evidence preserved, no invented infrastructure or operational approval.
+
+
+## D060 scope and acceptance
+
+Use the supplied database/role for migrations and runtime, initialise fresh schema transactionally inside startup, reject incomplete existing schema, retain blocked recovery state and durable setup closure. Commit deletion evidence and cascading account removal together. Preserve setup/OAuth/proxy safeguards. Expected files: server configuration/startup/database/setup/integration and mocked tests, plus current operator docs. No real connections, database creation, installations, server changes, credentials, push, merge or deployment. Full host gate and separate self-review required; actual PostgreSQL/image verification remains later work.
+
+
+## D060 actual results — 13 November 2026
+
+Implemented the prepared single-database application path. `platformProductionConfig` accepts the server-supplied database and separate credential/snapshot keys, rejecting obsolete migration/journal URLs and journal keys. Both setup and normal composition now use `startPreparedPlatform`, one pool and the existing owning non-superuser role. Startup performs versioned migration/first-use initialisation, schema/guard verification and readiness before listening, retaining the150-second budget and sanitised stage errors. Production executable validates this configuration but still deliberately refuses activation; no default live transport was added.
+
+Platform migration execution preserves original SQL files/checksums and skips only their historical organiser_app grants, since the supplied role owns its created tables. No database/role is created. Missing history amid existing tables, incomplete table inventories, changed checksums and incompatible schema fail instead of initialising over data. Fresh storage is created in the migration transaction. Existing blocked/missing recovery guard is not reset. A completely empty database cannot prove that no prior installation ever existed; operator restore responsibility and accepted backup loss remain authoritative.
+
+Normal application deletion now cancels integration work, locks setup/guard/account state, records the binding/timestamp tombstone and deletes the account with cascades in one transaction. Either write failure rolls back both. Setup uses ownership/tombstone state as its durable global latch and rechecks under locks before confirmation; no independent journal is needed. Existing token, session, PKCE, identity, CSRF, proxy and health safeguards remain. Legacy independent-journal functions/tests are retained as historical compatibility evidence, not selected by current application startup. No independent deletion survival is claimed: restoring an older backup may restore data/sessions/credentials and lose newer deletion records within the accepted loss model.
+
+Updated current setup procedure, architecture/contract, placeholder configuration and deletion explanation. The obsolete two-database/external-job rehearsal is not runnable evidence for the revised composition; prepare a matching single-database harness before any new execution. No dependency, lockfile, workflow, SQL migration file or server setting changed.
+
+Validation: `npm run check` PASS202 tests, zero failures/skips; project/lockfile validation, lint, TypeScript and client/server builds. New mocked coverage includes single-pool startup/readiness/cleanup, failure sanitisation, late composition disposal, blocked guards, configuration rejection, atomic deletion rollback, fresh migration/role behaviour, repeated migrations, corrupt/missing history/tables and setup closure/concurrent confirmation. Fixed a test-only TypeScript narrowing issue and added the newly linked operator documents to the disposable foundation fixture before the passing gate. Evidence `.work/d060-quality.log`; final documentation/foundation checks `.work/d060-foundation.log`. These tests exercise mocked SQL ordering/rollback requests, not actual PostgreSQL transaction/DDL semantics.
+
+Separate technical-lead self-review checked transaction boundaries, account/setup locking, schema/checksum preservation, cancellation, key separation, secret-free errors and unchanged activation gates; no independent security audit claimed. Whitespace review passed. No Docker/PG16 execution, installation, database creation, browser/device test, real data/credentials, server change, push, merge/settings change or deployment occurred. Constitution review confirms authorised scope, honest evidence and retained approval boundaries.
+
+Next: owner review/accept D060, then prepare the matching single-database end-to-end harness and release executable/lifecycle wiring with mocked transport. Actual disposable PostgreSQL/image execution remains a separate bounded approval; real transport/credentials, server changes, publication/merge and deployment remain separately gated. No further platform question is needed.

@@ -9,11 +9,11 @@ import type { Journal } from './journal.ts';
 const hash = (s: string) => createHash('sha256').update(s).digest();
 export interface SetupStore { available(): Promise<void>; complete(): Promise<void> }
 /** Existing owner and retained deletion records form a durable, global one-time latch. */
-export function setupStore(pool: Pool, owner: OwnerConfig, journal: Journal): SetupStore {
+export function setupStore(pool: Pool, owner: OwnerConfig, journal?: Journal): SetupStore {
   async function available() {
     const r = await pool.query('SELECT blocked FROM recovery_guard');
     if (r.rows.length !== 1 || r.rows[0].blocked !== false) throw new Fault(503, 'Setup unavailable');
-    if ((await journal.read()).length) throw new Fault(409, 'Setup closed');
+    if (journal && (await journal.read()).length) throw new Fault(409, 'Setup closed');
     const q = await pool.query('SELECT (SELECT count(*) FROM accounts)+(SELECT count(*) FROM deletion_records) AS n');
     if (Number(q.rows[0].n) !== 0) throw new Fault(409, 'Setup closed');
   }

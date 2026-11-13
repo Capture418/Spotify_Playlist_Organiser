@@ -1,4 +1,4 @@
-import { homeDatabaseConfig } from './home-config.ts';
+import { homeDatabaseConfig, platformDatabaseConfig } from './home-config.ts';
 
 function invalid(name: string): never { throw Error(`Missing or invalid setting: ${name}`); }
 function setting(env: NodeJS.ProcessEnv, name: string): string {
@@ -26,12 +26,14 @@ function keyRing(env: NodeJS.ProcessEnv, purpose: string) {
   return { keys, current };
 }
 /** Pure validation only: no pools, transport, key generation or bootstrap. */
-export function productionConfig(env: NodeJS.ProcessEnv) {
+export function productionConfig(env: NodeJS.ProcessEnv) { const config = validateConfig(env, false); return { ...config, journal: config.journal! }; }
+export function platformProductionConfig(env: NodeJS.ProcessEnv) { return validateConfig(env, true); }
+function validateConfig(env: NodeJS.ProcessEnv, platform: boolean) {
   for (const name of ['ORGANISER_SYNTHETIC', 'ORGANISER_DATABASE', 'ORGANISER_KEY']) {
     if (env[name] !== undefined) invalid(name);
   }
   const processConfig = homeProcessConfig(env);
-  const databases = homeDatabaseConfig(env);
+  const databases = platform ? { runtime: platformDatabaseConfig(env) } : homeDatabaseConfig(env);
   const origin = setting(env, 'ORGANISER_ORIGIN');
   try {
     const url = new URL(origin);
@@ -45,11 +47,12 @@ export function productionConfig(env: NodeJS.ProcessEnv) {
   if (binding.length > 256 || /\s/u.test(binding)) invalid('ORGANISER_OWNER');
   const clientId = setting(env, 'SPOTIFY_CLIENT_ID');
   if (!/^[a-zA-Z0-9]{32}$/.test(clientId)) invalid('SPOTIFY_CLIENT_ID');
-  const credentials = keyRing(env, 'CREDENTIAL'), snapshots = keyRing(env, 'SNAPSHOT'), journal = keyRing(env, 'JOURNAL');
+  const credentials = keyRing(env, 'CREDENTIAL'), snapshots = keyRing(env, 'SNAPSHOT'), journal = platform ? undefined : keyRing(env, 'JOURNAL');
+  if (platform) for (const name of ['ORGANISER_JOURNAL_KEYS', 'ORGANISER_JOURNAL_CURRENT']) if (env[name] !== undefined) invalid(name);
   // Never reuse encryption material between purposes, including retained versions.
   const seen = new Set<string>();
   for (const [name, ring] of [['CREDENTIAL', credentials], ['SNAPSHOT', snapshots], ['JOURNAL', journal]] as const) {
-    for (const key of ring.keys.values()) {
+    for (const key of ring?.keys.values() ?? []) {
       const hex = key.toString('hex');
       if (seen.has(hex)) invalid(`ORGANISER_${name}_KEYS`);
       seen.add(hex);

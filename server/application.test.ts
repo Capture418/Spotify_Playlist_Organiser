@@ -5,12 +5,10 @@ import type { Server } from 'node:http';
 import type { Pool } from 'pg';
 import { preparedListener, startIntegratedApplication } from './application.ts';
 import type { preparedApplication } from './integration.ts';
-import type { PostgresJournal } from './postgres-journal.ts';
 const env = ():NodeJS.ProcessEnv => ({
- NODE_ENV:'production', PORT:'3000', DATABASE_URL:'postgres://app:invented@db/music', MIGRATION_DATABASE_URL:'postgres://migrator:invented@db/music',
- JOURNAL_DATABASE_URL:'postgres://journal:invented@db/music_journal', JOURNAL_MIGRATION_DATABASE_URL:'postgres://journal_migrator:invented@db/music_journal',
+ NODE_ENV:'production', PORT:'3000', DATABASE_URL:'postgres://app:invented@db/music',
  ORGANISER_ORIGIN:'https://music.example.invalid',ORGANISER_CALLBACK:'https://music.example.invalid/callback',ORGANISER_ACCOUNT:'11111111-1111-4111-8111-111111111111',ORGANISER_OWNER:'invented-owner',SPOTIFY_CLIENT_ID:'a'.repeat(32),
- ORGANISER_CREDENTIAL_KEYS:'v1:'+'11'.repeat(32),ORGANISER_CREDENTIAL_CURRENT:'v1',ORGANISER_SNAPSHOT_KEYS:'v1:'+'22'.repeat(32),ORGANISER_SNAPSHOT_CURRENT:'v1',ORGANISER_JOURNAL_KEYS:'v1:'+'33'.repeat(32),ORGANISER_JOURNAL_CURRENT:'v1',
+ ORGANISER_CREDENTIAL_KEYS:'v1:'+'11'.repeat(32),ORGANISER_CREDENTIAL_CURRENT:'v1',ORGANISER_SNAPSHOT_KEYS:'v1:'+'22'.repeat(32),ORGANISER_SNAPSHOT_CURRENT:'v1',
 });
 function fakeServer(failure=false) {
  const events:string[]=[];
@@ -23,21 +21,20 @@ function fakeServer(failure=false) {
 }
 test('integrated composition validates before resources and binds owner, purpose keys and explicit transport',async()=>{
  let opened=0, composed=0, sent=0, disposed=0;
- const pool={} as Pool, journal={} as PostgresJournal, fake=fakeServer();
+ const pool={} as Pool, fake=fakeServer();
  const dependencies:Parameters<typeof startIntegratedApplication>[1]={
   pool:()=>{opened++;return pool;},transport:async()=>{sent++;throw Error('No live transport');},
   application:async(store,owner,spotify,vault,givenJournal)=>{
    composed++;assert.equal(store.pool,pool);assert.equal(vault.pool,pool);assert.equal(store.owner,owner.account);
    assert.equal(owner.binding,'invented-owner');assert.equal(store.snapshotsCipher?.purpose,'snapshot');
    assert.notDeepEqual(store.snapshotsCipher?.keys.get('v1'),vault.keys.get('v1'));
-   assert.equal(spotify.callback,env().ORGANISER_CALLBACK);assert.equal(givenJournal,journal);
+   assert.equal(spotify.callback,env().ORGANISER_CALLBACK);assert.equal(givenJournal,undefined);
    return {server:fake.server,dispose:()=>{disposed++;}} as Awaited<ReturnType<typeof preparedApplication>>;
   },
   start:async(_env,ciphers,options)=>{
-   assert.equal(ciphers.journal.purpose,'journal');assert.equal(ciphers.snapshots.purpose,'snapshot');
-   assert.notDeepEqual(ciphers.journal.keys.get('v1'),ciphers.snapshots.keys.get('v1'));
-   options.pool({});const listener=await options.compose(pool,journal,new AbortController().signal);
-   await listener.listen(3000,'0.0.0.0',new AbortController().signal);return {close:listener.close,journal};
+   assert.equal(ciphers.purpose,'snapshot');
+   options.pool({});const listener=await options.compose(pool,new AbortController().signal);
+   await listener.listen(3000,'0.0.0.0',new AbortController().signal);return {close:listener.close};
   },
  };
  await assert.rejects(startIntegratedApplication({...env(),ORGANISER_OWNER:''},dependencies));

@@ -5,7 +5,7 @@ import { JsonCipher } from './lifecycle.ts';
 import { CredentialStore } from './security.ts';
 import { SpotifyTransport } from './spotify.ts';
 import type { Pool } from 'pg';
-import { productionConfig } from './runtime-config.ts';
+import { productionConfig, platformProductionConfig } from './runtime-config.ts';
 
 const fixture = (): NodeJS.ProcessEnv => ({
   NODE_ENV: 'production', PORT: '3000',
@@ -50,7 +50,7 @@ test('invalid origins, callback, identities, key references and legacy or synthe
   })) for (const value of values) assert.throws(() => productionConfig({ ...fixture(), [name]: value }), { message: `Missing or invalid setting: ${name}` });
 });
 test('valid full configuration still cannot activate the production executable', () => {
-  const result = spawnSync(process.execPath, ['server/production.ts'], { env: fixture(), encoding: 'utf8', timeout: 5000 });
+  const result = spawnSync(process.execPath, ['server/production.ts'], { env: platformFixture(), encoding: 'utf8', timeout: 5000 });
   assert.equal(result.status, 1);
   assert.match(result.stderr, /Production activation requires the separate S04c operational gate/);
   assert.equal(result.stdout, '');
@@ -69,4 +69,16 @@ test('validated settings fit existing cipher and transport dependencies without 
   assert.throws(() => journal.decrypt(envelope, config.owner.account));
   const spotify = new SpotifyTransport(config.clientId, config.callback, async () => { throw Error('Unexpected network request'); });
   assert.equal(spotify.callback, config.callback);
+});
+
+function platformFixture() {
+ const env=fixture();
+ for(const name of ['MIGRATION_DATABASE_URL','JOURNAL_DATABASE_URL','JOURNAL_MIGRATION_DATABASE_URL','ORGANISER_JOURNAL_KEYS','ORGANISER_JOURNAL_CURRENT'])delete env[name];
+ return env;
+}
+test('platform configuration needs only supplied database and two purpose-separated key rings',()=>{
+ const env=platformFixture(), config=platformProductionConfig(env);
+ assert.equal(config.databases.runtime.database,'music');assert.equal(config.journal,undefined);
+ for(const name of ['MIGRATION_DATABASE_URL','JOURNAL_DATABASE_URL','JOURNAL_MIGRATION_DATABASE_URL','ORGANISER_JOURNAL_KEYS','ORGANISER_JOURNAL_CURRENT'])assert.throws(()=>platformProductionConfig({...env,[name]:'invented'}));
+ assert.throws(()=>platformProductionConfig({...env,ORGANISER_SNAPSHOT_KEYS:env.ORGANISER_CREDENTIAL_KEYS}));
 });

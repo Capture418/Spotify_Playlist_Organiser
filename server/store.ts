@@ -11,7 +11,7 @@ export type Session={hash:string;account:string;csrf:string};
 export type ExportData={format:'playlist-organiser';version:1;binding:string;revision:string;tags:{id:string;name:string}[];annotations:{itemId:string;tagIds:string[]}[]};
 const DAY=86400000;
 export class Store {
- snapshotsCipher?:JsonCipher; deletion?:DeletionCoordinator;
+ snapshotsCipher?:JsonCipher; deletion?:Pick<DeletionCoordinator, 'erase'>;
  pool:Pool;owner:string;now:()=>number;
  constructor(pool:Pool,owner:string,now=Date.now){this.pool=pool;this.owner=uuid(owner);this.now=now;}
  async permitted(){const q=await this.pool.query('SELECT blocked FROM recovery_guard');if(q.rows[0]?.blocked!==false)throw new Fault(503,'Recovery reconciliation required');}

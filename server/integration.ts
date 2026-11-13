@@ -8,6 +8,7 @@ import { binding, SpotifyTransport } from './spotify.ts';
 import { Fault, requireValue, uuid } from './validation.ts';
 import { importCollection } from './import.ts';
 import { maintenance } from './lifecycle.ts';
+import { AtomicDeletion } from './platform-deletion.ts';
 import { DeletionCoordinator } from './journal.ts';
 import type { Journal } from './journal.ts';
 import { appServer } from './http.ts';
@@ -104,12 +105,12 @@ export class Integration {
 }
 
 /** Prepared factory only. It never listens and the production executable remains blocked. */
-export async function preparedApplication(store: Store, owner: OwnerConfig, spotify: SpotifyTransport, vault: CredentialStore, journal: Journal) {
+export async function preparedApplication(store: Store, owner: OwnerConfig, spotify: SpotifyTransport, vault: CredentialStore, journal?: Journal) {
   requireValue(store.snapshotsCipher,'Snapshot encryption required');
-  await journal.read();
+  if (journal) await journal.read();
   const integration = new Integration(store, owner, spotify, vault);
   await integration.verifyOwner();
-  store.deletion = new DeletionCoordinator(store.pool,journal,()=>integration.cancel());
+  store.deletion = journal ? new DeletionCoordinator(store.pool,journal,()=>integration.cancel()) : new AtomicDeletion(store.pool,()=>integration.cancel());
   const sweeper=await maintenance(store.pool,()=>{integration.cancel();void store.pool.query('UPDATE recovery_guard SET blocked=true').catch(()=>server.close());});
   const origin = new URL(spotify.callback).origin;
   const server = appServer(store, { origin, production: true, connectedInterface: true, auth: integration, refresh: s => integration.refresh(s), disconnected: () => integration.cancel() });
