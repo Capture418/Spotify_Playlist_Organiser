@@ -64,3 +64,8 @@ Owner accepts D051 and requests PR #4 review, proposed merge sequence for PRs #1
 ## D053 — Invented-data production integration
 
 Owner authorises production integration using invented data first. Real data, credentials, server provisioning, merging, required-check settings and deployment remain separately gated. This implementation connects the existing interface to prepared production authentication/API and composes validated startup, store, keys, journal and maintenance with explicit injected transports. No dependency installation, database creation, live Spotify connection, implicit owner bootstrap or production executable activation is inferred. Existing approved interaction/security/lifecycle designs remain unchanged.
+
+
+## D054 — D053 acceptance and disposable end-to-end verification
+
+Owner accepts D053 and approves end-to-end verification with disposable local PostgreSQL databases and mocked Spotify responses. Only invented fixture identities, encryption material and database passwords are used. Real data/credentials, installations, server provisioning, merging, settings and deployment remain separately gated. No push or hosted run is needed.

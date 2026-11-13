@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D053: invented-data production integration implemented locally on `codex/production-integration`; awaiting owner review. Real data, credentials, server provisioning, merging, required-check settings and deployment remain separately gated. D051 normal CI authorisation remains; no push or new hosted run in this task.
+D054: D053 accepted. Connected composition end-to-end verification passed with disposable local PostgreSQL16 and mocked Spotify; awaiting owner acceptance. Work on `codex/connected-e2e`. Real data/credentials, installations, provisioning, merging, settings and deployment remain gated.
 
 ## Existing implementation
 
@@ -180,3 +180,29 @@ Browser review used the built connected UI against an ignored, memory-only inven
 Technical-lead self-review, including a separate pass over auth boundaries and startup cleanup, found no intended weakening of existing guards. Not an independent security audit. No lockfile, dependency, workflow, migration or deployment change. Private history/evidence preserved; no remote push, merge, rule setting or provisioning. Constitution review: bounded approved scope, invented data, honest evidence and operational gates retained.
 
 Next proposed bounded task: exercise this new composition against disposable local PostgreSQL16 and mocked Spotify end to end (including reconnect, failed initial import, cross-session edits, shutdown and recovery), under explicit approval for synthetic database/container execution. Then prepare the executable/operator bootstrap and immutable-image release package for review. Real owner bootstrap, keys, server readiness/backups, live OAuth, deployment and Mac/iPhone acceptance remain separate gates. Do not remove the production guard merely because the local UI and unit tests pass.
+
+
+## D054 scope and acceptance
+
+Use installed Docker/cached images, newly owned disposable app/journal databases and internal networking only. Exercise actual startup, connected HTTP/OAuth session flow, failed initial import and retry, shared tags/conflicts, reconnect, restore snapshot, deletion/recovery and clean shutdown. Test scripts and documentation are the expected changes; fix only failures within the accepted design. Run host quality checks and verify task-resource cleanup. No live Spotify transport, browser/device acceptance or production activation is implied.
+
+
+## D054 actual results — 13 November 2026
+
+PASS: five end-to-end scenario groups against real disposable PostgreSQL16, using the current compiled application mounted read-only into the already-installed Node22.23.5 runtime. Existing runtime image `sha256:855c5e68e89e22e1c5cb58fd56e0204d757284e140e3360d17286b942991b1e1`; PostgreSQL digest `sha256:a2f7e20374cd8fd8ed4a588b79549e10589bea7b1686e77922f5ac741b80b8a1`. This is current-source verification in a cached runtime, not a newly built immutable release image. No pull, install or image build. Preflight found about14GiB available disk and Docker4GiB memory; each container bounded to512MiB/one CPU.
+
+- Actual separate roles, migrations, journal/recovery approval and integrated startup; migration pools retired, production-facing HTML marker/title served, internal health and Host/session guards enforced.
+- HTTP login and callback with mocked token/identity exchange, secure cookie attributes, failed initial import followed by successful playlist/album import.
+- Shared tag saved to both item types, second-session stale revision rejected, refresh failure preserved organisation, successful refresh preserved tags, reconnect invalidated the replaced session while retaining the other session.
+- Replace-only restore preview/confirmation created a snapshot; snapshot preview/confirmation recovered assignments. Shutdown closed startup pools/listener and restart preserved organisation/session access.
+- Sign-out invalidated the session; disconnect wrote the independent encrypted deletion journal and invalidated access; deleted-owner startup failed closed and released its pools.
+
+`npm run check` passed173 host tests, zero failures/skips, project/lockfile checks, lint, TypeScript and both builds. New database scenarios are separate from that173 count. Existing application code needed no correction. Added `scripts/database/connected-run.mjs` and `connected.mjs`; the former requires explicit `CONNECTED_DISPOSABLE_APPROVED=synthetic-only`, local Mac Docker context, cached artifacts and an absent receipt. It refuses inherited operational settings and existing resources, then uses label/identity-checked cleanup. Keep receipts/evidence ignored. A future rerun requires review/archive of the empty receipt; do not blindly remove a receipt that may describe remaining resources.
+
+Actual preparation failures: tagged PostgreSQL reference was absent but its exact digest was cached; the local executor now uses that digest without pulling. The old cached image lacked newer PWA runtime files, so the current compiled runtime is mounted read-only for both runtime validation and the connected scenarios. Two test-client errors (assuming cookie attribute order and sending an undefined pre-session header) were corrected. All failed attempts ran scoped cleanup before another attempt. No application guard was weakened.
+
+Final run evidence: `.work/d054-e2e.log`, `.work/connected-e2e/scenarios.log`, `.work/d054-quality-final.log`. Final receipt resources array empty. A separate post-run Docker query independently returned no task-labelled containers, volumes or networks. All network resources were internal, no host ports published, app filesystem read-only, non-root, capabilities dropped and no-new-privileges enabled. Existing unrelated Docker resources were preserved.
+
+Limits: HTTP client supplied the trusted proxy headers inside the isolated container; no real HTTPS proxy, browser cookie enforcement, live Spotify or iPhone test. The independent journal and snapshot recovery paths were exercised, but this task did not repeat the older pg_dump/server-loss backup restoration suite. No claim that server backups/roles/keys exist. No real data/credentials, operational provisioning, installation, spending, push, merge, settings change or deployment. Production executable refusal still verified by runtime check.
+
+Technical-lead self-review of test resource boundaries, assertions and cleanup; not an independent security audit. Constitution review confirms approved synthetic-only execution, truthful limits and preserved approval gates. **Next proposal:** bounded release preparation for the executable/operator bootstrap and deployment contract, with mocked tests and a reviewable configuration/rollback checklist. Actual credentials, image publication, server provisioning, installation, deployment and live/device acceptance require separate approvals.
