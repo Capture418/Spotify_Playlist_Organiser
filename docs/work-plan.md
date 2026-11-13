@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D049: D048 accepted; one cancellation-only rehearsal approved and in progress. Use the reviewed hold and a new PR on the named rehearsal branch. No retry, merge, deployment, real data or application credentials; included allowance only.
+D049 completed: one cancellation-only attempt interrupted the bounded hold and independent cleanup verified no remaining job-labelled resources. PR #3 closed without merge. Temporary workflow is removed locally and policy inactive; publish retirement only after closure. No retries, merge or deployment.
 
 ## Existing implementation
 
@@ -79,3 +79,18 @@ Prepared `.work/d048-activation.patch` without applying it: policy mode change p
 ## D049 execution
 
 Preflight confirms only PR #1 open, no repository webhooks, Actions enabled, reviewed action release SHAs unchanged and no running jobs. Main remains README-only; remote rehearsal tree has no workflow file. GitHub retains the historical workflow registration as active, but it has no current main/branch file to trigger. D047's included-usage controls,90-day log retention and recent zero-vulnerability lockfile review remain evidence; no package/pin change. Apply exactly the reviewed D048 patch and run local validation before publishing. One attempt only; stop on failure or missed cancellation.
+
+
+## D049 actual result — 13 November 2026
+
+One attempt only: [run43502865462](https://github.com/Capture418/Spotify_Playlist_Organiser/actions/runs/43502865462), source `9718b0c1f726a399c66aab15b21c9e791f9a08dd`, [PR #3](https://github.com/Capture418/Spotify_Playlist_Organiser/pull/3). GitHub conclusion CANCELLED as intended, not a green baseline. The requested bounded cancellation/cleanup evidence is satisfied within the limits below.
+
+Node22 runner quality gate passed165 tests, zero failures; pinned action setup, locked installation and Docker/PostgreSQL image preparation passed. Candidate image `sha256:38098f33348469cbcd3bc9f42a4d5f61f724bba74ad65472964564f947085fc5`. Live-resource READY marker at20:35:28.566 UTC; cancellation at20:35:46.781, well before the120-second timeout. No scenario-success or timeout completion occurred. The independent Scoped cleanup step succeeded at20:35:47.290 and positively verified an empty receipt and no job-labelled containers, volumes or networks remaining. This is observed cleanup, not an inference from runner disposal.
+
+No `CANCELLED hold` signal-handler marker or in-process cleanup marker appears. Therefore this proves cancellation during an unfinished hold plus successful independent receipt-based cleanup, not graceful delivery/execution of the Node SIGINT/SIGTERM handler. It does not test SQL interruption/transaction rollback, SIGKILL recovery on a surviving runner, runner-loss cleanup or application graceful shutdown. Mocked signal-handler coverage remains local evidence only. No repeat is authorised or needed to describe this result honestly.
+
+Included-allowance standard GitHub runner used under the owner's confirmed paid-usage block; no billing change or paid service, though invoice-level costs were not independently audited. No app credentials, live data, local/server installations, operational provisioning, merge or deployment. Main and PR #1 remain untouched. Retain `.work/d049-local-check.log`, `d049-cancellation.log`, `d049-cancel-observation.json` and run-id evidence privately; no database dump/artifact upload. D047 baseline evidence remains separate and is not re-claimed as part of this cancellation-only mode.
+
+Closed PR #3 before publishing workflow retirement. Restore inactive policy and remove active file on the closed branch, then verify remote retirement and that this run has only attempt1. Preserve draft, history and evidence. Final local inactive gate and remote checks recorded after completion.
+
+**Next:** owner review/accept D049 evidence, then propose a bounded normal PR-CI preparation task (restore baseline scenario command and define intended permanent trigger scope/required checks) without automatically activating or merging it. No further rehearsal or deployment is inferred. Constitution review: exact single-attempt authorisation honoured, truthful limits, scoped cleanup observed and temporary activation retired.

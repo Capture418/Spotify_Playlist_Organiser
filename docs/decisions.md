@@ -41,3 +41,6 @@ Owner instruction: “Go ahead with the local preparation change to make cancell
 ## D049 — D048 acceptance and one cancellation-only rehearsal
 
 Owner accepts D048 and explicitly approves one cancellation-only CI rehearsal, including push/PR, temporary activation, runner installations and synthetic resources. Included allowance only; no extra retries, merging or deployment. Covers the reviewed120-second hold, observation/cancel, cleanup evidence, PR closure and workflow retirement. No real data/application credentials or local/server installations.
+
+
+D049 result: one attempt cancelled during the unfinished live-resource hold; independent cleanup verified empty inventory. No graceful-handler execution claim. PR #3 closed; temporary activation retired. Further runs, permanent CI activation, merge and deployment require separate approval.
