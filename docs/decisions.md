@@ -89,3 +89,8 @@ Owner approves setup mode using invented data/mocked Spotify and disposable loca
 ## D057 — D056 acceptance and release/initialisation rehearsal preparation
 
 Owner accepts D056 and approves preparation of the release-image and operator-initialisation rehearsal. This permits local source, mocked tests and an execution approval package, not Docker builds/downloads, installations, database creation or operational execution. Real data/credentials, server provisioning, merging, settings and deployment remain gated. Production executable stays blocked; no registry publication or push implied.
+
+
+## D058 — D057 acceptance and local image rehearsal
+
+Owner accepts D057 and approves the local image build, container dependency installation and disposable verification with cleanup. Execute one bounded candidate build and the prepared exact-image rehearsal. Real data/credentials, server provisioning, merging, settings and deployment remain separately gated. No host installation, registry publication or push. Preserve failed evidence and report before another execution.

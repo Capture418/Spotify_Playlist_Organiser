@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D057: D056 accepted. Exact-image/operator-initialisation rehearsal preparation complete locally; awaiting owner review and execution approval on `codex/release-rehearsal-preparation`. No image build/resource execution/installation or operational activation.
+D058: D057 accepted. Candidate image build passed; single exact-image rehearsal stopped at the required recovery fence. Cleanup verified. Fixture correction prepared locally; another execution awaits approval. Operational gates unchanged.
 
 ## Existing implementation
 
@@ -271,3 +271,23 @@ Validation PASS: full installed-host gate191 tests, zero failures/skips, project
 Operator checkpoint: no user shell and one app slot mean a supported operator-run one-time maintenance job must be agreed before real initialisation. No public initialisation endpoint or automatic startup bypass added. Ask the operator whether a reviewed-image maintenance job can run with app stopped, injected secret-safe configuration and all required roles; ask for the supported invocation and first-use/inventory/backup evidence, not secret values or immediate changes.
 
 Next approval proposal: accept D057 and separately approve one bounded local candidate Docker build (including its locked in-container dependency installations and any explicitly permitted downloads), exact-image runtime/initialisation/setup-to-normal verification and disposable local resources with cleanup. No automatic retry on failed execution; retain evidence and report. Real operator invocation, credentials, registry publication, executable activation, server provisioning, deployment and device acceptance remain gated. Constitution check confirms bounded preparation, truthful evidence, preserved private history and approval gates.
+
+
+## D058 execution scope
+
+Source code baseline357aee841e14458ccca5435f9633228cbd69bfe7; only approval/evidence documentation changes before building. Preflight clean Git tree,12GiB available disk, Docker4GiB memory and exact pinned amd64 Node/PostgreSQL artifacts cached. Dockerfile SHA25648331707c09ea8bb05e682747e2a7c02a1481b31ecefd36108c3fc8b9c110c89; lockfile SHA25694706ec4d2c18e16174fbbc4160cddf8398f828e80c3e1254499b49fa906768d. Build one local Linux-amd64 image, inspect exact identity, run release-mode operator/setup/normal tests without host runtime overlay, verify cleanup. No production activation or live data.
+
+
+## D058 actual outcome — 13 November 2026
+
+One local Linux-amd64 build PASS. Exact local image ID `sha256:ffae59f1c5a534da80d9690c28d9e8ec6705e1538e3d9060cafb0c594d0c292c`; inspect confirms linux/amd64, node user, expected blocked production command and15-second health interval/5-second timeout/3 retries. Both npm-ci layers were CACHED; the approved installation allowance was not used for a fresh dependency install. Source compilation and client/server builds ran in the image. No host installation, registry publication or remote deployment. Retain `.work/release-candidate.id`, `.work/d058-build.log`, `.work/d058-image.json`. This local image identity is not a published registry digest or production acceptance.
+
+One exact-image disposable verification attempt FAILED at operator initialisation with `Blocked recovery guard required`. Runtime restrictions/assets/default executable-refusal check passed before creating the test databases. The current v3 migration deliberately inserts `blocked=false`; the new initialisation primitive requires a prior explicit operator fence. The harness omitted that fence. This is a rehearsal-fixture/procedure defect; the security guard correctly refused. No journal initialisation or subsequent setup-to-normal scenario success is claimed for this attempt.
+
+Scoped cleanup PASS; final receipt has no resources. Independent Docker container/volume/network queries returned no task-labelled resources. Existing resources and the candidate image retained. No automatic retry or rebuild. Evidence `.work/d058-e2e.log`, `.work/release-e2e/receipt.json`; preserve the failed receipt/log before any later approved execution.
+
+Prepared the missing explicit `UPDATE recovery_guard SET blocked=true` in the disposable harness after migration and before first-use initialisation; updated both operator/rehearsal documents. Did not edit applied migrations, relax the initialisation check, auto-fence in the production app or approve recovery. This harness is mounted separately, so the application image is unchanged and can be reused for an approved rerun; do not attribute the failed attempt's result to the corrected harness.
+
+Documentation/foundation gate32 tests passed for initial approval docs. Full installed-host gate after the fixture correction PASS191 tests, zero failures/skips, lint/types and both builds, recorded in `.work/d058-quality.log`; no additional database execution. Technical-lead self-review confirmed the fence is before privileged journal creation and remains blocked until separate reconciliation/approval. Constitution check: exact bounded execution, observed failure/cleanup, no hidden retries and no real data/credentials, server provisioning, push, merge, settings change or deployment.
+
+Next decision: approve one rerun using this same exact image and the corrected external harness, with disposable local resources and cleanup. No image rebuild or fresh installation is needed. The operator maintenance-job invocation question and production executable activation remain separate outstanding work.

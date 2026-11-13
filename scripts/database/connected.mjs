@@ -76,6 +76,7 @@ try{
   const {initialiseEmptyJournal}=await import('../runtime/server/operator-initialisation.js');
   const approval={firstEver:true,appStopped:true,inventoryVerified:true};
   await assert.rejects(initialiseEmptyJournal(admin,jadmin,cipher,{...approval,firstEver:false}));
+  await admin.query('UPDATE recovery_guard SET blocked=true'); // Explicit operator fence before first-use initialisation.
   await initialiseEmptyJournal(admin,jadmin,cipher,approval);
   await assert.rejects(initialiseEmptyJournal(admin,jadmin,cipher,approval));
   assert.equal((await runtime.query('SELECT blocked FROM recovery_guard')).rows[0].blocked,true);
