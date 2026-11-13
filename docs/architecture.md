@@ -35,7 +35,7 @@ Production application requests require canonical Host and a single forwarded HT
 
 ## Verification and deployment boundary
 
-Host tests cover domain, validation, mocked HTTP/configuration/startup, security/lifecycle mechanics and CI resource plans. Actual disposable database tests are separate from the ordinary gate. The inactive CI draft targets a single same-repository rehearsal branch on GitHub-hosted Linux; no publishing/deploy job exists. Local image IDs are not registry digests or deployment approval.
+Host tests cover domain, validation, mocked HTTP/configuration/startup, security/lifecycle mechanics and CI resource plans. Actual disposable database tests are separate from the ordinary gate. The inactive normal PR CI draft proposes all same-repository PR branches targeting main on GitHub-hosted Linux; no publishing/deploy job exists. D050 is preparation only, not recurring-run approval. Local image IDs are not registry digests or deployment approval.
 
 No personal operational history, live-data verification counts, actual endpoint or recovery-custody location is part of this public summary. Deployment requires separately approved configuration, restricted access, backups/recovery, credentials, dependency review and device checks. See [deployment preparation](home-deployment.md).
 
@@ -44,3 +44,6 @@ D046 preparation adds an exact-byte workflow review policy and mocked inactive/r
 
 
 D048 adds a test-only cancellation probe: resource setup followed by a fixed120-second abortable hold, with no integration scenarios. Timeout/cancellation fail the probe and always attempt scoped cleanup. SIGINT/SIGTERM handling is limited to this mode; no application/server signal behaviour changes. The draft remains inactive pending a new execution approval.
+
+
+D050 restores normal synthetic integration execution in the draft and prepares normal PR event coverage. Exact-byte workflow policy now uses normal-pr for a future activated inventory; inactive still requires no workflow files. Event tests evaluate the exact draft condition with synthetic contexts, not the actual GitHub scheduler. Required-check/settings recommendations remain separate from workflow source.

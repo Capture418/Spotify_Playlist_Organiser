@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { runInNewContext } from 'node:vm';
 import { EventEmitter } from 'node:events';
 import { cancellationProbe, withCancellationSignals, holdMilliseconds } from './ci/cancellation.mjs';
 import { readFileSync, existsSync, readdirSync, lstatSync } from 'node:fs';
@@ -109,13 +110,13 @@ test('inactive draft preserves read-only PR boundaries and immutable action/imag
   assert.match(draft, /persist-credentials: false/); assert.match(draft, /runs-on: ubuntu-24.04/);
   assert.doesNotMatch(draft, /pull_request_target|self-hosted|secrets\.|packages: write|docker login|request-deploy|workflow_dispatch/);
   for (const action of draft.matchAll(/uses: ([^\s]+)/g)) assert.match(action[1], /^actions\/[a-z-]+@[a-f0-9]{40}$/);
-  assert.match(draft, /types: \[opened, synchronize\]/);
+  assert.match(draft, /types: \[opened, synchronize, reopened, ready_for_review\]/);
   assert.ok(draft.includes("github.event.pull_request.head.repo.full_name == github.repository"));
-  assert.ok(draft.includes("github.head_ref == 'codex/ci-rehearsal'"));
+  assert.doesNotMatch(draft, /github.head_ref|paths-ignore|paths:|branches-ignore/);
   assert.match(draft, /package-manager-cache: false/);
   assert.match(draft, /allow-unsafe-pr-checkout: false/);
-  assert.match(draft, /run: node scripts\/ci\/run.mjs cancellation-hold/);
-  assert.doesNotMatch(draft, /run: node scripts\/ci\/run.mjs run\s/);
+  assert.match(draft, /run: node scripts\/ci\/run.mjs run\s/);
+  assert.doesNotMatch(draft, /run: node scripts\/ci\/run.mjs cancellation-hold/);
   assert.ok(draft.includes(postgres)); assert.match(draft, /if: \$\{\{ always\(\) \}\}/);
 });
 
@@ -146,11 +147,11 @@ test('wrong candidate architecture refuses all creation and runtime check failur
   await broken.cleanup(); assert.equal(f.objects.size, 0);
 });
 
-test('workflow policy accepts only inactive inventory or byte-exact reviewed rehearsal', () => {
+test('workflow policy accepts only inactive inventory or byte-exact reviewed normal PR CI', () => {
   const draft = readFileSync(new URL('../docs/ci/pr-checks.yml.example', import.meta.url), 'utf8');
   const policy = JSON.parse(readFileSync(new URL('../docs/ci/workflow-policy.json', import.meta.url)));
   verifyWorkflows({ ...policy, mode: 'inactive' }, draft, {});
-  const active = { ...policy, mode: 'rehearsal' };
+  const active = { ...policy, mode: 'normal-pr' };
   verifyWorkflows(active, draft, { 'pr-checks.yml': draft });
   assert.throws(() => verifyWorkflows({ ...policy, mode: 'inactive' }, draft, { 'pr-checks.yml': draft }));
   for (const files of [{}, { 'other.yml': draft }, { 'pr-checks.yml': draft, 'extra.yaml': draft }]) assert.throws(() => verifyWorkflows(active, draft, files));
@@ -158,7 +159,7 @@ test('workflow policy accepts only inactive inventory or byte-exact reviewed reh
     assert.throws(() => verifyWorkflows(active, draft, { 'pr-checks.yml': changed }));
     assert.throws(() => verifyWorkflows(active, changed, { 'pr-checks.yml': changed }));
   }
-  assert.throws(() => verifyWorkflows({ ...active, mode: 'anything' }, draft, {}));
+  for (const mode of ['anything', 'rehearsal']) assert.throws(() => verifyWorkflows({ ...active, mode }, draft, {}));
 });
 
 test('cleanup reports verified success and a safe cancellation checkpoint only after operations', async () => {
@@ -247,4 +248,25 @@ test('SIGTERM cancels a hold, cleanup failure stays failure and signal listeners
   }, { signal, report: m => reports.push(m), wait: async () => { source.emit('SIGTERM'); signal.throwIfAborted(); } })), /Cleanup unverified/);
   assert.equal(source.listenerCount('SIGINT'), 0); assert.equal(source.listenerCount('SIGTERM'), 0);
   assert.equal(reports.some(m => m.startsWith('PASS')), false);
+});
+
+test('normal PR draft admits same-repository branches and rejects other repositories and events', () => {
+  const draft = readFileSync(new URL('../docs/ci/pr-checks.yml.example', import.meta.url), 'utf8');
+  const expression = /    if: \$\{\{ (.+) \}\}/.exec(draft)?.[1];
+  assert.equal(expression, "github.repository == 'Capture418/Spotify_Playlist_Organiser' && github.event.pull_request.head.repo.full_name == github.repository");
+  const actions = /types: \[([^\]]+)\]/.exec(draft)[1].split(', ');
+  const bases = /branches: \[([^\]]+)\]/.exec(draft)[1].split(', ');
+  // Mock event dispatch plus the exact draft expression; not a GitHub engine emulator.
+  function admitted({ action = 'opened', base = 'main', repo = 'Capture418/Spotify_Playlist_Organiser', headRepo = repo, branch = 'codex/example', event = 'pull_request', isDraft = false } = {}) {
+    if (event !== 'pull_request' || !actions.includes(action) || !bases.includes(base)) return false;
+    return runInNewContext(expression, { github: { repository: repo, head_ref: branch, event: { pull_request: { draft: isDraft, head: { repo: { full_name: headRepo } } } } } }, { timeout: 100 });
+  }
+  for (const action of ['opened', 'synchronize', 'reopened', 'ready_for_review']) {
+    for (const branch of ['codex/new-feature', 'fix/issue', 'codex/ci-rehearsal']) assert.equal(admitted({ action, branch }), true);
+  }
+  assert.equal(admitted({ isDraft: true }), true);
+  for (const scenario of [{ headRepo: 'outside/fork' }, { repo: 'outside/copy' }, { base: 'release' }, { event: 'push' }, { event: 'pull_request_target' }, { event: 'workflow_dispatch' }, { action: 'closed' }, { action: 'labeled' }]) assert.equal(admitted(scenario), false);
+  assert.match(draft, /group: music-checks-\$\{\{ github.event.pull_request.number \}\}/);
+  assert.match(draft, /cancel-in-progress: true/);
+  assert.match(draft, /timeout-minutes: 30/);
 });

@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D049 completed: one cancellation-only attempt interrupted the bounded hold and independent cleanup verified no remaining job-labelled resources. PR #3 closed without merge. Temporary workflow retirement7ce338d is verified on the remote branch; policy inactive. No retries, merge or deployment.
+D050: D049 accepted; local normal PR CI preparation complete on `codex/normal-pr-ci`. Prepare inactive full-scenario workflow and mocked eligibility/policy tests. No push, activation, installation, provisioning, spending, merge or deployment.
 
 ## Existing implementation
 
@@ -94,3 +94,16 @@ Included-allowance standard GitHub runner used under the owner's confirmed paid-
 Closed PR #3 before publishing workflow retirement. Restore inactive policy and remove active file on the closed branch, then verify remote retirement and that this run has only attempt1. Preserve draft, history and evidence. Final local inactive gate passed165 tests, zero failures/skips, lint/types/build and whitespace checks. Remote API confirms branch7ce338d has no workflow files; PR #3 CLOSED/unmerged; PR #1 OPEN at0bfeb55; main unchanged at3f54e32. New run43502865462 completed at attempt1; historical D047 run remains at attempt2, with no extra run.
 
 **Next:** owner review/accept D049 evidence, then propose a bounded normal PR-CI preparation task (restore baseline scenario command and define intended permanent trigger scope/required checks) without automatically activating or merging it. No further rehearsal or deployment is inferred. Constitution review: exact single-attempt authorisation honoured, truthful limits, scoped cleanup observed and temporary activation retired.
+
+
+## D050 scope and acceptance
+
+Prepare normal PR CI from the tested baseline while preserving cleanup/resource/security boundaries. Restore ordinary synthetic scenario execution, remove the one-off branch restriction and propose same-repository PRs targeting main on opened/synchronize/reopened/ready_for_review, including drafts. Keep the actual workflow absent. Update exact-byte policy with a distinct normal-pr mode, test event/branch/repository inclusion and rejection using synthetic contexts, and retain all cancellation/cleanup regressions. Document proposed required-check semantics and recurring-resource approval gates without changing GitHub settings.
+
+See [normal PR CI proposal](ci/normal-pr-plan.md). Implementation complete: inactive draft restores baseline `run`, expands only the intended PR actions and removes only the one-off head-branch restriction. Exact repository/same-repository guard stays. No path filter or draft skip; no push/manual/fork/deploy job. Fixed pins, permissions, timeouts, resource constraints and cleanup logic are unchanged. Proposed future policy mode is normal-pr; the old rehearsal mode now fails validation and actual mode remains inactive.
+
+**Actual validation: PASS.** Full installed-host gate166 tests, zero failures/skips; project/lockfile checks, lint, type checks and client/server builds. New mocked event matrix evaluates the exact draft condition for ordinary feature/fix/rehearsal branches and allowed actions; rejects fork/copy repos, other base branches and push/manual/target/closed/label events. Exact-byte inventory/mutation tests and all previous baseline/cancellation/cleanup regressions pass. These mocks are not a GitHub scheduler/branch-protection verification. No dependency/lockfile/application change; no external call, Docker/database operation, installation or remote CI run. Evidence `.work/d050-quality.log` and final documentation checks `.work/d050-foundation.log`.
+
+Prepared but did not apply `.work/d050-activation.patch`: normal-pr policy mode and exact reviewed draft copy only. Existing older activation patches are historical; do not reuse them. Required-check recommendation is documented but no GitHub check requirement or rule is configured. Fork skipping must never be treated as code validation; contributor policy remains bounded to same-repository work.
+
+Constitution/self-review: authorised local preparation only; no private-history publication, source privacy/whitespace reviewed, workflow remains absent and approval gates intact. No independent security audit claimed. D047/D049 execution approvals are exhausted; no recurring execution is inferred. **Next:** owner reviews the proposed normal event scope and separately approves publication/activation, recurring runner installations and disposable resources with an included-allowance execution bound; required-check settings, merges and deployment remain separate decisions.

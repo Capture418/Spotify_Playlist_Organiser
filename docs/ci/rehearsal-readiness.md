@@ -1,4 +1,6 @@
-# CI cancellation rehearsal — local preparation
+# CI cancellation rehearsal — historical D048/D049 plan
+
+D049 is complete and owner-accepted. This document records its original proposal; it is not current activation guidance. The draft now belongs to D050; use [the normal PR plan](normal-pr-plan.md). Old rehearsal activation patches and modes must not be reused.
 
 D048 authorises local cancellation-timing preparation and mocked tests only. D047 completed its two attempts; the second did not interrupt unfinished work. The real policy remains `inactive` and there is no `.github/workflows` directory. PR #1 and remote branches are unchanged by D048. No additional execution is approved.
 

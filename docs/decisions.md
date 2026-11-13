@@ -44,3 +44,8 @@ Owner accepts D048 and explicitly approves one cancellation-only CI rehearsal, i
 
 
 D049 result: one attempt cancelled during the unfinished live-resource hold; independent cleanup verified empty inventory. No graceful-handler execution claim. PR #3 closed; temporary activation retired. Further runs, permanent CI activation, merge and deployment require separate approval.
+
+
+## D050 — D049 acceptance and normal PR CI preparation
+
+Owner instruction: “I accept D049. Go ahead with local preparation for normal PR CI and mocked tests. Keep pushes, CI activation, installations, provisioning, spending, merging and deployment behind separate approval.” Accepts the recorded cancellation/cleanup evidence and its limits. Approves local preparation only; proposed normal trigger/resource/required-check defaults await review, not operational activation.

@@ -9,7 +9,7 @@ Before planning or editing, read:
 
 These are the source of truth for this snapshot. Surface conflicts before affected work. Work only in this project and inspect Git status before changes. Preserve user work; never initialise or alter another repository. Use one package and small reviewable changes, without a multi-agent hierarchy. Follow the canonical constitution rather than inventing competing rules.
 
-**Current boundary (D049):** the single cancellation-only rehearsal is finished. Cancellation interrupted the bounded hold; independent cleanup verified empty resources. PR #3 closed without merge; retire temporary workflow and keep policy inactive. No extra runs, activation, installations/resources, merge or deployment without new approval. Production guards remain. See the work plan for evidence limits.
+**Current boundary (D050):** D049 accepted; local normal PR CI preparation and mocked tests approved. The draft restores baseline checks and proposes same-repository PRs to main; policy remains inactive. Pushes, activation, installations, provisioning, spending, merging and deployment remain separately gated. No standing recurring-run approval. Production guards remain.
 
 Use a descriptive `codex/` branch. Never push directly to main or merge without owner approval. Do not install the inactive workflow or execute the disposable CI/database launcher as part of an ordinary check. Do not weaken environment, resource-ownership, proxy or production guards to make a test pass.
 
