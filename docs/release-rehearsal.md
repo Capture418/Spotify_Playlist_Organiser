@@ -1,6 +1,6 @@
 # Single-database release rehearsal — D061 preparation
 
-D060 is accepted. D061 authorises source preparation and mocked tests only. No Docker command, image build/install, database creation or rehearsal execution has occurred for this candidate. The fixed platform contract remains authoritative. Old release/setup modes and the D058 rerun are superseded.
+D062 authorises one build and one disposable run; both passed with verified cleanup. Exact image and evidence are in `docs/work-plan.md`. That execution allowance is exhausted; the package below remains a reference for any separately approved future run. The fixed platform contract remains authoritative. Old release/setup modes and the D058 rerun are superseded.
 
 ## Prepared wiring and scenarios
 

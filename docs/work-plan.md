@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D061: D060 accepted. Prepare the single-database exact-image rehearsal and injected executable/lifecycle wiring with mocked tests. Actual execution, real data/credentials, server changes, merging and deployment remain gated.
+D062: D061 accepted; execute one approved local build and single-database rehearsal with cleanup, then provide a reviewable invented-data app within existing gates.
 
 ## Existing implementation
 
@@ -344,3 +344,23 @@ Validation: `npm run check` PASS207 tests, zero failures/skips; project/lockfile
 No Docker command, database creation, actual rehearsal, real data/credentials, server change, browser/device test, installation, push, merge/settings or deployment occurred. Constitution review confirms bounded authorised preparation, preserved safeguards and honest evidence. Source preparation is ready for owner review; it is not a deployed or default-activated product.
 
 Next approval package: accept D061 and separately approve one local Linux-amd64 candidate build (including locked in-container dependency installation if needed) and one exact-image disposable single-database rehearsal with cleanup. Check disk/memory and cached artifacts first; preserve failure evidence and stop before any retry. See `docs/release-rehearsal.md`. Live/default activation, credentials, real signal acceptance, registry publication, server changes, merging and deployment remain separate. No new platform decision is needed.
+
+
+## D062 execution scope
+
+Source c2d9012; clean preflight.12GiB disk free; Docker has4107341824 bytes memory. Host memory sysctl was sandbox-restricted; Docker memory is sufficient for the two512MB test containers. Reviewed Node/PostgreSQL immutable artifacts are cached. Dockerfile/lockfile hashes unchanged from D058. One build and one disposable run, scoped cleanup, then local invented-data review interface. Preserve evidence; no extra run, real data/credentials, server changes, merge or deployment.
+
+
+## D062 actual result — 13 November 2026
+
+One local Linux-amd64 build PASS from application source c2d9012 (only approval docs changed before build). Exact local image ID `sha256:33fd6ec3afa5687cffb581823aa32ecb0a4fe59bbadad0405bfa62b603e0ce0c`; inspected linux/amd64, node user and expected production command. Both locked npm-ci layers were cached; no fresh installation was needed. Image compilation/client/server build passed. No registry publication. Evidence `.work/d062-build.log`, `.work/d062-image.id`, `.work/d062-image.json`.
+
+One exact-image single-database rehearsal PASS on disposable PostgreSQL16, with mocked Spotify and no compiled-runtime overlay. Observed fresh migration by the owning non-superuser role; token/CSRF/PKCE/exact-owner/confirmation setup; no stored setup grants; durable setup closure across restart/configuration rollback; normal login/import with failed-import retry; playlist/album shared tags; cross-session conflicts; failed refresh preservation; reconnect/session rotation; replace-only restore and encrypted recoverable snapshot; shutdown/persisted restart; injected deletion failure rolling back both tombstone and account removal; successful atomic deletion; deleted-owner refusal. All application pools closed. This executes packaged application/executable composition with an observed lifecycle host, not real OS signal delivery or the default blocked production command.
+
+Scoped cleanup PASS and independent Docker queries returned zero task-labelled containers, volumes and networks. `.work/platform-e2e/receipt.json` has an empty resources array (historical db ID retained as evidence). No rerun/rebuild occurred. Evidence `.work/d062-rehearsal.log` and `.work/platform-e2e/scenarios.log`. No unrelated resources were modified.
+
+Opened a reviewable built invented-data interface on loopback port4182 and left its in-app browser tab available. Port4173 was occupied and left untouched. Browser smoke check observed album filtering and saved Jazz tag on Amber Windows with success feedback. The preview explicitly says memory-only/reset-on-reload and has disabled Spotify handoff; it is not the persistent rehearsal or a live account. Preview process remains running for owner review, with log `.work/d062-preview.log`; stopping it does not delete user data. No new iPhone/zoom/network audit claimed.
+
+Validation relies on the unchanged source's D061207-test host gate plus the new exact-image build and actual PG16 rehearsal. Final documentation/foundation checks in `.work/d062-foundation.log`; whitespace review passed. Self-review confirms scoped resources, exact artifact identity, truthful distinction between demo/database evidence and live product, no weakened guard. No independent security/advisory audit, backup restore, prior-release image rollback, actual SIGTERM, HTTPS proxy or real-device acceptance claimed.
+
+Owner requested fewer confirmations. Routine local implementation, fixes and preparation towards the functioning app can continue under that direction; do not ask for acceptance of every internal step. The explicit one-build/one-rehearsal limit is exhausted, and real account data/credentials, server changes, publication, merging/settings and deployment remain gated. Consolidate the next consequential approval around a concrete private-pilot release package rather than more small preparation checkpoints. Default production command still refuses; live dependency wiring and release/pilot execution are not claimed complete. Current app is available for interface review at http://127.0.0.1:4182 on this laptop only.

@@ -109,3 +109,8 @@ Owner approves adapting startup, initialisation and deletion storage to the fixe
 ## D061 — D060 acceptance and rehearsal/executable preparation
 
 Owner accepts D060 and approves single-database rehearsal preparation and executable wiring using mocked tests. Actual execution, real data, credentials, server changes, merging and deployment remain separately gated. No resource creation, installation, live transport activation or push is inferred.
+
+
+## D062 — D061 acceptance and one local rehearsal
+
+Owner accepts D061 and approves one local image build including container dependency installation, and one disposable single-database rehearsal with cleanup. Owner requests autonomous progress to a reviewable functioning app; routine local implementation and invented-data preview work may proceed without repeated confirmations. This does not authorise extra rehearsal attempts, real data/credentials, server changes, publication, merging or deployment.
