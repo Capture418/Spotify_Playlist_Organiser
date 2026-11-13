@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D064: execute approved consolidated pilot. Counters: builds2/3 and synthetic attempts2/6 passed; setup dispatch43523781873 awaits GitHub security approval, zero server jobs executed. Normal deployment and one corrective normal deployment remain unused. Secure user handoffs remain required.
+D064: execute approved consolidated pilot. Counters: builds2/3 and synthetic attempts2/6 passed; setup dispatch43523781873 approved by owner, executed once and refused by operator image-name validation; no app startup observed. Normal deployment and one corrective normal deployment remain unused. Secure user handoffs remain required.
 
 ## Existing implementation
 
@@ -405,3 +405,9 @@ Manual release run43523513137 passed the same213-test quality gate and exact-ima
 Eleven setup secret names verified without reading values. Owner reports private verified identity entry and helper disconnect. Hosted callback observed registered in Spotify dashboard, which remains development mode. Setup deployment being dispatched with the tested digest; do not claim success or real-library import until observed. First app release has no previously verified organiser image to fall back to; prior-slot behaviour remains operator-owned, not a claimed working application.
 
 Setup workflow dispatch43523781873 was marked action_required with zero jobs. GitHub UI states the workflow may be malicious and requires a write-access reviewer to approve; no specific unsafe line/reason is given. Reviewed the exact manual main-only, single-step operator workflow (no checkout or code execution besides the approved helper, APP_SECRETS and digest inputs). Do not bypass the platform security gate; owner handoff pending. No server execution/deployment success is claimed. Prior-slot HTTPS root returned502 before dispatch, so hosted OAuth must wait for confirmed healthy deployment. Canonical callback was observed in the Spotify dashboard. No additional deployment dispatch or retry has been made.
+
+## D064 setup refusal — 13 November 2026
+
+Owner approved GitHub workflow security review. Run43523781873 executed on the dedicated runner and completed failure with operator outcome `refused`: image must come from `ghcr.io/capture418/spotify_playlist_organiser`. The approved package and release job used `ghcr.io/capture418/spotify-playlist-organiser`. This is a registry-name mismatch (underscores versus hyphens), not an observed application startup failure. HTTPS /health returns502. No hosted OAuth should start. No retry, secret change, image rebuild or server change performed.
+
+Proposed narrow scope amendment, pending owner approval: publish the existing successful tested artifact under the required underscore name, verify unchanged manifest/config digest, and retry setup once using that name. Preserve the original tested image and evidence; do not rebuild or ask the operator to relax its allowlist. The package currently authorises only the hyphenated publication destination and one setup deployment, so this amendment is not inferred. Normal deployment and its corrective allowance remain unused. Builds2/3, synthetic attempts2/6, setup dispatches1 (refused), successful deployments0.
