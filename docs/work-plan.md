@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D047 rehearsal finished: baseline passed on GitHub; second attempt cancelled with verified empty cleanup inventory, but the scenario completed before cancellation was reported. No third attempt. PR #2 closed without merge. Temporary workflow removed and policy inactive; result/deactivation commit is to be pushed only after closure. PR #1 and main remain untouched.
+D047 rehearsal finished: baseline passed on GitHub; second attempt cancelled with verified empty cleanup inventory, but the scenario completed before cancellation was reported. No third attempt. PR #2 closed without merge. Temporary workflow removed and policy inactive; result/deactivation commit98efc76 was pushed after closure. PR #1 and main remain untouched.
 
 ## Existing implementation
 
@@ -60,6 +60,6 @@ Accepted D046 and executed only the two approved attempts of [run43500524091](ht
 
 Private ignored evidence: `.work/d047-baseline.log`, `d047-cancellation.log`, `d047-cancel-observation.json`, `d047-audit.json`, `d047-local-check.log`; no dumps or secret values published. Normal GitHub log retention90 days. Logs capture only synthetic operations and fixed runner markers; no live Spotify or operational database access. Actual hosted login/VPN/device/backups/key custody remain outside this rehearsal.
 
-Closed PR #2 after both attempts; restore inactive policy and remove the workflow in a follow-up commit on the closed branch, avoiding any third PR-triggered attempt. Preserve the inactive reviewed draft and all evidence. Do not delete branches, alter main or change PR #1. Verify final remote branch/policy, closed/unmerged PR and two-attempt run count after the deactivation push.
+Closed PR #2 after both attempts; restore inactive policy and remove the workflow in a follow-up commit on the closed branch, avoiding any third PR-triggered attempt. Preserve the inactive reviewed draft and all evidence. Do not delete branches, alter main or change PR #1. Final API verification: remote branch at98efc76, no workflow files in its tree; PR #2 CLOSED/unmerged; PR #1 OPEN at0bfeb55; main unchanged at README seed3f54e32. Exactly one workflow run with two attempts, completed/cancelled, and no third attempt. Final inactive local full gate passed161 tests, zero failures/skips, lint/types/build; whitespace checks passed.
 
 **Next decision:** accept the baseline and stated cancellation limitation, or separately approve a bounded preparation change for a deterministic cancellation hold point, followed by a separately approved additional attempt. Permanent CI rollout, any merge, real data/credentials and deployment remain separately gated. No automatic extra work. Constitution review: narrow authorisation used, results/limits recorded honestly, private history preserved and temporary activation retired.
