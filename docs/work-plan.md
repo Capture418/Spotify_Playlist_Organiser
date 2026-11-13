@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D048 local cancellation-hold preparation complete; awaiting review. The previous two attempts are finished and the temporary workflow is absent. Prepare and test a bounded checkpoint locally; no further run, push or operational action is authorised.
+D049: D048 accepted; one cancellation-only rehearsal approved and in progress. Use the reviewed hold and a new PR on the named rehearsal branch. No retry, merge, deployment, real data or application credentials; included allowance only.
 
 ## Existing implementation
 
@@ -74,3 +74,8 @@ Implemented `cancellation-hold` as a separate CLI mode using the existing guarde
 **Actual validation: PASS.** Full installed-host gate165 tests, zero failures/skips; project/lockfile checks, lint, TypeScript and client/server builds. Four new mocked tests cover live-resource hold, SIGINT, SIGTERM, uncancelled timeout, setup/pre-cancel failure, cleanup failure, no scenario execution and listener removal. Existing baseline/receipt-gap/ownership tests still pass. No timer delay, real process signal, Docker, database, network, installation or GitHub run was used. Logs: `.work/d048-quality.log`; final documentation checks recorded in `.work/d048-foundation.log`. Technical-lead self-review confirms application code, dependencies, lockfile, resource constraints, action/image pins and production guards unchanged.
 
 Prepared `.work/d048-activation.patch` without applying it: policy mode change plus exact draft copy. Old D046 activation evidence is historical and must not be reused for this revised draft. Privacy/whitespace and patch applicability checks accompany the local checkpoint. No push, merge, activation or operational work occurred. Original private history/evidence and remote PRs remain unchanged. Next operational execution remains separately approved. The checkpoint will demonstrate cancellation with live disposable resources, not interruption of an in-flight SQL transaction or recovery from SIGKILL/runner loss.
+
+
+## D049 execution
+
+Preflight confirms only PR #1 open, no repository webhooks, Actions enabled, reviewed action release SHAs unchanged and no running jobs. Main remains README-only; remote rehearsal tree has no workflow file. GitHub retains the historical workflow registration as active, but it has no current main/branch file to trigger. D047's included-usage controls,90-day log retention and recent zero-vulnerability lockfile review remain evidence; no package/pin change. Apply exactly the reviewed D048 patch and run local validation before publishing. One attempt only; stop on failure or missed cancellation.

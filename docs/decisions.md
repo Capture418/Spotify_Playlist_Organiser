@@ -36,3 +36,8 @@ D047 outcome: two attempts only; baseline passed, second cancelled after scenari
 ## D048 — local cancellation timing preparation
 
 Owner instruction: “Go ahead with the local preparation change to make cancellation timing reliable, with mocked tests.” Approves a bounded test-only hold with mocked cancellation/timeout/cleanup checks and updated inactive workflow proposal. No further CI attempt, push, activation, installation, resource creation, spending, merge or deployment is inferred. D047 results and limits remain unchanged.
+
+
+## D049 — D048 acceptance and one cancellation-only rehearsal
+
+Owner accepts D048 and explicitly approves one cancellation-only CI rehearsal, including push/PR, temporary activation, runner installations and synthetic resources. Included allowance only; no extra retries, merging or deployment. Covers the reviewed120-second hold, observation/cancel, cleanup evidence, PR closure and workflow retirement. No real data/application credentials or local/server installations.
