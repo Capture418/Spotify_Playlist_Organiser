@@ -29,3 +29,10 @@ Do not run database commands, Compose or the CI launcher without explicit dispos
 Read [AGENTS.md](AGENTS.md), [the constitution](.ai/constitution.md), [architecture](docs/architecture.md), [decision summary](docs/decisions.md) and [work plan](docs/work-plan.md) before changes. Technical deployment gates are in the [deployment preparation plan](docs/home-deployment.md).
 
 Personal operational records and private development history are intentionally excluded from this public snapshot. Public technical summaries preserve the implementation boundaries without publishing account observations or actual infrastructure details.
+
+
+## App contract — operator-confirmed timing
+
+The server allows180 seconds for the app to become healthy, including migrations, and20 seconds to shut down after SIGTERM. These limits were confirmed by the owner after consulting the operator; this checkout has not independently inspected the server settings.
+
+The prepared application retains its tighter150-second startup limit and10-second shutdown deadline, leaving time within the server limits. Production activation and deployment remain separately gated.

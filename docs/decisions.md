@@ -74,3 +74,8 @@ Owner accepts D053 and approves end-to-end verification with disposable local Po
 ## D055 — D054 acceptance and startup/operator preparation
 
 Owner accepts D054 and authorises production startup and operator setup preparation. Implement/test preparation with injected dependencies and invented inputs; prepare the operator runbook and activation review. Real data, credentials, installations, provisioning, merging, settings and deployment remain separately gated. No production executable activation, live transport, public operator route or resource creation is inferred.
+
+
+### D055 operator timing clarification
+
+Owner reports operator confirmation:180 seconds to become healthy, migrations included;20 seconds to shut down after SIGTERM, also documented in the operator README contract. Record these limits in this checkout's README/setup package. Existing app limits of150 seconds startup and10 seconds shutdown remain within that budget; no code/settings change required. This does not accept D055 or approve activation. Temporary setup callback/access questions remain outstanding.
