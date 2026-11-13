@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D047: readiness accepted; two-run CI rehearsal authorised and in progress on `codex/ci-rehearsal`. Apply only the reviewed activation change, run one baseline attempt and then one cancellation attempt if baseline/cleanup pass. Included allowance only. No merge, deployment, real data/application credentials or extra retries.
+D047 rehearsal finished: baseline passed on GitHub; second attempt cancelled with verified empty cleanup inventory, but the scenario completed before cancellation was reported. No third attempt. PR #2 closed without merge. Temporary workflow removed and policy inactive; result/deactivation commit is to be pushed only after closure. PR #1 and main remain untouched.
 
 ## Existing implementation
 
@@ -48,3 +48,18 @@ Review this local change and the [rehearsal checklist](ci/rehearsal-readiness.md
 ## D047 execution
 
 Preflight: repository public, main default, only PR #1 open, zero existing workflows and no repository webhooks. Actions enabled; reviewed checkout/setup-node release SHAs unchanged. Log retention is90 days (no setting changed). Owner-confirmed included allowance/paid-usage block retained. Temporary runner/image/database operations approved; no local installation. Activation changes policy mode to rehearsal and copies exact reviewed draft; no changes to pins, job permissions or triggers. Stop on baseline failure and report without a second attempt.
+
+
+## D047 actual outcomes — 13 November 2026
+
+Accepted D046 and executed only the two approved attempts of [run43500524091](https://github.com/Capture418/Spotify_Playlist_Organiser/actions/runs/43500524091), head `25ff1ec61faa1672a47ec0558999e3eeb7cb71d1`, via [rehearsal PR #2](https://github.com/Capture418/Spotify_Playlist_Organiser/pull/2). No merge or deployment. Standard GitHub-hosted Ubuntu runner version2.338.2 executed pinned actions and Node22. No account billing/settings change or paid service; owner-confirmed included allowance and paid-usage block retained. Actual invoicing was not independently audited. Existing action release SHAs matched; fresh credential-free lockfile audit reported0 known vulnerabilities. Local activated-workflow gate passed161 tests before publication.
+
+**Attempt1 baseline: PASS.** GitHub quality gate161 tests, zero failures; locked dependency installation, lint/types/client/server builds, linux/amd64 candidate build, pinned PostgreSQL pull and synthetic role/migration/runtime/health/outage/restore checks passed. Candidate image `sha256:ecfa028b68e6639797aaeac8ab6384f18c0cf9cebbd91007700b9ca5c10b675e`. Database-start marker20:20:21 UTC; scenario success20:20:29; normal and always-step cleanup both positively reported empty receipt and no remaining job-labelled containers, volumes or networks. This is actual runner evidence, not mock inference.
+
+**Attempt2 controlled cancellation: CANCELLED, with a material coverage limit.** Same source revision, fresh runner/build, image `sha256:a19590ef18c87ee9c078a3fd1c5e6d5a81de2cc27ea74e1d0f06b26aec832a8a`. Monitor observed integration in progress at about4.7 seconds into the step and requested cancellation. Final logs establish database-start marker20:22:10.783 UTC, scenario success20:22:22.630, normal cleanup success20:22:23.000, cancellation reported20:22:23.020, and always-step cleanup success20:22:23.113. Thus cleanup was observed on a cancelled job, but actual interruption of unfinished synthetic work and recovery of resources from that interruption were **not demonstrated**. Do not mark that acceptance criterion passed or infer it from runner disposal. No extra attempt, injected delay, source change/retry or force cancellation was performed.
+
+Private ignored evidence: `.work/d047-baseline.log`, `d047-cancellation.log`, `d047-cancel-observation.json`, `d047-audit.json`, `d047-local-check.log`; no dumps or secret values published. Normal GitHub log retention90 days. Logs capture only synthetic operations and fixed runner markers; no live Spotify or operational database access. Actual hosted login/VPN/device/backups/key custody remain outside this rehearsal.
+
+Closed PR #2 after both attempts; restore inactive policy and remove the workflow in a follow-up commit on the closed branch, avoiding any third PR-triggered attempt. Preserve the inactive reviewed draft and all evidence. Do not delete branches, alter main or change PR #1. Verify final remote branch/policy, closed/unmerged PR and two-attempt run count after the deactivation push.
+
+**Next decision:** accept the baseline and stated cancellation limitation, or separately approve a bounded preparation change for a deterministic cancellation hold point, followed by a separately approved additional attempt. Permanent CI rollout, any merge, real data/credentials and deployment remain separately gated. No automatic extra work. Constitution review: narrow authorisation used, results/limits recorded honestly, private history preserved and temporary activation retired.

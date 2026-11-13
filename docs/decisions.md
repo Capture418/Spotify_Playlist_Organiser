@@ -28,3 +28,6 @@ All implementation remains bounded by the [constitution](../.ai/constitution.md)
 ## D047 — readiness acceptance and bounded CI rehearsal
 
 Owner accepts D046 and approves the two-run CI rehearsal: branch push/PR, temporary activation, runner installations and synthetic containers/databases. Included allowance only; no merging or deployment. Scope is one baseline attempt and, only after success with verified cleanup, one controlled cancellation attempt, with observation and rehearsal-PR closure per the accepted checklist. No automatic retries, real data/application credentials, Mac/server installations, paid spending or service provisioning.
+
+
+D047 outcome: two attempts only; baseline passed, second cancelled after scenario completion with verified cleanup. Interrupted-operation recovery remains unverified. Rehearsal PR closed and temporary workflow retired; any additional attempt needs a new bounded approval. No merge/deployment authorised or performed.
