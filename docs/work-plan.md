@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D064: execute approved consolidated pilot. Counters: candidate1/3 and synthetic attempt1/6 reserved for the release PR CI; deployments0/2 plus one corrective normal deployment. Secure user handoffs remain required.
+D064: execute approved consolidated pilot. Counters: builds2/3 and synthetic attempts2/6 passed; setup dispatch43523781873 awaits GitHub security approval, zero server jobs executed. Normal deployment and one corrective normal deployment remain unused. Secure user handoffs remain required.
 
 ## Existing implementation
 
@@ -395,3 +395,13 @@ D064 owner confirms verified immutable ID copied directly into APP_ORGANISER_OWN
 Preparing first approved PR CI candidate (build1/3, synthetic1/6 reserved on push/PR); release publication will build/test a second candidate on main rather than publish an untested rebuild. No deployment or registry publication yet.
 
 Final pre-push host gate:213 tests passed, zero failures/skips, lint/types/client/server build and whitespace checks passed (`.work/d064-final-quality.log`). Eleven setting names verified; values and private identity are absent from changes. First PR candidate is the next actual resource execution.
+
+## D064 release evidence — 13 November 2026
+
+PR #5 source73b945acf464a680972700e2f2031dc2254843d0 passed hosted CI run43523330999 (213 tests, build and actual default-entry PostgreSQL16/real SIGTERM/outage/connected/restore checks). Image dc74b7d25c290720efe2ec14d0a11122a432801e8bdfc9cfd2472d74f06da9b4. Both cleanup paths positively verified empty receipt and no labelled resources. Merged reviewed PR #5 with merge commit7ed509e4bf605f267340dedd904acbee5d60a070 after current green checks. GitHub automatically marked fully included ancestor PRs #1/#4 merged; separate close attempts found them already incorporated. No second merge operation or main push.
+
+Manual release run43523513137 passed the same213-test quality gate and exact-image scenarios, verified both cleanup paths, and published that exact tested artifact. Candidate2 image sha256:db1f246dcc39e0c66d4421cf1dd5647cb8bac7f154a5b0ad077a494aa6caf775; public GHCR digest sha256:30f0e3d6c4e85248b7cb42f14b0c68d1f8ea8a424a1a95db5d2530e01b56a9f1. Pull-by-digest/image-ID equality passed in publication job. Public package visibility observed in GitHub UI; no new package credential requested. Dockerfile SHA256 e82d4ad156a176457489a03bafc3e831358c3de06f04463d971b6c613a1f306a; lockfile SHA256 94706ec4d2c18e16174fbbc4160cddf8398f828e80c3e1254499b49fa906768d. Ignored logs `.work/d064-pr-ci.log` and `.work/d064-release-ci.log`. Builds2/3, synthetic attempts2/6 used; no retry. Included standard runner allowance only, no billing change.
+
+Eleven setup secret names verified without reading values. Owner reports private verified identity entry and helper disconnect. Hosted callback observed registered in Spotify dashboard, which remains development mode. Setup deployment being dispatched with the tested digest; do not claim success or real-library import until observed. First app release has no previously verified organiser image to fall back to; prior-slot behaviour remains operator-owned, not a claimed working application.
+
+Setup workflow dispatch43523781873 was marked action_required with zero jobs. GitHub UI states the workflow may be malicious and requires a write-access reviewer to approve; no specific unsafe line/reason is given. Reviewed the exact manual main-only, single-step operator workflow (no checkout or code execution besides the approved helper, APP_SECRETS and digest inputs). Do not bypass the platform security gate; owner handoff pending. No server execution/deployment success is claimed. Prior-slot HTTPS root returned502 before dispatch, so hosted OAuth must wait for confirmed healthy deployment. Canonical callback was observed in the Spotify dashboard. No additional deployment dispatch or retry has been made.
