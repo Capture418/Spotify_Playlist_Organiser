@@ -16,4 +16,4 @@ assert.equal(manifest.name, 'Music Library Organiser');
 for (const file of ['manifest.webmanifest', 'icons/apple-touch-icon.png', 'icons/library.svg', ...manifest.icons.map(icon => icon.src.slice(1))]) {
   assert.deepEqual(readFileSync(new URL('dist/' + file, output)), readFileSync(new URL('../public/' + file, import.meta.url)));
 }
-console.log('Backend JavaScript and runtime assets built; production activation remains blocked.');
+console.log('Backend JavaScript and runtime assets built; live runtime requires explicit valid settings.');

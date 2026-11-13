@@ -1,4 +1,4 @@
-# INACTIVE PREPARATION: do not move to .github/workflows without separate approval.
+# D064: same-repository PR verification, no publication or deployment.
 name: Music library checks
 on:
   pull_request:

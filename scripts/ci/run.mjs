@@ -13,7 +13,7 @@ const mode = process.argv[2];
 try {
   if (!['run', 'cleanup', 'cancellation-hold'].includes(mode)) throw Error('Expected run, cleanup or cancellation-hold');
   const image = readFileSync(resolve(directory, 'candidate.id'), 'utf8').trim();
-  const config = plan(process.env, root, image);
+  const config = {...plan(process.env, root, image), singleDatabase:true};
   mkdirSync(resolve(directory, 'docker-config'), { recursive: true });
   function execute(args, input) {
     // Ignore inherited Docker context/auth and unrelated environment; no shell interpolation.
@@ -36,7 +36,7 @@ try {
   else if (mode === 'cancellation-hold') {
     await withCancellationSignals(process, signal => cancellationProbe(job, { signal, report: message => console.log(message) }));
   } else {
-    try { await job.setup(); await job.exercise(); console.log('PASS synthetic CI database/health/restore checks for ' + image); }
+    try { await job.setup(); await job.platformExercise(); console.log('PASS synthetic CI database/health/restore checks for ' + image); }
     finally { await job.cleanup(); }
   }
 } catch {

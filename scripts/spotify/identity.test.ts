@@ -7,7 +7,7 @@ async function connect(session: SpotifySession) {
   const auth = new URL(session.connect('a'.repeat(32)));
   await session.callback(new URLSearchParams({ state: auth.searchParams.get('state')!, code: 'fake-code' }));
 }
-test('identity is explicit, uses fixed GET endpoint/exact scopes, exposes only boolean and clears on reconnect', async () => {
+test('identity is explicit, uses fixed GET endpoint/exact scopes, retains private binding and clears on reconnect', async () => {
   const calls: string[] = [];
   const session = new SpotifySession(async (url, init) => {
     calls.push(String(url));
@@ -23,8 +23,9 @@ test('identity is explicit, uses fixed GET endpoint/exact scopes, exposes only b
   await connect(session); assert.equal(calls.length, 1); assert.equal(session.identityVerified, false);
   await session.checkIdentity(); assert.equal(calls.length, 2); assert.equal(session.identityVerified, true);
   assert.doesNotMatch(JSON.stringify(session), /invented-account|discard-profile|fake-token|discard-refresh/);
+  assert.equal(session.verifiedAccountId, 'invented-account');
   assert.deepEqual(session.items, []); assert.deepEqual(session.albums, []);
-  await connect(session); assert.equal(session.identityVerified, false); session.disconnect();
+  await connect(session); assert.equal(session.identityVerified, false); session.disconnect(); assert.equal(session.verifiedAccountId, undefined);
 });
 test('missing, malformed, excessive and whitespace identity fail without leaking profile data or stale success', async () => {
   let body: unknown = { account_id: 'valid-fake' };
@@ -35,7 +36,7 @@ test('missing, malformed, excessive and whitespace identity fail without leaking
     body = bad; await session.checkIdentity(); assert.equal(session.identityVerified, false);
     assert.doesNotMatch(session.message, /valid-fake|mutable-only/);
   }
-  session.disconnect();
+  session.disconnect(); assert.equal(session.verifiedAccountId, undefined);
 });
 test('identity 401/403 clear the session; 429 enforces cooldown without automatic retries', async () => {
   for (const status of [401,403,429]) {

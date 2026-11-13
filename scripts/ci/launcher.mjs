@@ -1,6 +1,7 @@
 // Preparation only. No commands run on import; the CLI requires explicit CI approval.
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
+import { platformEnv } from './platform-env.mjs';
 export const postgres = 'postgres:16.16-alpine3.24@sha256:a2f7e20374cd8fd8ed4a588b79549e10589bea7b1686e77922f5ac741b80b8a1';
 const label = 'organiser.ci';
 export function plan(env, root, image, platform = process.platform) {
@@ -149,5 +150,53 @@ export function launcher(config, execute, save, state = { owner: config.owner, r
     for (const db of ['music', 'music_journal']) await sql(db, null, dumps[db]);
     await harness('stale', inventory);
   }
-  return { setup, exercise, cleanup, preflight, state };
+  async function platformExercise(pause = () => new Promise(r => setTimeout(r, 1000))) {
+    assert.equal(config.singleDatabase,true);
+    await wait(async()=>{await sql('music','SELECT 1');return true;},pause);
+    async function service(setup) {
+      const env={...platformEnv};if(!setup){delete env.SETUP_MODE;delete env.SETUP_TOKEN;}
+      const c=await create('container',['--name',`${config.owner}-default-${++serial}`,...constraints,'--network',config.network,
+        ...Object.entries(env).flatMap(([k,v])=>['-e',`${k}=${v}`]),config.image]);
+      const started=Date.now();await run(['start',c.id]);
+      return {c,started};
+    }
+    async function health(c) {
+      await verify(c);
+      return Number(await run(['exec',c.id,'node','--input-type=module','-e',
+        "fetch('http://127.0.0.1:3000/health',{signal:AbortSignal.timeout(3000)}).then(r=>console.log(r.status)).catch(()=>process.exit(1))"]));
+    }
+    async function ready(c,started) {
+      let good=false;
+      for(let n=0;n<180&&Date.now()-started<180000;n++){try{if(await health(c)===200){good=true;break;}}catch{}await pause();}
+      assert.ok(good&&Date.now()-started<180000,'Default entry startup deadline failed');
+    }
+    async function stop(c) {
+      const began=Date.now();await verify(c);await run(['stop','-t','20',c.id]);
+      assert.equal((await verify(c)).State.ExitCode,0,'SIGTERM did not exit cleanly');assert.ok(Date.now()-began<20000,'Shutdown deadline failed');
+      const logs=await run(['logs',c.id]);
+      assert.ok(logs.split('\n').every(line=>/^Application (ready|stopped)$/.test(line)),'Unexpected application log content');
+      await remove(c);
+    }
+    const first=await service(true);await ready(first.c,first.started);
+    assert.match(await sql('music','SELECT count(*) FROM schema_migrations'),/3/);
+    await verify(resource(state.db));await run(['stop','-t','10',state.db]);
+    await wait(async()=>await health(first.c)===503,pause);
+    await run(['start',state.db]);await wait(async()=>await health(first.c)===200,pause);
+    await stop(first.c);
+    const dump=await run(['exec',state.db,'pg_dump','-U','postgres','--clean','--if-exists','-d','music']);
+    assert.match(dump,/PostgreSQL database dump/);
+    const connected=await create('container',['--name',`${config.owner}-connected`,...constraints,'--network',config.network,
+      '-e','CONNECTED_DISPOSABLE=synthetic-only','--mount',`type=bind,src=${resolve(config.root,'scripts/database/connected.mjs')},dst=/app/verification/connected.mjs,readonly`,
+      '--entrypoint','node',config.image,'/app/verification/connected.mjs']);
+    await run(['start','-a',connected.id]);assert.equal((await verify(connected)).State.ExitCode,0,'Connected scenarios failed');await remove(connected);
+    assert.match(await sql('music','SELECT count(*) FROM deletion_records'),/1/);
+    await sql('music',null,dump);
+    assert.match(await sql('music','SELECT count(*) FROM deletion_records'),/0/);
+    // Deliberate synthetic owner fixture for the actual normal command; never used in production.
+    await sql('music',"INSERT INTO accounts(id,binding,generation) VALUES('11111111-1111-4111-8111-111111111111','invented-owner','22222222-2222-4222-8222-222222222222')");
+    const normal=await service(false);await ready(normal.c,normal.started);await stop(normal.c);
+    const restarted=await service(false);await ready(restarted.c,restarted.started);await stop(restarted.c);
+    report('PASS single-database connected scenarios, default setup/normal startup, outage recovery, real SIGTERM and coherent backup restore loss model');
+  }
+  return { setup, exercise, platformExercise, cleanup, preflight, state };
 }

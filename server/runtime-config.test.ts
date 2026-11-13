@@ -49,10 +49,10 @@ test('invalid origins, callback, identities, key references and legacy or synthe
     ORGANISER_SYNTHETIC: ['', 'false'], ORGANISER_DATABASE: ['legacy'], ORGANISER_KEY: ['legacy'],
   })) for (const value of values) assert.throws(() => productionConfig({ ...fixture(), [name]: value }), { message: `Missing or invalid setting: ${name}` });
 });
-test('valid full configuration still cannot activate the production executable', () => {
-  const result = spawnSync(process.execPath, ['server/production.ts'], { env: platformFixture(), encoding: 'utf8', timeout: 5000 });
+test('production executable rejects invalid settings without exposing values', () => {
+  const result = spawnSync(process.execPath, ['server/production.ts'], { env: { ...platformFixture(), ORGANISER_OWNER: undefined }, encoding: 'utf8', timeout: 5000 });
   assert.equal(result.status, 1);
-  assert.match(result.stderr, /Production activation requires the separate S04c operational gate/);
+  assert.match(result.stderr, /Application configuration-failed/);
   assert.equal(result.stdout, '');
   assert.doesNotMatch(result.stderr, /postgres:\/\/|invented-owner|111111111111111111/);
 });
@@ -81,4 +81,12 @@ test('platform configuration needs only supplied database and two purpose-separa
  assert.equal(config.databases.runtime.database,'music');assert.equal(config.journal,undefined);
  for(const name of ['MIGRATION_DATABASE_URL','JOURNAL_DATABASE_URL','JOURNAL_MIGRATION_DATABASE_URL','ORGANISER_JOURNAL_KEYS','ORGANISER_JOURNAL_CURRENT'])assert.throws(()=>platformProductionConfig({...env,[name]:'invented'}));
  assert.throws(()=>platformProductionConfig({...env,ORGANISER_SNAPSHOT_KEYS:env.ORGANISER_CREDENTIAL_KEYS}));
+});
+
+test('Mac UUID account settings normalise to PostgreSQL canonical identity without changing Spotify binding', () => {
+  const env = { ...platformFixture(), ORGANISER_ACCOUNT: 'ABCDEF12-ABCD-4ABC-8ABC-ABCDEF123456', ORGANISER_OWNER: 'CaseSensitiveOwner' };
+  const config = platformProductionConfig(env);
+  assert.equal(config.owner.account, 'abcdef12-abcd-4abc-8abc-abcdef123456');
+  assert.equal(config.owner.binding, 'CaseSensitiveOwner');
+  assert.equal(env.ORGANISER_ACCOUNT, 'ABCDEF12-ABCD-4ABC-8ABC-ABCDEF123456');
 });

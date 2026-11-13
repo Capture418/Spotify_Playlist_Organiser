@@ -1,4 +1,4 @@
-# Preparation only: production entry deliberately refuses activation.
+# D064 pilot: validated production entry, runtime settings supplied at deployment.
 # D032: reviewed linux/amd64 layers and database-free Node22 build/runtime checks pass.
 FROM node:22.23.5-bookworm-slim@sha256:47725aca53d3295ec2d3be8f62726599b3033cc262edc2c7e429909b3ac599fc AS dependencies
 WORKDIR /app

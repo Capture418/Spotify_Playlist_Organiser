@@ -105,7 +105,7 @@ test('inactive draft preserves read-only PR boundaries and immutable action/imag
     assert.ok(lstatSync(file).isFile() && !lstatSync(file).isSymbolicLink());
     files[name] = readFileSync(file, 'utf8');
   }
-  verifyWorkflows(JSON.parse(readFileSync(new URL('../docs/ci/workflow-policy.json', import.meta.url))), draft, files);
+  verifyWorkflows(JSON.parse(readFileSync(new URL('../docs/ci/workflow-policy.json', import.meta.url))), draft, files, JSON.parse(readFileSync(new URL('../docs/ci/pilot-workflow-policy.json',import.meta.url))));
   assert.match(draft, /pull_request:\s+branches: \[main\]/); assert.match(draft, /contents: read/);
   assert.match(draft, /persist-credentials: false/); assert.match(draft, /runs-on: ubuntu-24.04/);
   assert.doesNotMatch(draft, /pull_request_target|self-hosted|secrets\.|packages: write|docker login|request-deploy|workflow_dispatch/);
@@ -281,4 +281,44 @@ test('single-database setup selects only the owning-role fixture and keeps scope
  assert.match(sql,/NOSUPERUSER NOCREATEDB NOCREATEROLE/);assert.match(sql,/CREATE DATABASE music OWNER music_app/);
  await assert.rejects(job.exercise(),/single-database/);
  await job.cleanup();assert.equal(f.objects.size,0);
+});
+
+test('platform rehearsal runs default command, signal stops, one-database restore and cleanup',async()=>{
+ const f=fake();let restored=false;
+ const execute=async(args,input)=>{
+  if(args[0]==='logs'){f.calls.push({args,input});return 'Application ready\nApplication stopped';}
+  if(args.includes('psql')&&args.at(-1).includes('count(*)')){
+   f.calls.push({args,input});return args.at(-1).includes('schema_migrations')?'3':restored?'0':'1';
+  }
+  if(input?.includes('PostgreSQL database dump'))restored=true;
+  return f.execute(args,input);
+ };
+ const job=launcher({...config(),singleDatabase:true},execute,f.save);
+ await job.setup();await job.platformExercise(async()=>{});await job.cleanup();
+ assert.equal(f.objects.size,0);
+ assert.equal(f.calls.filter(c=>c.args[0]==='stop'&&c.args.includes('20')).length,3);
+ assert.ok(f.calls.some(c=>c.args.includes('/app/verification/connected.mjs')));
+ assert.ok(f.calls.some(c=>c.input?.includes('PostgreSQL database dump')));
+ assert.ok(!f.calls.some(c=>c.args.includes('music_journal')));
+});
+
+test('pilot workflows are manual main-only; release has no app secrets; deployment uses only operator helper', () => {
+  const files = Object.fromEntries(['pilot-release.yml','pilot-deploy.yml'].map(name => [name, readFileSync(new URL('../.github/workflows/'+name, import.meta.url),'utf8')]));
+  for(const body of Object.values(files)) {
+    assert.match(body,/workflow_dispatch:/);
+    assert.match(body,/github.ref == 'refs\/heads\/main'/);
+    assert.doesNotMatch(body,/\n  (push|pull_request|pull_request_target|schedule):/);
+  }
+  const release=files['pilot-release.yml'], deploy=files['pilot-deploy.yml'];
+  assert.doesNotMatch(release,/APP_|toJSON\(secrets\)|self-hosted/);
+  assert.equal((release.match(/docker .* build /g)??[]).length,1);
+  assert.ok(release.indexOf('node scripts/ci/run.mjs run')<release.indexOf('Publish the verified image'));
+  assert.match(release,/test "\$actual" = "\$image"/);
+  assert.equal((deploy.match(/      - /g)??[]).length,1);
+  assert.match(deploy,/- run: \/opt\/music-runner\/request-deploy/);
+  assert.doesNotMatch(deploy,/checkout|npm |docker |cancel-in-progress: true/);
+  const policy=JSON.parse(readFileSync(new URL('../docs/ci/workflow-policy.json',import.meta.url),'utf8'));
+  const draft=readFileSync(new URL('../docs/ci/pr-checks.yml.example',import.meta.url),'utf8');
+  const hashes=JSON.parse(readFileSync(new URL('../docs/ci/pilot-workflow-policy.json',import.meta.url),'utf8'));
+  for(const name of Object.keys(files)) assert.throws(()=>verifyWorkflows(policy,draft,{'pr-checks.yml':draft,...files,[name]:files[name]+'\n'},hashes));
 });

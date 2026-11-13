@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D063: D062 accepted. Prepare one consolidated real Spotify/server pilot approval package; routine local release preparation and mocked tests only. Credentials, live activation and deployment remain gated.
+D064: execute approved consolidated pilot. Counters: candidate1/3 and synthetic attempt1/6 reserved for the release PR CI; deployments0/2 plus one corrective normal deployment. Secure user handoffs remain required.
 
 ## Existing implementation
 
@@ -382,3 +382,16 @@ Reviewed official Spotify PKCE, redirects, development-mode/Premium/allowlist re
 Separate technical-lead self-review checked inertness, destination/method restriction, signal/redirect handling, secret-free errors, unapplied activation boundary and package distinctions between tested components and future release evidence. Not an independent security or dependency advisory audit. Final whitespace and foundation checks passed. No credential read/generation, real Spotify call, Docker/database operation, installation, browser account operation, push, merge/settings, server change or deployment. Constitution review confirms bounded preparation and explicit pending operational consent.
 
 Next: owner may approve the single package's proposed execution statement. Until then credentials and deployment remain blocked. After approval, routine fixes and in-scope verification proceed without milestone confirmations; only user secret/consent/device handoffs, a material scope change or a failed safety boundary interrupts. Final source SHA/image digest are produced and reported after those checks, never substituted from D062 or treated as already deployable.
+
+
+## D064 scope
+
+Apply release activation, update single-database CI/default-entry/signal/restore checks, run host gate and advisory review, publish/review/merge the release PR, build/test/publish exact image and perform secure setup/normal pilot within approved bounds. Retrieved the owner-supplied original platform prompt for exact `/opt/music-runner/request-deploy` invocation. Later fixed platform contract and manual pilot approval supersede its old automatic-main deployment instructions. No automatic deployment on merge.
+
+D064 credential handoff: owner reports entering the ten pre-identity repository settings and retaining keys/token/account UUID privately; values were not retrieved. Loopback callback4174 is confirmed by owner. Updated the memory-only helper to show only the explicitly verified immutable account ID in its browser-bound, no-store page for copying directly into APP_ORGANISER_OWNER. Other profile fields and tokens remain unrendered; disconnect clears the ID. Full installed-host gate passed211 tests, lint/types/build and whitespace checks; evidence `.work/d064-identity-quality.log`. Restarted the identified project-owned helper for the user handoff. No identity result or consent success is claimed yet. Candidate builds0/3, disposable attempts0/6, deployments0 remain unchanged.
+
+D064 owner confirms verified immutable ID copied directly into APP_ORGANISER_OWNER and helper disconnected. Names-only GitHub verification confirms all eleven setup settings present; values never read. Host checks before final UUID normalisation passed212 tests. Normalise organiser UUID case at configuration boundary (macOS uuidgen vs PostgreSQL); Spotify identity stays case-sensitive. Review covers explicit transport, no raw logging, CSRF/state/PKCE/owner checks, strict proxy, durable setup closure and single-database deletion. Technical-lead self-review, not independent audit. Credential-free lockfile advisory review reports zero known vulnerabilities; no dependency changes.
+
+Preparing first approved PR CI candidate (build1/3, synthetic1/6 reserved on push/PR); release publication will build/test a second candidate on main rather than publish an untested rebuild. No deployment or registry publication yet.
+
+Final pre-push host gate:213 tests passed, zero failures/skips, lint/types/client/server build and whitespace checks passed (`.work/d064-final-quality.log`). Eleven setting names verified; values and private identity are absent from changes. First PR candidate is the next actual resource execution.

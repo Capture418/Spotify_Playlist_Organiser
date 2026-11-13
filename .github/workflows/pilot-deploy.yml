@@ -1,0 +1,25 @@
+name: Pilot deploy
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: Verified ghcr.io/capture418/spotify-playlist-organiser@sha256 digest
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  deploy:
+    if: ${{ github.repository == 'Capture418/Spotify_Playlist_Organiser' && github.ref == 'refs/heads/main' }}
+    runs-on: [self-hosted, music-deploy]
+    permissions:
+      packages: read
+    concurrency:
+      group: deploy
+      cancel-in-progress: false
+    steps:
+      - run: /opt/music-runner/request-deploy
+        env:
+          IMAGE: ${{ inputs.image }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_SECRETS: ${{ toJSON(secrets) }}

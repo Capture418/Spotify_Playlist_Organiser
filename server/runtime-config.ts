@@ -41,7 +41,7 @@ function validateConfig(env: NodeJS.ProcessEnv, platform: boolean) {
   } catch { invalid('ORGANISER_ORIGIN'); }
   const callback = setting(env, 'ORGANISER_CALLBACK');
   if (callback !== origin + '/callback') invalid('ORGANISER_CALLBACK');
-  const account = setting(env, 'ORGANISER_ACCOUNT');
+  const account = setting(env, 'ORGANISER_ACCOUNT').toLowerCase();
   if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(account)) invalid('ORGANISER_ACCOUNT');
   const binding = setting(env, 'ORGANISER_OWNER');
   if (binding.length > 256 || /\s/u.test(binding)) invalid('ORGANISER_OWNER');

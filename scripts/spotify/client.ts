@@ -124,6 +124,7 @@ export class SpotifySession {
   constructor(fetcher: typeof fetch = fetch) { this.#fetch = fetcher; }
   get items(): readonly Playlist[] { this.#expire(); return this.#items; }
   get albums(): readonly Album[] { this.#expire(); return this.#albums; }
+  get verifiedAccountId(): string | undefined { this.#expire(); return this.#accountId; }
   get identityVerified(): boolean { this.#expire(); return this.#accountId !== undefined; }
   get connected(): boolean { this.#expire(); return Boolean(this.#token); }
   #expire() { if (this.#token && Date.now() >= this.#token.expires) this.disconnect('Session expired. Reconnect to continue.'); }
@@ -191,7 +192,7 @@ export class SpotifySession {
     if (clear || failure.message.startsWith('Access denied')) this.disconnect(failure.message);
     else this.message = failure.message;
   }
-  /** Explicit S04b.1 probe; the identifier is never exposed or used as an owner pin. */
+  /** Explicit identity probe; D064 permits private browser display for owner configuration. */
   async checkIdentity(): Promise<void> {
     this.#expire();
     if (!this.#token) throw new Failure('Connect before checking identity.');

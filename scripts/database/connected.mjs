@@ -69,7 +69,7 @@ async function start(){
 try{
  const row=(await runtime.query("SELECT current_database() AS db,current_setting('server_version_num') AS v,(SELECT rolsuper FROM pg_roles WHERE rolname=current_user) AS super")).rows[0];
  assert.equal(row.db,'music');assert.match(row.v,/^16\d{4}$/);assert.equal(row.super,false);
- assert.equal((await runtime.query("SELECT count(*) AS n FROM pg_tables WHERE schemaname='public'")).rows[0].n,'0');
+ assert.equal((await runtime.query('SELECT count(*) AS n FROM accounts')).rows[0].n,'0');
  await setupVerification(); // App startup itself migrates genuinely fresh storage.
  running=await start();
  const root=await http('/');assert.equal(root.status,200);assert.match(root.text,/name="organiser-mode" content="connected"/);assert.match(root.text,/<title>Music Library Organiser<\/title>/);

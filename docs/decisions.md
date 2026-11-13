@@ -119,3 +119,8 @@ Owner accepts D061 and approves one local image build including container depend
 ## D063 — D062 acceptance and consolidated pilot preparation
 
 Owner accepts D062 and approves preparing the real Spotify/server pilot as one approval package, avoiding repeated small confirmations. Credentials and deployment remain gated. This permits routine local source/document preparation and mocked tests, not live activation, secrets, extra resource execution, publication, merging or deployment. Proposed operational scope in the pilot package is not approval.
+
+
+## D064 — Consolidated pilot execution approved
+
+Owner approves the complete execution scope in docs/pilot-approval.md using included allowance only, with secure credential and Spotify consent guidance. Limits: three candidate builds, six synthetic verification attempts, setup and normal deployment plus one corrective normal deployment. Covers the reviewed release PR/merge, public tested-image publication and listed credential/real-data handoffs. No new infrastructure/scopes, destructive real-data operation or unrelated settings change.

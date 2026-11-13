@@ -86,7 +86,7 @@ test('saved-album route has origin/CSRF protection and renders untrusted metadat
   assert.equal(calls, 2); server.emit('close');
 });
 
-test('identity POST is bound to browser/origin/CSRF and renders no profile or identifier; shutdown clears it', async () => {
+test('identity POST is bound to browser/origin/CSRF and displays only verified ID privately; shutdown clears it', async () => {
   let calls = 0;
   const session = new SpotifySession(async url => {
     calls++;
@@ -111,7 +111,9 @@ test('identity POST is bound to browser/origin/CSRF and renders no profile or id
   await request('/identity','POST',headers,`csrf=${csrf}`);
   const rendered = await request('/','GET',{ cookie });
   assert.match(rendered.body,/Identity verified in this session: yes/);
-  assert.doesNotMatch(rendered.body,/private-account|private-name|private-email|private-token/);
+  assert.match(rendered.body,/id="verified-owner"[^>]*value="private-account"/);
+  assert.doesNotMatch(rendered.body,/private-name|private-email|private-token/);
   assert.equal(rendered.headers['cache-control'],'no-store'); assert.equal(calls,2);
   server.emit('close'); assert.equal(session.identityVerified,false);
+  assert.doesNotMatch((await request('/', 'GET', { cookie })).body, /private-account|id="verified-owner"/);
 });

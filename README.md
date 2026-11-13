@@ -2,7 +2,7 @@
 
 A responsive personal organiser for Spotify playlists and saved albums. Shared tags, match-all filtering and all-word search help find music; Spotify remains the player.
 
-This is a development snapshot. The default interface uses invented data and resets edits on reload. The Node/PostgreSQL foundation and an online-only PWA manifest are prepared, but the production executable deliberately refuses activation. No hosted service, live account connection or offline library is supplied by this repository.
+This is a development snapshot. The default interface uses invented data and resets edits on reload. The Node/PostgreSQL foundation and an online-only PWA manifest are prepared, and the production executable requires explicit validated settings. No hosted service, live account connection or offline library is supplied by this repository.
 
 ## Development
 
@@ -24,7 +24,7 @@ Do not run database commands, Compose or the CI launcher without explicit dispos
 - Same-origin server API, explicit owner binding and one application database/owning role; deletion records commit atomically with account removal.
 - Versioned encryption keys and restore/recovery controls are preparation mechanisms, not proof of hosted custody or backups.
 - `.env.example` contains placeholders and a reserved example hostname. It is not a working deployment configuration.
-- Normal PR CI is present under `.github/workflows` under D051. There is no active publish/deploy workflow; source publication does not itself authorise deployment.
+- Normal PR CI is present under `.github/workflows` under D051. D064 adds manual-only pilot image publication and deployment workflows; source publication never automatically deploys.
 
 Read [AGENTS.md](AGENTS.md), [the constitution](.ai/constitution.md), [architecture](docs/architecture.md), [decision summary](docs/decisions.md) and [work plan](docs/work-plan.md) before changes. Technical deployment gates are in the [deployment preparation plan](docs/home-deployment.md).
 
@@ -35,6 +35,6 @@ Personal operational records and private development history are intentionally e
 
 The server allows180 seconds for the app to become healthy, including migrations, and20 seconds to shut down after SIGTERM. These limits were confirmed by the owner after consulting the operator; this checkout has not independently inspected the server settings.
 
-The prepared application retains its tighter150-second startup limit and10-second shutdown deadline, leaving time within the server limits. Production activation and deployment remain separately gated.
+The prepared application retains its tighter150-second startup limit and10-second shutdown deadline, leaving time within the server limits. D064 authorises the bounded pilot; future deployment needs its applicable approval.
 
-The consolidated private-pilot approval package is [here](docs/pilot-approval.md). Credentials, live activation and deployment remain gated.
+The consolidated private-pilot approval package is [here](docs/pilot-approval.md). D064 approves that bounded package; secure user handoffs remain required.

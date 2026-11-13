@@ -1,6 +1,6 @@
 # Consolidated private pilot approval package — D063
 
-Status: **prepared, not approved for execution**. D062 is accepted. Credentials, real Spotify access, publication/merging and deployment have not been authorised by preparation. This package groups those actions into one bounded decision. Routine implementation and fixes inside the accepted design do not need further checkpoint approvals.
+Status: **approved for bounded execution under D064**. The following proposal records the approved scope; its preparation-era wording is retained as context. D062 is accepted. Credentials, real Spotify access, publication/merging and deployment have not been authorised by preparation. This package groups those actions into one bounded decision. Routine implementation and fixes inside the accepted design do not need further checkpoint approvals.
 
 ## Outcome to review
 
@@ -93,4 +93,4 @@ Pilot acceptance means these checks pass against the final digest and real servi
 
 > I approve the consolidated pilot execution scope in docs/pilot-approval.md: release activation and ordinary fixes, up to three candidate builds/six synthetic verification attempts with installation and cleanup, sanitised release PR/merge after passing review and checks, publication of the tested public GHCR image, the listed credential/real-read-only-Spotify setup through secure owner/operator handoffs, setup and normal deployments plus one corrective normal deployment, and Mac/iPhone pilot verification. Use included allowance only. No new infrastructure, scopes, destructive real-data operations or unrelated settings changes.
 
-This wording is a proposal, not a recorded decision. Browser consent or secret-entry handoffs can still require the owner's action; they are not additional engineering milestone approvals. If the owner approves only preparation, credentials and deployment remain blocked.
+The owner approved this package under D064. Browser consent or secret-entry handoffs can still require the owner's action; they are not additional engineering milestone approvals. If the owner approves only preparation, credentials and deployment remain blocked.

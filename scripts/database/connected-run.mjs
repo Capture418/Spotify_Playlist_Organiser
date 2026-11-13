@@ -27,13 +27,5 @@ save(state);
 const job=launcher(config,execute,save,state,console.log);
 try{
  await job.setup();
- let ready=false;
- for(let i=0;i<30;i++){try{execute(['exec',state.db,'psql','-XAt','-U','postgres','-d','music','-c','SELECT 1']);ready=true;break;}catch{}await new Promise(r=>setTimeout(r,1000));}
- assert.ok(ready,'Database did not become ready');
- const id=execute(['container','create','--name',owner+'-app','--label','organiser.ci='+owner,'--pull','never','--platform','linux/amd64','--network',config.network,'--user','1000:1000','--read-only','--tmpfs','/tmp:size=67108864,mode=1777','--memory','512m','--cpus','1','--cap-drop','ALL','--security-opt','no-new-privileges:true','--pids-limit','128','-e','CONNECTED_DISPOSABLE=synthetic-only',...runtimeMounts(plan,root.replace(/\/$/,'')),'--mount',`type=bind,src=${resolve(root,'scripts/database/connected.mjs')},dst=/app/verification/connected.mjs,readonly`,'--entrypoint','node',image,'/app/verification/connected.mjs']).trim();
- const found=JSON.parse(execute(['container','inspect',id]))[0];assert.equal(found.Config.Labels['organiser.ci'],owner);assert.equal(found.Id,id);
- state.resources.push({kind:'container',id});save(state);
- assert.equal(found.HostConfig.ReadonlyRootfs,true);assert.equal(Object.keys(found.HostConfig.PortBindings??{}).length,0);
- const output=execute(['start','-a',id]);writeFileSync(resolve(directory,'scenarios.log'),output);console.log(output);
- assert.equal(JSON.parse(execute(['container','inspect',id]))[0].State.ExitCode,0,'Connected scenarios failed');
+ await job.platformExercise();
 }finally{await job.cleanup();}
