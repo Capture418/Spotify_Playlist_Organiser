@@ -8,7 +8,7 @@ This is preparation, not execution approval. The [fixed platform contract](platf
 
 `startPreparedPlatform` uses one pool under the existing non-superuser database-owning role. In one migration transaction it locks, distinguishes empty public storage from incomplete existing storage, validates historical checksums and applies missing migrations. It omits only the historical grants to the unavailable organiser_app role: the supplied role owns the tables it creates. Canonical migration SQL/checksums are unchanged. It creates no database or role and performs no independent journal initialisation. A partial schema, missing migration history, changed checksum, newer schema or missing/blocked recovery guard refuses startup. An empty database after total loss cannot be distinguished from a new installation; operator restore procedure remains authoritative.
 
-Startup verifies schema and guard before composition, checks database readiness before listening, and retains the150-second deadline. No existing blocked guard is cleared automatically. The prepared process lifecycle retains10-second shutdown within the server's20-second allowance. Actual PostgreSQL semantics and exact-image timings remain to be verified in a separately approved disposable rehearsal.
+Startup verifies schema and guard before composition, checks database readiness before listening, and retains the150-second deadline. No existing blocked guard is cleared automatically. The prepared process lifecycle retains10-second shutdown within the server's20-second allowance. D062 verified PostgreSQL semantics using the exact image and injected lifecycle; actual default-entry signal/timing acceptance remains in the pilot package.
 
 ## First use and normal operation
 
@@ -28,4 +28,4 @@ The operator restores the entire database from its encrypted backups. Data, setu
 
 ## Remaining release work
 
-D061 prepares the matching single-database disposable harness and executable/lifecycle wiring with injected mocked transport. The default command still refuses activation. Obtain separate execution approval for the exact-image/database checks in `docs/release-rehearsal.md`; no such run has occurred. Real OS-signal delivery is not simulated by the harness lifecycle stop. Live transport/credentials, server changes, publication, merging and deployment remain separate gates. There are no new platform questions.
+D061 prepares the matching single-database disposable harness and executable/lifecycle wiring with injected mocked transport. The default command still refuses activation. D062 passed the exact-image/database checks in `docs/release-rehearsal.md`; further operational work is consolidated in `docs/pilot-approval.md`. Real OS-signal delivery is not simulated by the harness lifecycle stop. Live transport/credentials, server changes, publication, merging and deployment remain separate gates. There are no new platform questions.

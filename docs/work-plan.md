@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D062: D061 accepted; execute one approved local build and single-database rehearsal with cleanup, then provide a reviewable invented-data app within existing gates.
+D063: D062 accepted. Prepare one consolidated real Spotify/server pilot approval package; routine local release preparation and mocked tests only. Credentials, live activation and deployment remain gated.
 
 ## Existing implementation
 
@@ -364,3 +364,21 @@ Opened a reviewable built invented-data interface on loopback port4182 and left 
 Validation relies on the unchanged source's D061207-test host gate plus the new exact-image build and actual PG16 rehearsal. Final documentation/foundation checks in `.work/d062-foundation.log`; whitespace review passed. Self-review confirms scoped resources, exact artifact identity, truthful distinction between demo/database evidence and live product, no weakened guard. No independent security/advisory audit, backup restore, prior-release image rollback, actual SIGTERM, HTTPS proxy or real-device acceptance claimed.
 
 Owner requested fewer confirmations. Routine local implementation, fixes and preparation towards the functioning app can continue under that direction; do not ask for acceptance of every internal step. The explicit one-build/one-rehearsal limit is exhausted, and real account data/credentials, server changes, publication, merging/settings and deployment remain gated. Consolidate the next consequential approval around a concrete private-pilot release package rather than more small preparation checkpoints. Default production command still refuses; live dependency wiring and release/pilot execution are not claimed complete. Current app is available for interface review at http://127.0.0.1:4182 on this laptop only.
+
+
+## D063 scope and acceptance
+
+Prepare a concrete release adapter and unapplied activation diff, exact configuration-name inventory, release artifact/test/publish/setup/normal sequence, rollback and device acceptance checklist, and one bounded approval statement. Recheck official Spotify requirements. Preserve platform contract and existing executable refusal; no secret access/generation, live API calls, resource runs, pushes/merges, server changes or deployment. Validate local changes and distinguish completed evidence from future gates.
+
+
+## D063 actual results — 13 November 2026
+
+D062 acceptance recorded. Prepared `docs/pilot-approval.md` as one consolidated proposed execution scope: bounded release builds/tests/fixes, sanitised source PR/merge, tested public GHCR publication, secure configuration/identity handoffs, setup/normal deployments, rollback and final Mac/iPhone checks. It contains exact setting names, custody guidance, retained platform risks, acceptance evidence and explicit stop conditions. No operational approval is inferred. No new platform question or message to the operator was sent. The existing deploy helper syntax is not present in this checkout; the package requires using/reviewing the existing job rather than inventing a new service or claiming a deploy workflow exists.
+
+Added inert `releaseDependencies` with approved token/read destination and method restriction, mandatory abort signal, redirects refused, fixed transport errors and handled idle pool errors. It makes no connection on construction and is not called by the default production entry. Added three mocked tests; the full installed-host gate passed210 tests, zero failures/skips, project/lockfile checks, lint, types and both builds. Prepared `docs/release/pilot-activation.patch` and checked applicability without applying it. This is a reviewable activation proposal, not a tested activated image. Existing default-refusal test remains passing. Evidence `.work/d063-quality.log`; final documentation/foundation `.work/d063-foundation.log`.
+
+Reviewed official Spotify PKCE, redirects, development-mode/Premium/allowlist requirements, current immutable account_id guidance and collection endpoint documentation; links and date are in the package. Current account state was not accessed. Reviewed official GitHub GHCR authentication guidance: proposed publication uses GITHUB_TOKEN in a bounded hosted job, with no APP_ secrets there. No new authentication or actual workflow/publish execution. Corrected stale README/architecture/setup claims about separate roles/journal, inactive PR CI and pending D062 database verification.
+
+Separate technical-lead self-review checked inertness, destination/method restriction, signal/redirect handling, secret-free errors, unapplied activation boundary and package distinctions between tested components and future release evidence. Not an independent security or dependency advisory audit. Final whitespace and foundation checks passed. No credential read/generation, real Spotify call, Docker/database operation, installation, browser account operation, push, merge/settings, server change or deployment. Constitution review confirms bounded preparation and explicit pending operational consent.
+
+Next: owner may approve the single package's proposed execution statement. Until then credentials and deployment remain blocked. After approval, routine fixes and in-scope verification proceed without milestone confirmations; only user secret/consent/device handoffs, a material scope change or a failed safety boundary interrupts. Final source SHA/image digest are produced and reported after those checks, never substituted from D062 or treated as already deployable.

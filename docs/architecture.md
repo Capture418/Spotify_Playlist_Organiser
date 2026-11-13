@@ -1,6 +1,6 @@
 # Architecture and boundaries
 
-**D059 supersession:** `docs/platform-contract.md` is the current hosting target. Separate journal databases/roles and external operator jobs described below are historical implementation/preparation, not available infrastructure or launch requirements. No D058 rerun is planned. D060 implements the prepared single-database path; actual PostgreSQL/image verification is pending.
+**D059 supersession:** `docs/platform-contract.md` is the current hosting target. Separate journal databases/roles and external operator jobs described below are historical implementation/preparation, not available infrastructure or launch requirements. No D058 rerun is planned. D060 implements the single-database path; D062 passed exact-image PostgreSQL verification. Live activation and real OS-signal verification remain separate.
 
 
 This public summary describes the implemented development snapshot. It excludes personal account observations and actual infrastructure identifiers. Read the [constitution](../.ai/constitution.md), [decisions](decisions.md) and [work plan](work-plan.md).
@@ -65,3 +65,6 @@ D057 prepares exact-image verification without the host runtime overlay and an o
 
 
 D061 joins the validated application to `prepareProcess` through the injected `executable` boundary and inert `processHost` adapter. The default production entry supplies no dependencies and still refuses activation. The current exact-image rehearsal uses one owning role/database and the same executable boundary with mocked Spotify and an observed lifecycle host. Historical release/setup launcher modes are rejected. Real container/database and OS-signal verification remain separate; see `docs/release-rehearsal.md`.
+
+
+D063 records D062 acceptance and prepares `docs/pilot-approval.md`. `release-dependencies.ts` supplies an inert, tested transport/pool adapter; the proposed activation diff stays unapplied in `docs/release/pilot-activation.patch`. The default entry still refuses. The package combines release verification, publication, secure credential handoffs, setup/normal deployment and owner acceptance; none of that operational scope is approved by preparation.

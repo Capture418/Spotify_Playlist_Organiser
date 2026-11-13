@@ -114,3 +114,8 @@ Owner accepts D060 and approves single-database rehearsal preparation and execut
 ## D062 — D061 acceptance and one local rehearsal
 
 Owner accepts D061 and approves one local image build including container dependency installation, and one disposable single-database rehearsal with cleanup. Owner requests autonomous progress to a reviewable functioning app; routine local implementation and invented-data preview work may proceed without repeated confirmations. This does not authorise extra rehearsal attempts, real data/credentials, server changes, publication, merging or deployment.
+
+
+## D063 — D062 acceptance and consolidated pilot preparation
+
+Owner accepts D062 and approves preparing the real Spotify/server pilot as one approval package, avoiding repeated small confirmations. Credentials and deployment remain gated. This permits routine local source/document preparation and mocked tests, not live activation, secrets, extra resource execution, publication, merging or deployment. Proposed operational scope in the pilot package is not approval.
