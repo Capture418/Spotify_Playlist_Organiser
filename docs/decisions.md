@@ -104,3 +104,8 @@ Owner supplies the settled platform contract and directs work within it without 
 ## D060 — Single-database adaptation
 
 Owner approves adapting startup, initialisation and deletion storage to the fixed single-database contract using invented data and mocked tests. Real data, credentials, server changes, merging and deployment remain separately gated. No installation, resource creation or live execution is inferred. Existing setup safeguards and accepted four-hour restore loss model remain.
+
+
+## D061 — D060 acceptance and rehearsal/executable preparation
+
+Owner accepts D060 and approves single-database rehearsal preparation and executable wiring using mocked tests. Actual execution, real data, credentials, server changes, merging and deployment remain separately gated. No resource creation, installation, live transport activation or push is inferred.

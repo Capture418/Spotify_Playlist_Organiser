@@ -28,4 +28,4 @@ The operator restores the entire database from its encrypted backups. Data, setu
 
 ## Remaining release work
 
-Prepare a matching single-database disposable harness and executable wiring with injected mocked transport first. The historical two-database harness is not current-platform evidence. Then obtain separate execution approval for the exact-image/database checks. Live transport/credentials, server changes, publication, merging and deployment remain separate gates. There are no new platform questions.
+D061 prepares the matching single-database disposable harness and executable/lifecycle wiring with injected mocked transport. The default command still refuses activation. Obtain separate execution approval for the exact-image/database checks in `docs/release-rehearsal.md`; no such run has occurred. Real OS-signal delivery is not simulated by the harness lifecycle stop. Live transport/credentials, server changes, publication, merging and deployment remain separate gates. There are no new platform questions.

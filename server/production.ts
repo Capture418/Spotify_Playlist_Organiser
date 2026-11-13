@@ -1,4 +1,3 @@
-import { platformProductionConfig } from './runtime-config.ts';
-// Real transport/bootstrap activation is deliberately unavailable until S04c approval.
-platformProductionConfig(process.env);
-throw new Error('Production activation requires the separate S04c operational gate.');
+import { executable } from './executable.ts';
+// No live dependencies are supplied until separate execution/credential approval.
+executable(process.env);

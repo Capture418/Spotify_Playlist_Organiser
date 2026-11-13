@@ -3,28 +3,18 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { request } from 'node:http';
 import { Pool } from 'pg';
-import { startIntegratedApplication } from '../runtime/server/application.js';
-import { productionConfig } from '../runtime/server/runtime-config.js';
-import { migrate } from '../runtime/server/database.js';
-import { migrateJournal } from '../runtime/server/journal-migration.js';
-import { JsonCipher } from '../runtime/server/lifecycle.js';
-import { PostgresJournal } from '../runtime/server/postgres-journal.js';
-import { reconcileRecovery, approveRecovery } from '../runtime/server/journal.js';
-import { bootstrapOwner } from '../runtime/server/integration.js';
+import { executable } from '../runtime/server/executable.js';
+import { platformProductionConfig } from '../runtime/server/runtime-config.js';
 import { SCOPES } from '../runtime/server/security.js';
-import { digest } from '../runtime/server/validation.js';
 assert.equal(process.env.CONNECTED_DISPOSABLE,'synthetic-only');
 assert.equal(process.getuid(),1000);assert.equal(process.arch,'x64');
 const origin='https://music.example.invalid';
 const env={NODE_ENV:'production',PORT:'3000',ORGANISER_ORIGIN:origin,ORGANISER_CALLBACK:origin+'/callback',ORGANISER_ACCOUNT:'11111111-1111-4111-8111-111111111111',ORGANISER_OWNER:'invented-owner',SPOTIFY_CLIENT_ID:'a'.repeat(32)};
-for(const [setting,user,password,db] of [
- ['DATABASE_URL','music_app','invented-local-app-only','music'],['MIGRATION_DATABASE_URL','music_migrator','invented-local-migrator-only','music'],
- ['JOURNAL_DATABASE_URL','music_journal_app','invented-local-journal-app-only','music_journal'],['JOURNAL_MIGRATION_DATABASE_URL','music_journal_migrator','invented-local-journal-migrator-only','music_journal']])env[setting]=`postgres://${user}:${password}@db:5432/${db}`;
-for(const [purpose,byte] of [['CREDENTIAL','11'],['SNAPSHOT','22'],['JOURNAL','33']]){env[`ORGANISER_${purpose}_KEYS`]='invented:'+byte.repeat(32);env[`ORGANISER_${purpose}_CURRENT`]='invented';}
-const config=productionConfig(env),pools=[];
+env.DATABASE_URL='postgres://music_app:invented-local-app-only@db:5432/music';
+for(const [purpose,byte] of [['CREDENTIAL','11'],['SNAPSHOT','22']]){env[`ORGANISER_${purpose}_KEYS`]='invented:'+byte.repeat(32);env[`ORGANISER_${purpose}_CURRENT`]='invented';}
+const config=platformProductionConfig(env),pools=[];
 function pool(c){const p=new Pool({...c,max:4,connectionTimeoutMillis:2000,statement_timeout:5000});p.on('error',()=>{});pools.push(p);return p;}
-const admin=pool(config.databases.migration),jadmin=pool(config.databases.journalMigration),runtime=pool(config.databases.runtime),jp=pool(config.databases.journal);
-const snapshots=new JsonCipher(config.snapshots.keys,config.snapshots.current,'snapshot'),cipher=new JsonCipher(config.journal.keys,config.journal.current,'journal'),journal=new PostgresJournal(jp,cipher);
+const runtime=pool(config.databases.runtime);
 let mode='ok',identity=config.owner.binding,calls=0,running;
 const id='A'.repeat(22);
 const transport=async(url,init)=>{
@@ -68,28 +58,24 @@ async function setupVerification(){
 }
 async function get(path,s){const r=await http(path,s);assert.equal(r.status,200,r.text);return r.data();}
 async function post(path,s,body){const r=await http(path,s,body);assert.equal(r.status,200,r.text);return r.data();}
-async function start(){const before=pools.length;const result=await startIntegratedApplication(env,{pool,transport});assert.equal(pools.slice(before).filter(p=>p.ended).length,2);return result;}
+async function start(){
+ const before=pools.length,reports=[],exits=[];let stopped;
+ const closed=new Promise(resolve=>{stopped=resolve;});
+ const host={on:()=>{},off:()=>{},report:status=>reports.push(status),exit:code=>{exits.push(code);stopped();},deadline:(fn,ms)=>{const timer=setTimeout(fn,ms);return()=>clearTimeout(timer);}};
+ const process=executable(env,{dependencies:{pool,transport},host});await process.started;
+ assert.deepEqual(reports,['ready'],'Application startup failed');assert.equal(pools.length-before,1);
+ return {close:async()=>{process.stop();await closed;assert.deepEqual(exits,[0]);assert.ok(pools.slice(before).every(p=>p.ended));}};
+}
 try{
- for(const p of [admin,jadmin,runtime,jp]){const row=(await p.query("SELECT current_setting('server_version_num') AS v,(SELECT rolsuper FROM pg_roles WHERE rolname=current_user) AS super")).rows[0];assert.match(row.v,/^16\d{4}$/);assert.equal(row.super,false);}
- await migrate(admin,3,snapshots);await migrateJournal(jadmin);
- if(process.env.INITIALISATION_DISPOSABLE==='synthetic-only'){
-  const {initialiseEmptyJournal}=await import('../runtime/server/operator-initialisation.js');
-  const approval={firstEver:true,appStopped:true,inventoryVerified:true};
-  await assert.rejects(initialiseEmptyJournal(admin,jadmin,cipher,{...approval,firstEver:false}));
-  await admin.query('UPDATE recovery_guard SET blocked=true'); // Explicit operator fence before first-use initialisation.
-  await initialiseEmptyJournal(admin,jadmin,cipher,approval);
-  await assert.rejects(initialiseEmptyJournal(admin,jadmin,cipher,approval));
-  assert.equal((await runtime.query('SELECT blocked FROM recovery_guard')).rows[0].blocked,true);
-  console.log('PASS explicit first-use journal initialisation, repeat refusal and recovery remains blocked');
- }else await jadmin.query('INSERT INTO deletion_journal(singleton,payload) VALUES(true,$1)',[cipher.encrypt([],'deletions')]);
- const recovery=await reconcileRecovery(runtime,journal,digest(await journal.read()),true);await approveRecovery(runtime,journal,recovery.receipt,true);
- if(process.env.SETUP_DISPOSABLE==='synthetic-only')await setupVerification();
- else await bootstrapOwner(admin,config.owner,config.owner.binding,true); // Explicit invented operator fixture.
+ const row=(await runtime.query("SELECT current_database() AS db,current_setting('server_version_num') AS v,(SELECT rolsuper FROM pg_roles WHERE rolname=current_user) AS super")).rows[0];
+ assert.equal(row.db,'music');assert.match(row.v,/^16\d{4}$/);assert.equal(row.super,false);
+ assert.equal((await runtime.query("SELECT count(*) AS n FROM pg_tables WHERE schemaname='public'")).rows[0].n,'0');
+ await setupVerification(); // App startup itself migrates genuinely fresh storage.
  running=await start();
  const root=await http('/');assert.equal(root.status,200);assert.match(root.text,/name="organiser-mode" content="connected"/);assert.match(root.text,/<title>Music Library Organiser<\/title>/);
  assert.equal((await http('/health',null,undefined,{Host:'127.0.0.1:3000','X-Forwarded-Proto':''})).status,200);
  assert.equal((await http('/',null,undefined,{Host:'wrong.invalid'})).status,403);assert.equal((await http('/api/library')).status,401);
- console.log('PASS real PG16 roles/migrations/recovery gate/startup, connected HTML and HTTP guards');
+ console.log('PASS single PG16 role/app-owned migrations/guard/startup, connected HTML and HTTP guards');
  let a=await login();mode='fail';assert.equal((await http('/api/refresh',a,{})).status,503);assert.equal((await get('/api/library',a)).library.items.length,0);mode='ok';await post('/api/refresh',a,{});
  let state=await get('/api/library',a);assert.equal(state.library.items.length,2);assert.deepEqual(state.library.items.map(i=>i.kind).sort(),['album','playlist']);
  console.log('PASS OAuth session/callback, failed initial import and successful retry');
@@ -102,12 +88,22 @@ try{
  console.log('PASS shared playlist/album tags, cross-session conflict, failed refresh preservation and reconnect rotation');
  const preview=await post('/api/restore/preview',a,{...exported,tags:[],annotations:[]});await post('/api/restore/confirm',a,{previewId:preview.id,revision:preview.revision,requestId:randomUUID(),confirm:true});
  const saved=await get('/api/snapshots',a);assert.equal(saved.length,1);const recover=await post('/api/snapshots/preview',a,{id:saved[0].id});await post('/api/restore/confirm',a,{previewId:recover.id,revision:recover.revision,requestId:randomUUID(),confirm:true});assert.deepEqual((await get('/api/export',a)).annotations,exported.annotations);
- await running.close();running=undefined;assert.ok(pools.slice(4).every(p=>p.ended));await assert.rejects(http('/health'));
+ await running.close();running=undefined;assert.ok(pools.slice(1).every(p=>p.ended));await assert.rejects(http('/health'));
  running=await start();assert.deepEqual((await get('/api/export',a)).annotations,exported.annotations);
  console.log('PASS replace-only restore, encrypted recoverable snapshot, shutdown and persisted restart');
  await post('/api/signout',b,{});assert.equal((await http('/api/session',b)).status,401);
- await post('/api/disconnect',a,{confirm:true});assert.equal((await http('/api/library',a)).status,401);assert.equal((await journal.read()).length,1);
- await running.close();running=undefined;await assert.rejects(start(),/application composition/);assert.ok(pools.slice(4).every(p=>p.ended));
- if(process.env.SETUP_DISPOSABLE==='synthetic-only'){env.SETUP_MODE='1';env.SETUP_TOKEN='s'.repeat(43);running=await start();assert.equal((await setupRequest('/setup/unlock','',{token:env.SETUP_TOKEN})).status,409);await running.close();running=undefined;console.log('PASS setup refuses deleted owner even after restored setup configuration');}
- assert.ok(calls>0);console.log('PASS signout, independent deletion journal, deleted owner blocks restart; all startup pools closed');
+ // Inject a database failure after tombstone insertion to prove both changes roll back.
+ await runtime.query("CREATE FUNCTION reject_test_delete() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'invented failure'; END $$; CREATE TRIGGER reject_test_delete BEFORE DELETE ON accounts FOR EACH ROW EXECUTE FUNCTION reject_test_delete()");
+ try {
+  assert.ok((await http('/api/disconnect',a,{confirm:true})).status>=400);
+  assert.equal((await runtime.query('SELECT count(*) AS n FROM deletion_records')).rows[0].n,'0');
+  assert.equal((await runtime.query('SELECT count(*) AS n FROM accounts')).rows[0].n,'1');
+  assert.deepEqual((await get('/api/export',a)).annotations,exported.annotations);
+ } finally { await runtime.query('DROP TRIGGER reject_test_delete ON accounts; DROP FUNCTION reject_test_delete()'); }
+ console.log('PASS failed deletion rolls back tombstone and preserves account organisation');
+ await post('/api/disconnect',a,{confirm:true});assert.equal((await http('/api/library',a)).status,401);assert.equal((await runtime.query('SELECT count(*) AS n FROM deletion_records')).rows[0].n,'1');
+ assert.equal((await runtime.query('SELECT count(*) AS n FROM accounts')).rows[0].n,'0');
+ await running.close();running=undefined;await assert.rejects(start(),/Application startup failed/);assert.ok(pools.slice(1).every(p=>p.ended));
+ {env.SETUP_MODE='1';env.SETUP_TOKEN='s'.repeat(43);running=await start();assert.equal((await setupRequest('/setup/unlock','',{token:env.SETUP_TOKEN})).status,409);await running.close();running=undefined;console.log('PASS setup refuses deleted owner even after restored setup configuration');}
+ assert.ok(calls>0);console.log('PASS signout, transactional deletion record, deleted owner blocks restart; all startup pools closed');
 }finally{if(running)await running.close();await Promise.all(pools.filter(p=>!p.ended).map(p=>p.end()));}

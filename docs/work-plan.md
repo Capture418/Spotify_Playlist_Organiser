@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D060: adapt startup, first-use initialisation and atomic deletion storage to the fixed single-database contract. Mocked tests and installed-host quality gate only; production execution remains blocked.
+D061: D060 accepted. Prepare the single-database exact-image rehearsal and injected executable/lifecycle wiring with mocked tests. Actual execution, real data/credentials, server changes, merging and deployment remain gated.
 
 ## Existing implementation
 
@@ -324,3 +324,23 @@ Validation: `npm run check` PASS202 tests, zero failures/skips; project/lockfile
 Separate technical-lead self-review checked transaction boundaries, account/setup locking, schema/checksum preservation, cancellation, key separation, secret-free errors and unchanged activation gates; no independent security audit claimed. Whitespace review passed. No Docker/PG16 execution, installation, database creation, browser/device test, real data/credentials, server change, push, merge/settings change or deployment occurred. Constitution review confirms authorised scope, honest evidence and retained approval boundaries.
 
 Next: owner review/accept D060, then prepare the matching single-database end-to-end harness and release executable/lifecycle wiring with mocked transport. Actual disposable PostgreSQL/image execution remains a separate bounded approval; real transport/credentials, server changes, publication/merge and deployment remain separately gated. No further platform question is needed.
+
+
+## D061 scope and acceptance
+
+Prepare a single-database disposable fixture and exact-image launcher using existing resource ownership/cleanup controls. Wire the executable boundary to the application and process lifecycle with injected dependencies, retaining default activation refusal and no live transport. Test startup/shutdown/error handling and resource plans with mocks; full host gate. Expected files: server executable/tests, scripts/database and release/launcher fixtures/tests, operator docs. No Docker commands, databases, installations, real credentials, server operations, push, merge or deployment.
+
+
+## D061 actual results — 13 November 2026
+
+D060 acceptance recorded. Added `executable.ts`: validates platform settings and joins application composition to the existing process lifecycle when dependencies/host are explicitly injected. Added an inert process-host adapter for fixed status reporting, signals, deadlines and exit. `production.ts` calls the same boundary without dependencies, preserving default refusal; there is no activation environment switch or live transport. No real process handler/exit is installed by importing the module. Setup/normal host wiring, startup failure sanitisation and refusal are mocked-tested; previous lifecycle deadline/late-start regressions remain passing.
+
+Adapted the connected rehearsal to one freshly empty database and one non-superuser owning role. The app itself performs migrations on first setup startup. The fixture invokes the image-packaged executable boundary with mocked Spotify and an observed lifecycle host, then checks setup/confirmation/closure, normal imports/tags/conflicts/reconnect/restore, shutdown/restart, an injected database deletion failure with rollback, final atomic deletion and deleted-owner refusal. This scenario source is prepared, not executed. It exercises lifecycle stop, not a real OS SIGTERM. No database restore drill or prior-image rollback is claimed.
+
+The current CLI accepts only `platform <immutable-local-image-id>` and rejects obsolete setup/release modes, tags and extra arguments. It uses dedicated D061 names/receipt and no compiled-runtime overlay. The shared resource launcher has an explicit single-database fixture selection and prevents invoking its legacy two-database scenarios in that mode; existing label/identity/receipt checks and internal network/resource restrictions remain. The default historical PR-CI scenario remains unchanged; D061 does not activate a new CI or deployment workflow. Updated the image refusal fixture for the current configuration. A mocked mount-path assertion exposed the old destination filename; it now uses a neutral init filename and passes.
+
+Validation: `npm run check` PASS207 tests, zero failures/skips; project/lockfile checks, lint, TypeScript and frontend/server builds. Both rehearsal scripts pass `node --check` without execution. Final documentation/foundation checks recorded separately. Evidence `.work/d061-quality.log` and `.work/d061-foundation.log`; diff whitespace passed. Existing installed host dependencies only, no installation or advisory/security audit. Separate technical-lead self-review checked dependency injection/default refusal, fixed logs, one-database fixture selection, exact-image constraints, scenario assertions and scoped cleanup; not an independent review.
+
+No Docker command, database creation, actual rehearsal, real data/credentials, server change, browser/device test, installation, push, merge/settings or deployment occurred. Constitution review confirms bounded authorised preparation, preserved safeguards and honest evidence. Source preparation is ready for owner review; it is not a deployed or default-activated product.
+
+Next approval package: accept D061 and separately approve one local Linux-amd64 candidate build (including locked in-container dependency installation if needed) and one exact-image disposable single-database rehearsal with cleanup. Check disk/memory and cached artifacts first; preserve failure evidence and stop before any retry. See `docs/release-rehearsal.md`. Live/default activation, credentials, real signal acceptance, registry publication, server changes, merging and deployment remain separate. No new platform decision is needed.

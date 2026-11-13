@@ -78,7 +78,7 @@ export function launcher(config, execute, save, state = { owner: config.owner, r
     const db = await create('container', ['--name', config.db, '--pull', 'never', '--platform', 'linux/amd64',
       '--network', config.network, '--network-alias', 'db', '--memory', '512m', '--cpus', '1',
       '--mount', `type=volume,src=${config.volume},dst=/var/lib/postgresql/data`,
-      '--mount', `type=bind,src=${resolve(config.root, 'db/init/10-app-role.sql')},dst=/docker-entrypoint-initdb.d/10-app-role.sql,readonly`,
+      '--mount', `type=bind,src=${resolve(config.root, config.singleDatabase ? 'db/init/20-platform.sql' : 'db/init/10-app-role.sql')},dst=/docker-entrypoint-initdb.d/10-init.sql,readonly`,
       '-e', 'POSTGRES_PASSWORD=invented-local-admin-only', '-e', 'POSTGRES_USER=postgres', '-e', 'POSTGRES_DB=postgres', postgres]);
     state.db = db.id; save(state); await run(['start', db.id]);
     report('PHASE synthetic database started; cancellation checkpoint');
@@ -119,6 +119,7 @@ export function launcher(config, execute, save, state = { owner: config.owner, r
     throw Error('Synthetic readiness timed out');
   }
   async function exercise(pause = () => new Promise(r => setTimeout(r, 1000))) {
+    assert.ok(!config.singleDatabase, 'Use the single-database connected rehearsal');
     await wait(async () => { await sql('music', 'SELECT 1'); await sql('music_journal', 'SELECT 1'); return true; }, pause);
     await harness('tests');
     const service = await app('serve'); await run(['start', service.id]);

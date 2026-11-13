@@ -62,3 +62,6 @@ D056 adds the prepared same-image setup branch to application composition. `setu
 
 
 D057 prepares exact-image verification without the host runtime overlay and an operator-only empty-journal initialisation primitive. The primitive requires explicit external first-use evidence, empty storage and a blocked recovery guard; it never resets existing journal data or approves recovery. No executable/HTTP initialisation entry is activated. `docs/release-rehearsal.md` defines the later execution package and no-shell operator checkpoint.
+
+
+D061 joins the validated application to `prepareProcess` through the injected `executable` boundary and inert `processHost` adapter. The default production entry supplies no dependencies and still refuses activation. The current exact-image rehearsal uses one owning role/database and the same executable boundary with mocked Spotify and an observed lifecycle host. Historical release/setup launcher modes are rejected. Real container/database and OS-signal verification remain separate; see `docs/release-rehearsal.md`.

@@ -270,3 +270,15 @@ test('normal PR draft admits same-repository branches and rejects other reposito
   assert.match(draft, /cancel-in-progress: true/);
   assert.match(draft, /timeout-minutes: 30/);
 });
+
+test('single-database setup selects only the owning-role fixture and keeps scoped cleanup',async()=>{
+ const f=fake(),job=launcher({...config(),singleDatabase:true},f.execute,f.save);
+ await job.setup();
+ const commands=f.calls.flatMap(c=>c.args).join(' ');
+ assert.match(commands,/20-platform.sql/);assert.doesNotMatch(commands,/10-app-role.sql|music_journal/);
+ const sql=readFileSync(new URL('../db/init/20-platform.sql',import.meta.url),'utf8');
+ assert.equal((sql.match(/CREATE DATABASE/g)??[]).length,1);assert.equal((sql.match(/CREATE ROLE/g)??[]).length,1);
+ assert.match(sql,/NOSUPERUSER NOCREATEDB NOCREATEROLE/);assert.match(sql,/CREATE DATABASE music OWNER music_app/);
+ await assert.rejects(job.exercise(),/single-database/);
+ await job.cleanup();assert.equal(f.objects.size,0);
+});
