@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D051: D050 accepted; normal PR CI approved for eligible same-repository PRs targeting main, including runner installations and synthetic resources within included allowance. Activate on `codex/normal-pr-ci`, open a review PR and verify its first run. No merge, required-check configuration or deployment.
+D051 complete: normal PR CI active on published `codex/normal-pr-ci` candidate, PR #4 open/unmerged and first hosted run successful. Eligible same-repository PR execution is approved within included allowance. Main remains README-only; merge, required-check settings and deployment remain separately gated.
 
 ## Existing implementation
 
@@ -113,4 +113,15 @@ Constitution/self-review: authorised local preparation only; no private-history 
 
 Preflight: Actions enabled, reviewed action release SHAs unchanged, no repository webhooks, only original PR #1 open and all historical runs completed. Existing paid-usage block and included allowance remain owner-confirmed. Pins/lockfile unchanged since the recent reviewed rehearsals. Apply exactly the D050 activation patch; preserve main and PR #1. No automatic retry loop. CI is active on this branch's PR candidate; main remains README-only until a separately approved merge, so this does not claim every older branch already contains the workflow.
 
-First hosted result pending. Local activated quality gate and source review precede publication. No application/source feature or dependency change.
+Local activated quality gate passed166 tests, lint/types/build and whitespace checks before publication. No application feature/dependency change. Published source `da7b46a43d72601e32e5004bb3c5aa9517c4edfe` and opened [PR #4](https://github.com/Capture418/Spotify_Playlist_Organiser/pull/4). No private-history publication, main push or merge.
+
+
+## D051 verified result — 13 November 2026
+
+[Normal CI run43504490222](https://github.com/Capture418/Spotify_Playlist_Organiser/actions/runs/43504490222) attempt1 completed SUCCESS on the recorded source. GitHub-hosted Node22 quality gate166 tests, zero failures; locked install, lint/types, client/server builds, Docker candidate build, pinned PostgreSQL and full synthetic role/migration/runtime/health/restore scenarios passed. Candidate image `sha256:91e66d7f181e6bf07be3c91ccb4d0b5024899e5fd28bb0674ba6cea26fca71f4`. Both normal cleanup and the independent always-step verified empty receipt and no remaining job-labelled containers, volumes or networks. Evidence `.work/d051-run.log`, local gate `.work/d051-local-check.log`. No rerun was needed.
+
+Actual check identity: `verify`, GitHub App `github-actions` id15368, check-run132158444926, SUCCESS for `da7b46a43d72601e32e5004bb3c5aa9517c4edfe`. This is a candidate for a separately approved required-check configuration, not an applied setting. No branch-rule changes, merge queue, auto-merge or deployment changes occurred. PR #4 remains OPEN/unmerged; main still README seed `3f54e32771a04fd38a2f998ca871bca123257f75`. PR #1 remains the original snapshot proposal; no alteration/closure is inferred. The workflow stays active on this candidate under D051; it has not been merged into main or retrofitted onto older branches.
+
+Execution used standard GitHub runners under owner-confirmed included allowance/paid-usage block. No billing setting changed or paid service selected; invoice-level usage not independently audited. Runner-only installations/synthetic resources were within D051. No local/server installation, real data, app credentials, operational provisioning or deployment. Source approval/security boundaries remain; this is not hosted application or device acceptance. Broader same-repository events are statically/mocked tested; only PR opened execution was exercised here, not every event type.
+
+Final result documentation is checkpointed locally, avoiding an unnecessary documentation-only synchronize run. **Next:** review PR #4 and separately decide merge sequencing with PR #1 and required-check settings. Recommend the observed `verify` check from GitHub Actions for the intended current revision, while retaining owner merge approval and explicitly handling excluded fork PRs; a skipped fork check is not validation. Do not apply settings or merge without approval. Constitution review confirms bounded authorised CI, observed cleanup, no production activation and preserved private history/evidence.

@@ -29,3 +29,8 @@ Workflow conditions alone do not enforce merge safety. Fork PRs are outside this
 D051 covers publication and normal CI execution; no additional approval is needed for the same eligible-event scope within included allowance. Required-check settings, merging and deployment still require explicit separate approval. After the first successful run, record the actual GitHub check identity for a proposed required-check configuration; do not apply settings automatically.
 
 Preflight and actual results belong in the work plan. Historical D047 baseline and D049 cancellation evidence support this design but do not replace verification of this normal workflow. A skipped fork job remains outside coverage and is not approval to merge. Permanent availability on main still requires a separately approved merge.
+
+
+## First activation evidence
+
+D051's first normal PR run passed on PR #4. The observed check is `verify`, GitHub Actions App id15368, for source da7b46a. Full results and limits are in [the work plan](../work-plan.md). No required-check configuration has been applied. Main remains README-only until a separately approved merge.
