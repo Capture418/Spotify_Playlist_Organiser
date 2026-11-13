@@ -16,7 +16,7 @@ Proxy scheme checks assume network isolation and header overwrite; neither assum
 
 ## Inactive CI
 
-`docs/ci/pr-checks.yml.example` is outside the workflow activation directory. D050 proposes ordinary opened/synchronize/reopened/ready_for_review PRs to main from any same-repository branch, including drafts. It is not activated; recurring runner/resource use needs separate approval. See [the normal PR plan](ci/normal-pr-plan.md). It uses full action commit pins, contents:read, nonpersistent checkout credentials and no remote package cache, secrets, registry publishing, self-hosted deploy job or deployment command.
+`docs/ci/pr-checks.yml.example` is outside the workflow activation directory. D050 proposes ordinary opened/synchronize/reopened/ready_for_review PRs to main from any same-repository branch, including drafts. D051 approves activation and recurring runner/synthetic-resource use within included allowance. Merging, required-check settings and deployment remain gated. See [the normal PR plan](ci/normal-pr-plan.md). It uses full action commit pins, contents:read, nonpersistent checkout credentials and no remote package cache, secrets, registry publishing, self-hosted deploy job or deployment command.
 
 The future job builds one candidate image and passes its exact local ID through tests. That ID is not a registry manifest digest. Any later publishing/release process must prove it retains the tested artifact; a rebuild does not inherit acceptance automatically.
 

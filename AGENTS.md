@@ -9,9 +9,9 @@ Before planning or editing, read:
 
 These are the source of truth for this snapshot. Surface conflicts before affected work. Work only in this project and inspect Git status before changes. Preserve user work; never initialise or alter another repository. Use one package and small reviewable changes, without a multi-agent hierarchy. Follow the canonical constitution rather than inventing competing rules.
 
-**Current boundary (D050):** D049 accepted; local normal PR CI preparation and mocked tests approved. The draft restores baseline checks and proposes same-repository PRs to main; policy remains inactive. Pushes, activation, installations, provisioning, spending, merging and deployment remain separately gated. No standing recurring-run approval. Production guards remain.
+**Current boundary (D051):** D050 accepted; normal PR CI activation, push/PR, runner installations and synthetic resources for eligible same-repository PRs to main are approved, included allowance only. Merge, required-check settings and deployment remain separately gated. No app credentials, real data or Mac/server installations. Production guards remain. See the work plan for actual run evidence.
 
-Use a descriptive `codex/` branch. Never push directly to main or merge without owner approval. Do not install the inactive workflow or execute the disposable CI/database launcher as part of an ordinary check. Do not weaken environment, resource-ownership, proxy or production guards to make a test pass.
+Use a descriptive `codex/` branch. Never push directly to main or merge without owner approval. Normal PR workflow execution is authorised by D051; local database/container execution is not implied by ordinary checks. Do not weaken environment, resource-ownership, proxy or production guards to make a test pass.
 
 Existing commands: `npm run check` (full installed-host gate), `npm run check:foundation`, `npm run dev` (loopback invented demo), `npm run build` and `npm run build:server`. Database commands can create/reset resources and are separately gated. `npm start` intentionally refuses production activation. No dependency installation is implied by a code-review task.
 

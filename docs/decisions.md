@@ -49,3 +49,8 @@ D049 result: one attempt cancelled during the unfinished live-resource hold; ind
 ## D050 — D049 acceptance and normal PR CI preparation
 
 Owner instruction: “I accept D049. Go ahead with local preparation for normal PR CI and mocked tests. Keep pushes, CI activation, installations, provisioning, spending, merging and deployment behind separate approval.” Accepts the recorded cancellation/cleanup evidence and its limits. Approves local preparation only; proposed normal trigger/resource/required-check defaults await review, not operational activation.
+
+
+## D051 — D050 acceptance and normal PR CI activation
+
+Owner instruction: “I accept D050 and approve normal PR CI, including push/PR, activation, runner installations and synthetic resources for eligible PRs. Use included allowance only; keep merging, required-check settings and deployment separately gated.” Approves the reviewed same-repository PR/main event scope and recurring runner-only installations/synthetic resources within included allowance. No paid usage, operational data/credentials, Mac/server installs, merge, required-check settings or deployment. Preserve private history and production guards.

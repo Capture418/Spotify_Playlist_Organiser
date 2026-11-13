@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D050: D049 accepted; local normal PR CI preparation complete on `codex/normal-pr-ci`. Prepare inactive full-scenario workflow and mocked eligibility/policy tests. No push, activation, installation, provisioning, spending, merge or deployment.
+D051: D050 accepted; normal PR CI approved for eligible same-repository PRs targeting main, including runner installations and synthetic resources within included allowance. Activate on `codex/normal-pr-ci`, open a review PR and verify its first run. No merge, required-check configuration or deployment.
 
 ## Existing implementation
 
@@ -107,3 +107,10 @@ See [normal PR CI proposal](ci/normal-pr-plan.md). Implementation complete: inac
 Prepared but did not apply `.work/d050-activation.patch`: normal-pr policy mode and exact reviewed draft copy only. Existing older activation patches are historical; do not reuse them. Required-check recommendation is documented but no GitHub check requirement or rule is configured. Fork skipping must never be treated as code validation; contributor policy remains bounded to same-repository work.
 
 Constitution/self-review: authorised local preparation only; no private-history publication, source privacy/whitespace reviewed, workflow remains absent and approval gates intact. No independent security audit claimed. D047/D049 execution approvals are exhausted; no recurring execution is inferred. **Next:** owner reviews the proposed normal event scope and separately approves publication/activation, recurring runner installations and disposable resources with an included-allowance execution bound; required-check settings, merges and deployment remain separate decisions.
+
+
+## D051 activation and verification
+
+Preflight: Actions enabled, reviewed action release SHAs unchanged, no repository webhooks, only original PR #1 open and all historical runs completed. Existing paid-usage block and included allowance remain owner-confirmed. Pins/lockfile unchanged since the recent reviewed rehearsals. Apply exactly the D050 activation patch; preserve main and PR #1. No automatic retry loop. CI is active on this branch's PR candidate; main remains README-only until a separately approved merge, so this does not claim every older branch already contains the workflow.
+
+First hosted result pending. Local activated quality gate and source review precede publication. No application/source feature or dependency change.

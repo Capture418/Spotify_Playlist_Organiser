@@ -35,7 +35,7 @@ Production application requests require canonical Host and a single forwarded HT
 
 ## Verification and deployment boundary
 
-Host tests cover domain, validation, mocked HTTP/configuration/startup, security/lifecycle mechanics and CI resource plans. Actual disposable database tests are separate from the ordinary gate. The inactive normal PR CI draft proposes all same-repository PR branches targeting main on GitHub-hosted Linux; no publishing/deploy job exists. D050 is preparation only, not recurring-run approval. Local image IDs are not registry digests or deployment approval.
+Host tests cover domain, validation, mocked HTTP/configuration/startup, security/lifecycle mechanics and CI resource plans. Actual disposable database tests are separate from the ordinary gate. D051 approves normal PR CI for all same-repository PR branches targeting main on GitHub-hosted Linux; no publishing/deploy job exists. Runner installations and synthetic resources are approved within included allowance; merging and required-check settings remain separate. Local image IDs are not registry digests or deployment approval.
 
 No personal operational history, live-data verification counts, actual endpoint or recovery-custody location is part of this public summary. Deployment requires separately approved configuration, restricted access, backups/recovery, credentials, dependency review and device checks. See [deployment preparation](home-deployment.md).
 
