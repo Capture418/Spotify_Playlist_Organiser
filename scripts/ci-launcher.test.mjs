@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { EventEmitter } from 'node:events';
+import { cancellationProbe, withCancellationSignals, holdMilliseconds } from './ci/cancellation.mjs';
 import { readFileSync, existsSync, readdirSync, lstatSync } from 'node:fs';
 import { verifyWorkflows } from './ci/workflow-policy.mjs';
 import { plan, launcher, postgres } from './ci/launcher.mjs';
@@ -112,6 +114,8 @@ test('inactive draft preserves read-only PR boundaries and immutable action/imag
   assert.ok(draft.includes("github.head_ref == 'codex/ci-rehearsal'"));
   assert.match(draft, /package-manager-cache: false/);
   assert.match(draft, /allow-unsafe-pr-checkout: false/);
+  assert.match(draft, /run: node scripts\/ci\/run.mjs cancellation-hold/);
+  assert.doesNotMatch(draft, /run: node scripts\/ci\/run.mjs run\s/);
   assert.ok(draft.includes(postgres)); assert.match(draft, /if: \$\{\{ always\(\) \}\}/);
 });
 
@@ -194,4 +198,53 @@ test('remove-before-receipt interruption and inventory failures never claim clea
   const empty = launcher(config(), async () => { throw Error('Inventory unavailable'); }, f.save, undefined, m => reports.push(m));
   await assert.rejects(empty.cleanup(), /Inventory unavailable/);
   assert.deepEqual(reports, []);
+});
+
+test('cancellation hold keeps resources live until a signal and then verifies cleanup', async () => {
+  const f = fake(), source = new EventEmitter(), reports = [];
+  const job = launcher(config(), f.execute, f.save, undefined, m => reports.push(m));
+  await assert.rejects(withCancellationSignals(source, signal => cancellationProbe(job, {
+    signal, report: m => reports.push(m),
+    wait: async (ms, value, options) => {
+      assert.equal(ms, 120000); assert.equal(ms, holdMilliseconds);
+      assert.equal(value, undefined); assert.equal(options.signal, signal);
+      assert.ok(f.objects.has(job.state.db));
+      assert.equal(job.state.resources.length, 3);
+      assert.ok(reports.some(m => m.startsWith('READY cancellation hold:')));
+      source.emit('SIGINT'); options.signal.throwIfAborted();
+    },
+  })), { name: 'AbortError' });
+  assert.equal(f.objects.size, 0);
+  assert.ok(reports.some(m => m.startsWith('CANCELLED hold:')));
+  assert.ok(reports.at(-1).startsWith('PASS cleanup:'));
+  assert.equal(f.calls.some(c => c.args.includes('tests') || c.args.includes('serve')), false);
+  assert.equal(source.listenerCount('SIGINT'), 0); assert.equal(source.listenerCount('SIGTERM'), 0);
+});
+
+test('uncancelled hold expires as failure, cleans resources and never runs scenarios', async () => {
+  const f = fake(), reports = [], controller = new AbortController();
+  const job = launcher(config(), f.execute, f.save, undefined, m => reports.push(m));
+  await assert.rejects(cancellationProbe(job, { signal: controller.signal, report: m => reports.push(m), wait: async () => {} }), /expired without cancellation/);
+  assert.equal(f.objects.size, 0);
+  assert.equal(reports.some(m => m.startsWith('CANCELLED')), false);
+  assert.equal(f.calls.some(c => c.args.includes('tests')), false);
+});
+
+test('setup failure and pre-cancelled probes clean up without reaching the hold', async () => {
+  for (const cancelled of [true, false]) {
+    const controller = new AbortController(), calls = [];
+    if (cancelled) controller.abort();
+    const job = { setup: async () => { calls.push('setup'); throw Error('Setup failed'); }, cleanup: async () => { calls.push('cleanup'); } };
+    await assert.rejects(cancellationProbe(job, { signal: controller.signal, wait: async () => { calls.push('wait'); } }));
+    assert.deepEqual(calls, cancelled ? ['cleanup'] : ['setup', 'cleanup']);
+  }
+});
+
+test('SIGTERM cancels a hold, cleanup failure stays failure and signal listeners are removed', async () => {
+  const source = new EventEmitter(), reports = [];
+  await assert.rejects(withCancellationSignals(source, signal => cancellationProbe({
+    setup: async () => {}, cleanup: async () => { throw Error('Cleanup unverified'); },
+  }, { signal, report: m => reports.push(m), wait: async () => { source.emit('SIGTERM'); signal.throwIfAborted(); } })), /Cleanup unverified/);
+  assert.equal(source.listenerCount('SIGINT'), 0); assert.equal(source.listenerCount('SIGTERM'), 0);
+  assert.equal(reports.some(m => m.startsWith('PASS')), false);
 });

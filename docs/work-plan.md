@@ -4,7 +4,7 @@ Updated: 13 November2026.
 
 ## Current task
 
-D047 rehearsal finished: baseline passed on GitHub; second attempt cancelled with verified empty cleanup inventory, but the scenario completed before cancellation was reported. No third attempt. PR #2 closed without merge. Temporary workflow removed and policy inactive; result/deactivation commit98efc76 was pushed after closure. PR #1 and main remain untouched.
+D048 local cancellation-hold preparation complete; awaiting review. The previous two attempts are finished and the temporary workflow is absent. Prepare and test a bounded checkpoint locally; no further run, push or operational action is authorised.
 
 ## Existing implementation
 
@@ -63,3 +63,14 @@ Private ignored evidence: `.work/d047-baseline.log`, `d047-cancellation.log`, `d
 Closed PR #2 after both attempts; restore inactive policy and remove the workflow in a follow-up commit on the closed branch, avoiding any third PR-triggered attempt. Preserve the inactive reviewed draft and all evidence. Do not delete branches, alter main or change PR #1. Final API verification: remote branch at98efc76, no workflow files in its tree; PR #2 CLOSED/unmerged; PR #1 OPEN at0bfeb55; main unchanged at README seed3f54e32. Exactly one workflow run with two attempts, completed/cancelled, and no third attempt. Final inactive local full gate passed161 tests, zero failures/skips, lint/types/build; whitespace checks passed.
 
 **Next decision:** accept the baseline and stated cancellation limitation, or separately approve a bounded preparation change for a deterministic cancellation hold point, followed by a separately approved additional attempt. Permanent CI rollout, any merge, real data/credentials and deployment remain separately gated. No automatic extra work. Constitution review: narrow authorisation used, results/limits recorded honestly, private history preserved and temporary activation retired.
+
+
+## D048 bounded task and acceptance
+
+Add an explicit cancellation-only CLI mode that sets up the existing isolated synthetic resources and waits at most120 seconds for cancellation without proceeding to integration scenarios. SIGINT/SIGTERM abort the wait; timeout is a failure, not a successful scenario. Preserve scoped cleanup and independent always-step cleanup; keep signal handlers local to the probe and remove them afterwards. Tests use injected waiting/signals/executors, no real sleep or Docker. Keep the real workflow absent and policy inactive; update the inactive draft/digest and exact unapplied activation proposal. No changes to dependencies, application code, database roles, production guards or previous evidence.
+
+Implemented `cancellation-hold` as a separate CLI mode using the existing guarded launcher/receipt. Its fixed120-second abortable wait follows setup and never enters integration scenarios. SIGINT/SIGTERM abort it; listeners are removed when the probe finishes. Timeout fails rather than falling through. Both failure and cancellation enter scoped cleanup, whose errors remain failures. The independent workflow always-cleanup step remains unchanged. Draft step name/command and reviewed SHA256 are updated; policy remains inactive.
+
+**Actual validation: PASS.** Full installed-host gate165 tests, zero failures/skips; project/lockfile checks, lint, TypeScript and client/server builds. Four new mocked tests cover live-resource hold, SIGINT, SIGTERM, uncancelled timeout, setup/pre-cancel failure, cleanup failure, no scenario execution and listener removal. Existing baseline/receipt-gap/ownership tests still pass. No timer delay, real process signal, Docker, database, network, installation or GitHub run was used. Logs: `.work/d048-quality.log`; final documentation checks recorded in `.work/d048-foundation.log`. Technical-lead self-review confirms application code, dependencies, lockfile, resource constraints, action/image pins and production guards unchanged.
+
+Prepared `.work/d048-activation.patch` without applying it: policy mode change plus exact draft copy. Old D046 activation evidence is historical and must not be reused for this revised draft. Privacy/whitespace and patch applicability checks accompany the local checkpoint. No push, merge, activation or operational work occurred. Original private history/evidence and remote PRs remain unchanged. Next operational execution remains separately approved. The checkpoint will demonstrate cancellation with live disposable resources, not interruption of an in-flight SQL transaction or recovery from SIGKILL/runner loss.

@@ -9,7 +9,7 @@ Before planning or editing, read:
 
 These are the source of truth for this snapshot. Surface conflicts before affected work. Work only in this project and inspect Git status before changes. Preserve user work; never initialise or alter another repository. Use one package and small reviewable changes, without a multi-agent hierarchy. Follow the canonical constitution rather than inventing competing rules.
 
-**Current boundary (D047):** the approved two-attempt rehearsal is finished. Baseline passed; cancellation was recorded after scenario completion, so interrupted-operation recovery remains unverified. Rehearsal PR #2 closed without merge; temporary workflow removed and policy restored to inactive. No additional runs, activation, installations/resources, merge or deployment without new approval. Production guards remain. See the work plan.
+**Current boundary (D048):** local preparation of a bounded cancellation hold and mocked tests is approved. D047 attempts are exhausted. No push, workflow activation, additional CI run, installation/resource creation, merge or deployment is authorised. Workflow policy stays inactive; production guards remain. See the work plan.
 
 Use a descriptive `codex/` branch. Never push directly to main or merge without owner approval. Do not install the inactive workflow or execute the disposable CI/database launcher as part of an ordinary check. Do not weaken environment, resource-ownership, proxy or production guards to make a test pass.
 

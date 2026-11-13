@@ -41,3 +41,6 @@ No personal operational history, live-data verification counts, actual endpoint 
 
 
 D046 preparation adds an exact-byte workflow review policy and mocked inactive/rehearsal inventory checks. The launcher reports a safe database-start checkpoint and verifies empty receipts plus exact job-labelled resource inventories before cleanup success. Unknown resources are reported, never removed by inference. This does not activate CI or prove cancellation behaviour on GitHub.
+
+
+D048 adds a test-only cancellation probe: resource setup followed by a fixed120-second abortable hold, with no integration scenarios. Timeout/cancellation fail the probe and always attempt scoped cleanup. SIGINT/SIGTERM handling is limited to this mode; no application/server signal behaviour changes. The draft remains inactive pending a new execution approval.

@@ -31,3 +31,8 @@ Owner accepts D046 and approves the two-run CI rehearsal: branch push/PR, tempor
 
 
 D047 outcome: two attempts only; baseline passed, second cancelled after scenario completion with verified cleanup. Interrupted-operation recovery remains unverified. Rehearsal PR closed and temporary workflow retired; any additional attempt needs a new bounded approval. No merge/deployment authorised or performed.
+
+
+## D048 — local cancellation timing preparation
+
+Owner instruction: “Go ahead with the local preparation change to make cancellation timing reliable, with mocked tests.” Approves a bounded test-only hold with mocked cancellation/timeout/cleanup checks and updated inactive workflow proposal. No further CI attempt, push, activation, installation, resource creation, spending, merge or deployment is inferred. D047 results and limits remain unchanged.
