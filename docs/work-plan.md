@@ -766,3 +766,19 @@ Preparation checks: npm run check:foundation passed36 tests and project validati
 ## D082 execution preflight
 
 Clean initial tree and unchanged mainc145189; no open PR or active run observed. Existing nine normal-mode setting names retained, setup settings absent; no values read. npm audit zero vulnerabilities. Included-only approval and prior paid-usage-blocked confirmation retained; no billing/settings change. Starting consumption15/19 builds,18/22 synthetic attempts,7/10 deployments. Full installed-host gate and final diff review before publication.
+
+## D084 MuLO branding
+
+The library header now reads “MuLO: Music Library Organiser”. The browser title, Home Screen app name, sign-in and setup pages use MuLO. Removed the subtext under “Your library.” and the green information box from the connected library. Demo and synthetic screens retain their notices about invented data and edit behaviour.
+
+The local quality gate passed all 227 tests, lint, type checks and both builds. The final diff passed whitespace checks. Browser and device review remain pending. This change is ready for local review and has no release approval.
+
+## D085 MuLO release preparation
+
+Owner accepted the local rebrand. Prepared the [MuLO release approval package](mulo-release-approval.md) with two image builds, two disposable test attempts, one planned deployment and one conditional rollback within the existing lifetime caps. Reviewed the local workflow triggers and recorded the accepted rollback digest. The local main reference predates the accepted deployment. Refresh the base and verify remote state during execution preflight after approval. Prior local quality results stand. No release resources were used during preparation.
+
+Foundation validation passed all 36 tests after adding the new approval document to the project-check fixture inventory. The diff passed whitespace checks.
+
+## D086 MuLO release preflight
+
+Current main matches the accepted D083 source. No open PR or active run was found. The nine normal setting names are present and setup settings are absent. The npm advisory check found zero vulnerabilities. The isolated candidate passed the full local quality gate. Starting consumption is 17 builds, 20 disposable test attempts and 8 deployment requests. The owner approved included allowance only and previously confirmed paid usage is blocked.

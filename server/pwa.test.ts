@@ -8,7 +8,7 @@ test('PWA assets form a fixed public allowlist, with no file traversal or privat
 });
 test('manifest and local icons have a stable same-origin identity and valid PNG dimensions', () => {
   const manifest = JSON.parse(readFileSync(new URL('../public/manifest.webmanifest', import.meta.url), 'utf8'));
-  assert.equal(manifest.name, 'Music Library Organiser'); assert.equal(manifest.short_name, manifest.name);
+  assert.equal(manifest.name, 'MuLO'); assert.equal(manifest.short_name, manifest.name);
   assert.equal(manifest.id, '/'); assert.equal(manifest.start_url, '/'); assert.equal(manifest.scope, '/'); assert.equal(manifest.display, 'standalone');
   for (const [path, size] of [['/icons/apple-touch-icon.png', 180], ...manifest.icons.map((icon: {src:string;sizes:string}) => [icon.src, Number(icon.sizes.split('x')[0])])] ) {
     assert.equal(pwaAssetType(path as string), 'image/png');

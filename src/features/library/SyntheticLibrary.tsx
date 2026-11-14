@@ -37,7 +37,7 @@ export function ConnectedLibrary({mode='connected',harness=false}:{mode?:'connec
  }
  async function download(){const data=await request('export',csrf);const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=connected?'music-library-organisation.json':'organiser-synthetic.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setMessage('Organisation export downloaded.');}
  if(!ready)return <main className="app-shell"><p role="status">{connected?'Loading your library…':'Loading synthetic session…'}</p></main>;
- if(!state)return <main className="app-shell"><h1>{connected?'Music Library Organiser':harness?'Connection rehearsal':'Synthetic library'}</h1><p>{connected?'Sign in to organise your playlists and saved albums. Spotify access is read-only.':'Invented data only. No Spotify connection. Changes are saved on this Mac.'}</p><button className="primary-button" disabled={busy||!online} onClick={()=>void action(async()=>{
+ if(!state)return <main className="app-shell"><h1>{connected?'MuLO':harness?'Connection rehearsal':'Synthetic library'}</h1><p>{connected?'Sign in to organise your playlists and saved albums. Spotify access is read-only.':'Invented data only. No Spotify connection. Changes are saved on this Mac.'}</p><button className="primary-button" disabled={busy||!online} onClick={()=>void action(async()=>{
   clearSession();
   if(connected){window.location.assign(await authorisationLocation(request,window.location.origin));return;}
   const s=await request<{csrf:string}>('synthetic-login','',{});setCsrf(s.csrf);await load();setMessage('Signed into the invented owner account.');

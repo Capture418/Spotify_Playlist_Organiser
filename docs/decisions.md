@@ -214,3 +214,15 @@ Owner is happy with D080 and requests a CI/deployment package including build/te
 ## D082 — Menu release execution approved
 
 Owner approves docs/menu-release-approval.md using included allowance only. Reassign unused D079 reserves (not additional overlapping budgets), with lifetime caps19 builds/22 synthetic attempts/10 deployments, reviewed exact passing-head PR/merge, bounded deployments and iPhone handoff. Package exclusions and stop conditions remain binding.
+
+## D084 — MuLO branding approved for local implementation
+
+The owner chose MuLO for the app name and asked to show the expanded name in the library header. Remove the connected library information box and the subtext under “Your library.” Keep the demo and synthetic data notices so those screens explain how edits behave.
+
+## D085 — MuLO accepted locally and release preparation requested
+
+The owner accepts the D084 changes and requests a CI and deployment approval package for the iPhone review. See [MuLO release approval](mulo-release-approval.md) for the proposed scope and allowance. Release execution awaits approval.
+
+## D086 — MuLO release execution approved
+
+Owner approved the MuLO package with included Actions allowance only. Approved scope is two builds, two disposable test attempts, the reviewed PR and merge, one deployment and one conditional rollback.

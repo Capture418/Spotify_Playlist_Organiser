@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "Music Library Organiser",
-  "short_name": "Music Library Organiser",
+  "name": "MuLO",
+  "short_name": "MuLO",
   "description": "Find playlists and albums with shared tags. Online access required; this preview uses invented data.",
   "lang": "en-GB",
   "start_url": "/",

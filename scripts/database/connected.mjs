@@ -81,7 +81,7 @@ try{
  await running.close();running=undefined;
  console.log('PASS explicit local HTTP PKCE callback and session; no proxy bypass in production');
  running=await start();
- const root=await http('/');assert.equal(root.status,200);assert.match(root.text,/name="organiser-mode" content="connected"/);assert.match(root.text,/<title>Music Library Organiser<\/title>/);
+ const root=await http('/');assert.equal(root.status,200);assert.match(root.text,/name="organiser-mode" content="connected"/);assert.match(root.text,/<title>MuLO<\/title>/);
  assert.equal((await http('/health',null,undefined,{Host:'127.0.0.1:3000','X-Forwarded-Proto':''})).status,200);
  assert.equal((await http('/',null,undefined,{Host:'wrong.invalid'})).status,403);assert.equal((await http('/api/library')).status,401);
  console.log('PASS restricted PG16 roles/host-run migrations/guard/startup, connected HTML and HTTP guards');

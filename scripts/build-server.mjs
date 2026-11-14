@@ -12,7 +12,7 @@ cpSync(new URL('../server/migrations/', import.meta.url), new URL('server/migrat
 cpSync(new URL('../server/journal-migrations/', import.meta.url), new URL('server/journal-migrations/', output), { recursive: true });
 cpSync(new URL('../dist/', import.meta.url), new URL('dist/', output), { recursive: true });
 const manifest = JSON.parse(readFileSync(new URL('dist/manifest.webmanifest', output), 'utf8'));
-assert.equal(manifest.name, 'Music Library Organiser');
+assert.equal(manifest.name, 'MuLO');
 for (const file of ['spotify/logo-white.svg', 'manifest.webmanifest', 'icons/apple-touch-icon.png', 'icons/library.svg', ...manifest.icons.map(icon => icon.src.slice(1))]) {
   assert.deepEqual(readFileSync(new URL('dist/' + file, output)), readFileSync(new URL('../public/' + file, import.meta.url)));
 }

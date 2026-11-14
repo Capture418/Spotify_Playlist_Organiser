@@ -69,7 +69,7 @@ export function appServer(store:Store,options:Options){
     if(publicType){const data=await readFile(new URL('../dist'+path,import.meta.url));res.setHeader('Content-Type',publicType);res.end(data);return;}
     const asset=/^\/assets\/[a-zA-Z0-9_-]+\.(js|css)$/.exec(path);if(path!=='/'&&!asset)throw new Fault(404,'Not found');
     const data=await readFile(new URL('../dist'+(path==='/'?'/index.html':path),import.meta.url));
-    res.setHeader('Content-Type',path==='/'?'text/html':path.endsWith('.js')?'text/javascript':'text/css');res.end(path==='/'&&(!options.production||options.connectedInterface)?data.toString().replace('Music Library Organiser — demo library',options.connectedInterface?'Music Library Organiser':'Music Library Organiser — demo library').replace('<head>',`<head><meta name="organiser-mode" content="${options.connectedInterface?'connected':options.harness?'harness':'synthetic'}">`):data);return;
+    res.setHeader('Content-Type',path==='/'?'text/html':path.endsWith('.js')?'text/javascript':'text/css');res.end(path==='/'&&(!options.production||options.connectedInterface)?data.toString().replace('<title>MuLO — demo library</title>',options.connectedInterface?'<title>MuLO</title>':'<title>MuLO — demo library</title>').replace('<head>',`<head><meta name="organiser-mode" content="${options.connectedInterface?'connected':options.harness?'harness':'synthetic'}">`):data);return;
    }
    rateLimit('ip:'+(req.socket.remoteAddress??'unknown'),240);
    if(req.headers['sec-fetch-site']==='cross-site')throw new Fault(403,'Cross-site request rejected');

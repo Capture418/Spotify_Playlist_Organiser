@@ -5,7 +5,7 @@ assert.equal(process.getuid(), 1000); assert.equal(process.arch, 'x64');
 assert.match(readFileSync('/proc/mounts', 'utf8'), / \/ overlay ro,/);
 assert.match(readFileSync('/proc/mounts', 'utf8'), / \/tmp tmpfs .*size=65536k/);
 const manifest = JSON.parse(readFileSync('/app/runtime/dist/manifest.webmanifest', 'utf8'));
-assert.equal(manifest.name, 'Music Library Organiser');
+assert.equal(manifest.name, 'MuLO');
 for (const file of ['icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'icons/library.svg']) assert.ok(existsSync('/app/runtime/dist/' + file));
 for (const file of ['/app/.env', '/app/src', '/app/node_modules/typescript', '/app/runtime/server/proxy.test.js']) assert.equal(existsSync(file), false);
 const {spawnSync}=await import('node:child_process');
