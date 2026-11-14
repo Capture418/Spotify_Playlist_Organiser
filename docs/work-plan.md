@@ -695,3 +695,6 @@ Added assertions to the existing disposable mocked-Spotify scenario for actual P
 ## D076 artwork execution preflight
 
 Owner approves artwork release package. Clean initial tree; fetched unchanged maina0645c5, prior runs completed successfully, names-only inventory retains nine expected settings with setup settings absent. No secret values accessed. Current dependency audit checked before publication; no dependency installation or workflow change. Counters begin11/15 builds,14/18 synthetic attempts,5/8 deployments. Preserve exact reviewed initial PR/main sequence and bounded correction/rollback controls.
+
+
+D076 initial PR11 run43608030874 failed at host quality before candidate build or disposable verification. The isolated foundation-test copy omitted the new artwork approval document linked by AGENTS.md. Added that document to the fixture copy list; no validation weakened or runtime changed. Earlier pre-publication command batch did not propagate this foundation test failure correctly; CI caught it. Re-running full host gate with explicit exit checking before the corrected push. No build/synthetic/deployment consumed by this failed run (steps skipped); counters remain11/15,14/18,5/8.
