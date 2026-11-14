@@ -1,7 +1,7 @@
 import type { Pool, PoolConfig } from 'pg';
 import { capacityPool } from './capacity.ts';
 import { hostedConfig } from './hosted-config.ts';
-import { verifySchema } from './database.ts';
+import { verifyTagGroupSchema } from './database.ts';
 import { AppendJournal, verifyAppendJournal } from './append-journal.ts';
 import { JsonCipher } from './lifecycle.ts';
 import { bounded, CredentialStore } from './security.ts';
@@ -26,7 +26,7 @@ export async function startHosted(env:NodeJS.ProcessEnv,deps:{pool:(c:PoolConfig
     const app=capacityPool(deps.pool({...config.databases.runtime,options:'-c search_path=public'}));pools.push(app);
     const jp=deps.pool({...config.journalDatabase,options:'-c search_path=public'});pools.push(jp);
     await bounded(controller.signal,async()=>{
-      await verifySchema(app);const identity=await verifyAppendJournal(jp);
+      const supportsGroups=await verifyTagGroupSchema(app);const identity=await verifyAppendJournal(jp);
       const binding=await app.query('SELECT identity FROM public.hosted_journal_binding');
       if(binding.rows.length!==1||binding.rows[0].identity!==identity)throw Error('Journal binding mismatch');
       const journal=new AppendJournal(jp,new JsonCipher(config.journalKeys,config.snapshots.current,'journal'));
@@ -42,7 +42,7 @@ export async function startHosted(env:NodeJS.ProcessEnv,deps:{pool:(c:PoolConfig
         const setup=new Setup(env.SETUP_TOKEN!,config.owner,spotify,setupStore(app,config.owner,journal));
         listener=preparedListener(setupServer(setup,config.origin,health,local),()=>setup.close());
       }else{
-        const store=new Store(app,config.owner.account);store.snapshotsCipher=new JsonCipher(config.snapshots.keys,config.snapshots.current,'snapshot');
+        const store=new Store(app,config.owner.account,Date.now,supportsGroups);store.snapshotsCipher=new JsonCipher(config.snapshots.keys,config.snapshots.current,'snapshot');
         const application=await preparedApplication(store,config.owner,spotify,new CredentialStore(app,config.credentials.keys,config.credentials.current),journal,{localOAuth:local,health});
         listener=preparedListener(application.server,application.dispose);
       }

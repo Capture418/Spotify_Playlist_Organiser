@@ -12,7 +12,7 @@ export async function transaction<T>(pool: Pool, work: (c: PoolClient)=>Promise<
 }
 /** Platform mode preserves canonical SQL checksums but omits legacy role grants.
  * The supplied role owns its newly created schema; no roles are created or switched. */
-export async function migrate(pool: Pool, maximum=3,snapshots?:JsonCipher, platform=false): Promise<void> {
+export async function migrate(pool: Pool, maximum=3,snapshots?:JsonCipher, platform=false, allowTagGroups=false): Promise<void> {
  await transaction(pool,async c=>{
   await c.query('SELECT pg_advisory_xact_lock(47174174)');
   let existingTables: Set<string> | undefined;
@@ -29,11 +29,30 @@ export async function migrate(pool: Pool, maximum=3,snapshots?:JsonCipher, platf
    if(!applied.rows.length || required.some(t=>!existingTables!.has(t)) || (applied.rows.some(r=>r.version===3)&&!existingTables.has('recovery_guard')))throw Error('Incomplete existing storage');
   }
   const paths=(await readdir(new URL('./migrations/',import.meta.url))).filter(x=>x.endsWith('.sql')).sort();
-  if(applied.rows.some(x=>x.version>maximum))throw Error('Incompatible schema');
+  if (allowTagGroups && applied.rows.some(x => x.version === 4)) {
+   await verifyTagGroupSchema(pool, c);
+  } else if(applied.rows.some(x=>x.version>maximum))throw Error('Incompatible schema');
   for(const path of paths){const version=Number(path.split('-')[0]);if(version>maximum)continue;const sql=await readFile(new URL('./migrations/'+path,import.meta.url),'utf8');const checksum=createHash('sha256').update(sql).digest('hex');const previous=applied.rows.find(x=>x.version===version);if(previous){if(previous.checksum!==checksum)throw Error('Applied migration checksum mismatch');continue;}await c.query(platform ? sql.replace(/^GRANT [^\n]+ TO organiser_app;\n?/gm, '') : sql);
    if(version===3){const rows=await c.query('SELECT * FROM restore_snapshots');if(rows.rowCount&&!snapshots)throw Error('Snapshot encryption required for migration');for(const row of rows.rows)await c.query('UPDATE restore_snapshots SET payload=$3,encrypted=true WHERE account_id=$1 AND id=$2',[row.account_id,row.id,snapshots!.encrypt(row.payload,`${row.account_id}/${row.id}/${row.revision}`)]);}
    await c.query('INSERT INTO schema_migrations(version,checksum) VALUES($1,$2)',[version,checksum]);}
   if(!platform)await c.query('GRANT SELECT ON schema_migrations TO organiser_app');
  });
 }
-export async function verifySchema(pool: Pool) {const r=await pool.query('SELECT version,checksum FROM schema_migrations ORDER BY version');if(r.rows.map(x=>x.version).join(',')!=='1,2,3')throw Error('Incompatible schema');for(const name of (await readdir(new URL('./migrations/',import.meta.url))).filter(x=>x.endsWith('.sql'))){const version=Number(name.split('-')[0]);const sql=await readFile(new URL('./migrations/'+name,import.meta.url),'utf8');if(r.rows.find(x=>x.version===version)?.checksum!==createHash('sha256').update(sql).digest('hex'))throw Error('Applied migration checksum mismatch');}const legacy=await pool.query('SELECT 1 FROM restore_snapshots WHERE NOT encrypted LIMIT 1');if(legacy.rowCount)throw Error('Unconverted snapshot');}
+export async function verifyTagGroupSchema(pool: Pool, client?: PoolClient): Promise<boolean> {
+ const db = client ?? pool;
+ const applied = await db.query<{version:number;checksum:string}>('SELECT version,checksum FROM schema_migrations ORDER BY version');
+ const history = applied.rows.map(row => row.version).join(',');
+ if (history !== '1,2,3' && history !== '1,2,3,4') throw Error('Incompatible schema');
+ const paths = await readdir(new URL('./migrations/', import.meta.url));
+ for (const row of applied.rows) {
+  const path = paths.find(name => name.startsWith(String(row.version).padStart(3, '0') + '-') && name.endsWith('.sql'));
+  if (!path) throw Error('Missing migration');
+  const sql = await readFile(new URL('./migrations/' + path, import.meta.url), 'utf8');
+  if (row.checksum !== createHash('sha256').update(sql).digest('hex')) throw Error('Applied migration checksum mismatch');
+ }
+ const legacy = await db.query('SELECT 1 FROM restore_snapshots WHERE NOT encrypted LIMIT 1');
+ if (legacy.rowCount) throw Error('Unconverted snapshot');
+ return history === '1,2,3,4';
+}
+
+export async function verifySchema(pool: Pool): Promise<void> { await verifyTagGroupSchema(pool); }

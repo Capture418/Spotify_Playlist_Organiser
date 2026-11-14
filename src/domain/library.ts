@@ -1,5 +1,11 @@
 /** Prototype data only. This is not the future Spotify/account schema. */
-export type Tag = Readonly<{ id: string; name: string }>;
+export const tagGroups = ['Genre', 'Occasion', 'Tempo'] as const;
+export type TagGroup = typeof tagGroups[number];
+export function isTagGroup(value: unknown): value is TagGroup {
+  return tagGroups.some(group => group === value);
+}
+export type Tag = Readonly<{ id: string; name: string; group?: TagGroup }>;
+export type TagMove = Readonly<{ id: string; group: TagGroup }>;
 export type ItemKind = 'playlist' | 'album';
 export type LibraryItem = Readonly<{
   /** Type-qualified identity, never a title. */
@@ -41,6 +47,7 @@ export type TagEdit = Readonly<{
   itemIds: readonly string[];
   tagIds: readonly string[];
   newTags: readonly Tag[];
+  moves?: readonly TagMove[];
 }>;
 
 export function cleanTagName(value: string): string {
@@ -86,6 +93,7 @@ export function prepareTag(
   tags: readonly Tag[],
   name: string,
   newId: string,
+  group?: TagGroup,
 ): Readonly<{ tag: Tag; created: boolean }> {
   const cleaned = cleanTagName(name);
   if (!cleaned) throw new Error('Give the tag a name first.');
@@ -94,7 +102,7 @@ export function prepareTag(
   if (!newId.trim() || tags.some(tag => tag.id === newId)) {
     throw new Error('That tag could not be created. Please try again.');
   }
-  return { tag: { id: newId, name: cleaned }, created: true };
+  return { tag: { id: newId, name: cleaned, ...(group ? { group } : {}) }, created: true };
 }
 
 /** Atomic, immutable edit. Item metadata is never changed here. */
@@ -109,16 +117,24 @@ export function applyTagEdit(library: Library, edit: TagEdit): Library {
   if (itemIds.some(id => !knownItems.has(id))) {
     throw new Error('A selected item is no longer available. Nothing was changed.');
   }
-  if (edit.mode === 'bulk' && !selectedTagIds.length) {
+  if (edit.mode === 'bulk' && !selectedTagIds.length && !edit.moves?.length) {
     throw new Error('Choose at least one tag to add.');
   }
 
-  const tags = [...library.tags];
+  const moves = new Map((edit.moves ?? []).map(move => [move.id, move.group]));
+  if (moves.size !== (edit.moves?.length ?? 0) ||
+      [...moves].some(([id, group]) => !isTagGroup(group) || !library.tags.some(tag => tag.id === id))) {
+    throw new Error('A tag could not be moved.');
+  }
+  const tags = library.tags.map(tag => {
+    const group = moves.get(tag.id);
+    return group ? { ...tag, group } : tag;
+  });
   for (const draft of edit.newTags) {
     if (!selectedTagIds.includes(draft.id)) {
       throw new Error('A new tag must be applied to an item.');
     }
-    const prepared = prepareTag(tags, draft.name, draft.id);
+    const prepared = prepareTag(tags, draft.name, draft.id, draft.group);
     if (!prepared.created) throw new Error('A tag with that name already exists.');
     tags.push(prepared.tag);
   }
@@ -144,7 +160,7 @@ export function applyTagEdit(library: Library, edit: TagEdit): Library {
   }
   return {
     items: library.items,
-    tags: edit.newTags.length ? tags : library.tags,
+    tags: edit.newTags.length || moves.size ? tags : library.tags,
     annotations,
   };
 }
