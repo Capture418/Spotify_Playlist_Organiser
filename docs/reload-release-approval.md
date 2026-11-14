@@ -1,6 +1,6 @@
 # Reload app release approval package
 
-Status: **preparation only; execution not yet approved** (D078, 14 November 2026).
+Status: **approved for bounded execution under D079** (14 November 2026). Owner approved this package using included allowance only; all limits and exclusions below apply.
 
 ## Candidate and evidence
 

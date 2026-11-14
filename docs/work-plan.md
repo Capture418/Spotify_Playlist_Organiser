@@ -725,3 +725,8 @@ Working directory confirmed; clean initial tree on codex/reload-app. Owner accep
 Scope includes iPhone Safari/Home Screen reload checks and pending desktop keyboard/zoom/artwork-network acceptance review. Prior227-test pass remains implementation evidence; no runtime gate or device test repeated for this documentation task. No push, CI, install, database/image execution, merge, secret/settings change or deployment. Check current runs/allowance/advisories at approved execution preflight; not claimed reverified here. Next: owner approval of the package, then bounded execution and private device handoff.
 
 Preparation validation: npm run check:foundation passed36 tests and project checks; git diff --check passed. Added the new approval document to the isolated foundation fixture so the AGENTS link is validated in CI. Constitution self-review complete; proposed permissions remain clearly unapproved.
+
+
+## D079 execution preflight
+
+Clean initial tree, main unchanged23e3002, no open PR or active run observed. Existing nine normal-mode setting names present, setup settings absent; values not read. npm audit reports zero vulnerabilities. Owner reaffirms included allowance only; prior paid-usage-blocked confirmation retained, no billing change. Starting counters13/17 builds,16/20 synthetic attempts,6/9 deployments. Full local gate before publication; exact reviewed PR/main sequence next.

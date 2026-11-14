@@ -194,3 +194,8 @@ Owner reports artwork works on Mac/iPhone/Home Screen and asks for a phone refre
 ## D078 — Reload app accepted locally; release preparation requested
 
 Owner is happy with D077 and requests a CI/deployment approval package with build/test allowance and iPhone verification. Preparation only. docs/reload-release-approval.md proposes reassignment of unused D076 reserves plus cap increases to17/20/9; none of this execution scope is approved yet. Existing caps and exclusions remain in force.
+
+
+## D079 — Reload app release execution approved
+
+Owner approves docs/reload-release-approval.md using included allowance only, including CI, exact passing-head merge, deployment and iPhone handoff. Unused D076 reserves are reassigned (not additive); lifetime caps17 builds/20 synthetic attempts/9 deployments. Existing package exclusions and bounded correction/rollback apply.
