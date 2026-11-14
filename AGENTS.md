@@ -9,7 +9,7 @@ Before planning or editing, read:
 
 These are the source of truth for this snapshot. Surface conflicts before affected work. Work only in this project and inspect Git status before changes. Preserve user work; never initialise or alter another repository. Use one package and small reviewable changes, without a multi-agent hierarchy. Follow the canonical constitution rather than inventing competing rules.
 
-**Current boundary (D080):** Owner approved local compact library controls: ellipsis actions menu and Settings & data panel. Keep existing API, privacy and confirmation safeguards. Publication/CI image execution/merge/deployment for this feature require a separate release approval; D079 correction reserves are not reassigned. Current recorded consumption15/17 builds,18/20 synthetic attempts,7/9 deployments. No credentials/settings, provisioning, installations or unrelated features.
+**Current boundary (D081):** Owner accepts local compact menu D080. [The menu release package](docs/menu-release-approval.md) is preparation only; reserve reassignment and proposed caps19/22/10 are unapproved. Current D079 caps17/20/9 and consumption15/18/7 remain. No menu push/merge/deployment before package approval; retain privacy, credential, installation and unrelated-feature gates.
 
 Use a descriptive `codex/` branch. Never push directly to main or merge without owner approval. Normal PR workflow execution is authorised by D051; local database/container execution is not implied by ordinary checks. Do not weaken environment, resource-ownership, proxy or production guards to make a test pass.
 

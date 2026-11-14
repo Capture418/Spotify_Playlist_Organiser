@@ -204,3 +204,8 @@ Owner approves docs/reload-release-approval.md using included allowance only, in
 ## D080 — Compact actions menu approved locally
 
 Owner approves the suggested top-right ellipsis menu with Reload app, Refresh from Spotify and a Settings & data panel. Export, restore, recovery and sign-out controls move into that panel, with all-device sign-out/deletion separated and existing confirmations retained. Routine up-to-date/recovery text leaves the permanent top bar; relevant progress/errors remain visible. User reports deployed Reload app works well; no exhaustive unreported device checks inferred. Local implementation authorised; separate release approval remains required.
+
+
+## D081 — Menu accepted locally; release preparation requested
+
+Owner is happy with D080 and requests a CI/deployment package including build/test allowance and iPhone verification. Preparation only. docs/menu-release-approval.md proposes reassignment of unused D079 reserves and lifetime caps19/22/10. Execution is not yet approved; existing caps/exclusions remain.
