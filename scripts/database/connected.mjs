@@ -27,6 +27,7 @@ const transport=async(url,init)=>{
  if(mode==='fail')return Response.json({}, {status:500});
  const playlist=url.includes('playlists'),limit=playlist?50:10;
  const item=playlist?{id,name:'Invented playlist',owner:{display_name:'Invented owner'},external_urls:{spotify:`https://open.spotify.com/playlist/${id}`}}:{album:{id,name:'Invented album',artists:[{name:'Invented artist'}],external_urls:{spotify:`https://open.spotify.com/album/${id}`}}};
+ (playlist?item:item.album).images=[{width:300,url:'https://i.scdn.co/image/invented300'}];
  return Response.json({offset:0,limit,total:1,items:[item],next:null});
 };
 function http(path,session,body,headers={}){return new Promise((resolve,reject)=>{
@@ -86,12 +87,15 @@ try{
  console.log('PASS restricted PG16 roles/host-run migrations/guard/startup, connected HTML and HTTP guards');
  let a=await login();mode='fail';assert.equal((await http('/api/refresh',a,{})).status,503);assert.equal((await get('/api/library',a)).library.items.length,0);mode='ok';await post('/api/refresh',a,{});
  let state=await get('/api/library',a);assert.equal(state.library.items.length,2);assert.deepEqual(state.library.items.map(i=>i.kind).sort(),['album','playlist']);
- console.log('PASS OAuth session/callback, failed initial import and successful retry');
+ assert.ok(state.library.items.every(i=>i.artworkUrl==='https://i.scdn.co/image/invented300'));
+ assert.equal((await http('/spotify/logo-white.svg')).headers['content-type'],'image/svg+xml');
+ assert.match(root.headers['content-security-policy'],/img-src[^;]*https:\/\/i\.scdn\.co/);
+ console.log('PASS OAuth session/callback, failed initial import, artwork persistence and successful retry');
  const b=await login(),oldRevision=state.revision;
  const edit={requestId:randomUUID(),revision:oldRevision,edit:{mode:'bulk',itemIds:state.library.items.map(i=>i.id),tagIds:['new-tag'],newTags:[{id:'new-tag',name:'Invented shared tag'}]}};
  await post('/api/edit',a,edit);assert.equal((await http('/api/edit',b,{...edit,requestId:randomUUID()})).status,409);
  state=await get('/api/library',b);assert.equal(state.library.tags.length,1);assert.ok(state.library.annotations.every(x=>x.tagIds.length===1));
- const exported=await get('/api/export',a);mode='fail';assert.equal((await http('/api/refresh',a,{})).status,503);mode='ok';assert.deepEqual(await get('/api/export',a),exported);await post('/api/refresh',a,{});assert.deepEqual((await get('/api/export',a)).annotations,exported.annotations);
+ const exported=await get('/api/export',a);assert.doesNotMatch(JSON.stringify(exported),/artworkUrl|scdn\.co/);mode='fail';assert.equal((await http('/api/refresh',a,{})).status,503);mode='ok';assert.deepEqual(await get('/api/export',a),exported);await post('/api/refresh',a,{});assert.deepEqual((await get('/api/export',a)).annotations,exported.annotations);
  const old=a;a=await login(a);assert.equal((await http('/api/session',old)).status,401);assert.equal((await http('/api/session',b)).status,200);
  await assert.rejects(capacityPool(runtime).query("UPDATE metadata_cache SET payload=jsonb_build_object('oversized',repeat('x',1100000))"),/Storage capacity/);
  assert.deepEqual((await get('/api/export',a)).annotations,exported.annotations);

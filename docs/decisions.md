@@ -174,3 +174,8 @@ Owner explicitly accepts the pilot after the recorded Mac/iPhone, Spotify links,
 ## D074 — Direct Spotify artwork local implementation approved
 
 Owner approves direct artwork loading from Spotify image servers, local implementation and tests. Scope: existing cards, unmodified artwork, attribution, neutral fallback and narrowly validated image destinations. Existing metadata cache may retain selected URLs, not image binaries; no new scopes or credentials. Browser image requests reveal device IP/image requests to Spotify infrastructure. Deployment, pushes/CI resources and installations remain separately gated; no release allowance extended.
+
+
+## D075 — Artwork accepted locally; release preparation requested
+
+Owner is happy with D074 artwork changes and requests one CI/deployment approval package with build/test allowance and real Mac/iPhone checks. Preparation only; no new execution resources, push, merge or deploy authorised. Proposed bounds and rollback in docs/artwork-release-approval.md remain unapproved until explicit owner acceptance.
