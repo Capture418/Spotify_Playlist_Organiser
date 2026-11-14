@@ -184,3 +184,8 @@ Owner is happy with D074 artwork changes and requests one CI/deployment approval
 ## D076 — Artwork release execution approved
 
 Owner explicitly approves docs/artwork-release-approval.md using included allowance only: up to four additional builds/four synthetic attempts (lifetime15/18), reviewed initial and bounded corrective PR/merge, and up to three additional deployments (lifetime8) including return to accepted pilot if needed. Existing credentials/settings retained; real Mac/iPhone artwork checks included. Package stop conditions and exclusions remain binding.
+
+
+## D077 — Explicit app reload control requested
+
+Owner reports artwork works on Mac/iPhone/Home Screen and asks for a phone refresh button, clarifying it must reload the app itself, not refresh Spotify. Implement locally a clearly labelled Reload app in the connected library header, reusing normal page reload without new caching or service workers. Preserve saved data; transient search/selection reset. Disable during operations/offline and pending editor/restore/delete confirmation. No publication/deployment approval is inferred; D076 reserves cover diagnosed artwork corrections, not this new control.

@@ -257,3 +257,7 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 .artwork-wrap .item-selector { position: static; margin: 8px 0 0 auto; }
 .spotify-attribution { display: block; width: 80px; height: auto; margin: 10px 0; }
 @media (min-width: 1000px) { .spotify-artwork { border-radius: 8px; } }
+
+.header-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 12px; }
+.app-header { flex-wrap: wrap; padding-block: 16px; }
+@media (max-width: 600px) { .header-actions { width: 100%; justify-content: space-between; } }
