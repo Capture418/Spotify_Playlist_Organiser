@@ -2,11 +2,11 @@
 
 Updated: 14 November2026.
 
-## Current task
+## Current status — pilot accepted (D073)
 
-D069: owner approved [the remaining release package](release-approval.md). Execute the reviewed release PR, Linux CI and merge-triggered verified-image/setup deployment, then private setup and same-digest normal deployment. User confirms retained token/keys, registered HTTPS callback and included allowance with paid usage blocked.
+Owner accepted the working pilot on14 November2026 after the recorded acceptance checks passed. Music Library Organiser is running in normal mode with read-only Spotify playlists/albums, persistent shared tags, Mac/iPhone access and the online-only Home Screen app. No active implementation task remains.
 
-Current counters: **11/11 candidate builds,14/14 synthetic attempts,5/5 new deploy requests** (D070 corrective setup deployed). Initial and corrective hosted setup deployments are verified; D071 second Safari handoff correction is deployed and healthy; owner confirms setup completed and closed. Normal mode is deployed and healthy; owner reports successful live sign-in/import and Mac checks1–3; Spotify card links pass on Mac and iPhone. Owner confirms iPhone Safari/Home Screen checks and cross-device tag sync. Final acceptance checks passed; ready for explicit owner pilot acceptance. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
+Final execution counters: **11/11 candidate builds,14/14 synthetic attempts,5/5 deploy requests**. All allowances are exhausted. Do not push evidence to main or trigger another release. Future work requires a separately scoped task and applicable approvals. Historical evidence below is retained; earlier pending statuses are superseded by D073.
 
 ## Existing implementation
 
@@ -654,3 +654,8 @@ Agent checked the deployed authenticated app in actual Mac Safari. Opened an exi
 Safari Network inspected by request metadata only: reload produced document, manifest, local JS/CSS, session and library fetches, all on the application's own domain (six resources, one domain, zero redirects). An ordinary library poll was also observed on that same domain. No third-party request appeared during the observed normal page-load/poll window. Did not inspect cookies, response bodies, OAuth URLs or save a HAR. Source review corroborates same-origin API fetches and restrictive CSP; this bounded browser observation does not claim to capture server-side Spotify traffic or every possible future action. No private catalogue content or screenshots written to project evidence.
 
 Ready for explicit owner pilot acceptance: no outstanding acceptance defect identified in the agreed checks. Existing online/VPN-only and four-hour backup-loss limitations remain accepted; destructive recovery/deletion remain synthetic-only evidence. Owner acceptance itself is still pending and is not inferred from test passes. Deployed digest unchanged from D072. No runtime edits, new test/image execution, push, settings or deployment; counters remain11/11 builds,14/14 synthetic attempts,5/5 deployments. Documentation whitespace checked. Next action: owner acceptance, then record that decision locally without triggering another release.
+
+
+## D073 acceptance recorded
+
+Owner explicitly stated “I accept pilot”. Recorded acceptance in the decision log against the D072 deployed image and completed final evidence. Documentation-only change with clean initial Git status; whitespace validation passed. No runtime tests repeated, private data altered, push, merge, build or deployment. Evidence committed locally only. Next step is ordinary use and gathering any future improvement requests; no new development scope inferred.
