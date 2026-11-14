@@ -234,3 +234,7 @@ The owner accepted the local subtitle and requested the release package.
 ## D089 — MuLO subtitle release approved
 
 The owner approved the [subtitle release package](subtitle-release-approval.md) using included allowance only. Lifetime caps are 21 builds, 24 disposable attempts and 11 deployment requests.
+
+## D093 — Compatibility release approved
+
+The owner approved the [compatibility release package](tag-group-compatibility-release-approval.md) using included allowance only. The first production deployment stays on schema 003. Tag groups and production migration 004 remain a separate release. Lifetime caps are 23 builds, 26 disposable test attempts and 12 deployment requests.

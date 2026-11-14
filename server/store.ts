@@ -5,16 +5,21 @@ import { JsonCipher, pruneAccount } from './lifecycle.ts';
 import type { DeletionCoordinator } from './journal.ts';
 import { transaction } from './database.ts';
 import { Fault, requireValue, record, text, uuid, revision, array, distinct, key, digest } from './validation.ts';
-import { applyTagEdit, cleanTagName } from '../src/domain/library.ts';
-import type { Library, LibraryItem, TagEdit } from '../src/domain/library.ts';
+import { applyTagEdit, cleanTagName, isTagGroup } from '../src/domain/library.ts';
+import type { Library, LibraryItem, Tag, TagEdit } from '../src/domain/library.ts';
 export const hashToken=(s:string)=>createHash('sha256').update(s).digest('hex');
 export type Session={hash:string;account:string;csrf:string};
-export type ExportData={format:'playlist-organiser';version:1;binding:string;revision:string;tags:{id:string;name:string}[];annotations:{itemId:string;tagIds:string[]}[]};
+export type ExportData={format:'playlist-organiser';version:1;binding:string;revision:string;tags:Tag[];annotations:{itemId:string;tagIds:string[]}[]};
+function readTagGroup(value: unknown) {
+ if (value === undefined) return {};
+ requireValue(isTagGroup(value), 'Invalid tag group');
+ return { group: value };
+}
 const DAY=86400000;
 export class Store {
  snapshotsCipher?:JsonCipher; deletion?:Pick<DeletionCoordinator, 'erase'>;
- pool:Pool;owner:string;now:()=>number;
- constructor(pool:Pool,owner:string,now=Date.now){this.pool=pool;this.owner=uuid(owner);this.now=now;}
+ pool:Pool;owner:string;now:()=>number; private readonly supportsGroups:boolean;
+ constructor(pool:Pool,owner:string,now=Date.now,supportsGroups=false){this.pool=pool;this.owner=uuid(owner);this.now=now;this.supportsGroups=supportsGroups;}
  async permitted(){const q=await this.pool.query('SELECT blocked FROM recovery_guard');if(q.rows[0]?.blocked!==false)throw new Fault(503,'Recovery reconciliation required');}
  async session(token:string):Promise<Session>{
   await this.permitted();
@@ -43,9 +48,11 @@ export class Store {
  async load(c:PoolClient,account:string):Promise<Library>{
   await c.query('DELETE FROM metadata_cache WHERE account_id=$1 AND expires_ms<=$2',[account,this.now()]);
   const items=await c.query('SELECT i.*,m.payload FROM items i LEFT JOIN metadata_cache m USING(account_id,kind,spotify_id) WHERE account_id=$1 ORDER BY kind,spotify_id',[account]);
-  const tags=await c.query('SELECT tag_id AS id,name FROM tags WHERE account_id=$1 ORDER BY canonical',[account]);
+  const tags=await c.query(this.supportsGroups
+   ? 'SELECT tag_id AS id,name,tag_group FROM tags WHERE account_id=$1 ORDER BY canonical'
+   : 'SELECT tag_id AS id,name,NULL AS tag_group FROM tags WHERE account_id=$1 ORDER BY canonical',[account]);
   const annotations=await c.query('SELECT kind,spotify_id,tag_id FROM assignments WHERE account_id=$1 ORDER BY kind,spotify_id,tag_id',[account]);
-  return {items:items.rows.map(i=>({id:`${i.kind}:${i.spotify_id}`,kind:i.kind,title:i.payload?.title??`Unavailable ${i.kind} (${i.spotify_id})`,available:i.available&&!!i.payload,source:i.payload?.source==='spotify'?'spotify':'demo',spotifyUrl:i.payload?.source==='spotify'&&i.payload?.spotifyUrl===`https://open.spotify.com/${i.kind}/${i.spotify_id}`?i.payload.spotifyUrl:null,artworkUrl:i.available&&i.payload?.source==='spotify'?artworkUrl(i.payload?.artworkUrl):null,...(i.kind==='album'?{artists:i.payload?.artists??[]}:{ownerLabel:i.payload?.ownerLabel??''})} as LibraryItem)),tags:tags.rows,annotations:items.rows.map(i=>({itemId:`${i.kind}:${i.spotify_id}`,tagIds:annotations.rows.filter(a=>a.kind===i.kind&&a.spotify_id===i.spotify_id).map(a=>a.tag_id)}))};
+  return {items:items.rows.map(i=>({id:`${i.kind}:${i.spotify_id}`,kind:i.kind,title:i.payload?.title??`Unavailable ${i.kind} (${i.spotify_id})`,available:i.available&&!!i.payload,source:i.payload?.source==='spotify'?'spotify':'demo',spotifyUrl:i.payload?.source==='spotify'&&i.payload?.spotifyUrl===`https://open.spotify.com/${i.kind}/${i.spotify_id}`?i.payload.spotifyUrl:null,artworkUrl:i.available&&i.payload?.source==='spotify'?artworkUrl(i.payload?.artworkUrl):null,...(i.kind==='album'?{artists:i.payload?.artists??[]}:{ownerLabel:i.payload?.ownerLabel??''})} as LibraryItem)),tags:tags.rows.map(({id,name,tag_group})=>({id,name,...(tag_group === null ? {} : readTagGroup(tag_group))})),annotations:items.rows.map(i=>({itemId:`${i.kind}:${i.spotify_id}`,tagIds:annotations.rows.filter(a=>a.kind===i.kind&&a.spotify_id===i.spotify_id).map(a=>a.tag_id)}))};
  }
  async library(s:Session){return this.locked(s,async(c,a)=>({library:await this.load(c,s.account),revision:a.revision}));}
  async exportAt(c:PoolClient,account:string,a:{binding:string;revision:string}):Promise<ExportData>{const l=await this.load(c,account);return {format:'playlist-organiser',version:1,binding:a.binding,revision:a.revision,tags:l.tags.map(t=>({...t})),annotations:l.annotations.map(x=>({itemId:x.itemId,tagIds:[...x.tagIds]}))};}
@@ -53,7 +60,8 @@ export class Store {
  validateExport(input:unknown,binding:string):ExportData{
   requireValue(Buffer.byteLength(JSON.stringify(input))<=10*1024*1024,'Restore too large');
   const r=record(input,['format','version','binding','revision','tags','annotations']);requireValue(r.format==='playlist-organiser'&&r.version===1&&r.binding===binding,'Wrong account or export format');
-  const tags=array(r.tags,2000).map(x=>{const t=record(x,['id','name']);return {id:uuid(t.id),name:cleanTagName(text(t.name))};});requireValue(tags.every(t=>t.name.length>0));distinct(tags.map(t=>t.id));distinct(tags.map(t=>t.name.toLocaleLowerCase('en-GB')));
+  const tags=array(r.tags,2000).map(x=>{const t=record(x,['id','name','group']);return {id:uuid(t.id),name:cleanTagName(text(t.name)),...readTagGroup(t.group)};});requireValue(tags.every(t=>t.name.length>0));distinct(tags.map(t=>t.id));distinct(tags.map(t=>t.name.toLocaleLowerCase('en-GB')));
+  requireValue(this.supportsGroups || tags.every(t=>!t.group),'Tag groups require schema 004');
   const known=new Set(tags.map(t=>t.id));let total=0;
   const annotations=array(r.annotations,10000).map(x=>{const a=record(x,['itemId','tagIds']);const k=key(a.itemId);const ids=array(a.tagIds,2000).map(uuid);distinct(ids);requireValue(ids.every(id=>known.has(id)));total+=ids.length;return {itemId:`${k.kind}:${k.id}`,tagIds:ids};});distinct(annotations.map(a=>a.itemId));requireValue(total<=100000);
   return {format:'playlist-organiser',version:1,binding,revision:revision(r.revision),tags,annotations};
@@ -63,7 +71,11 @@ export class Store {
   const identities=new Set([...existing.rows.map(i=>`${i.kind}:${i.spotify_id}`),...data.annotations.map(a=>a.itemId)]);
   requireValue(identities.size<=10000,'Too many library items');
   await c.query('DELETE FROM assignments WHERE account_id=$1',[account]);await c.query('DELETE FROM tags WHERE account_id=$1',[account]);
-  for(const t of data.tags)await c.query('INSERT INTO tags VALUES($1,$2,$3,$4)',[account,t.id,t.name,cleanTagName(t.name).toLocaleLowerCase('en-GB')]);
+  for(const t of data.tags) {
+   const fields=[account,t.id,t.name,cleanTagName(t.name).toLocaleLowerCase('en-GB')];
+   if(this.supportsGroups) await c.query('INSERT INTO tags(account_id,tag_id,name,canonical,tag_group) VALUES($1,$2,$3,$4,$5)',[...fields,t.group??null]);
+   else await c.query('INSERT INTO tags(account_id,tag_id,name,canonical) VALUES($1,$2,$3,$4)',fields);
+  }
   for(const a of data.annotations){const k=key(a.itemId);await c.query('INSERT INTO items(account_id,kind,spotify_id) VALUES($1,$2,$3) ON CONFLICT DO NOTHING',[account,k.kind,k.id]);for(const id of a.tagIds)await c.query('INSERT INTO assignments VALUES($1,$2,$3,$4)',[account,k.kind,k.id,id]);}
  }
  async mutation(s:Session,requestId:string,expected:string,payload:unknown,work:(c:PoolClient,a:{binding:string;revision:string;generation:string})=>Promise<Record<string,unknown>>){
@@ -75,9 +87,13 @@ export class Store {
    const result=await work(c,a);const next=(BigInt(a.revision)+1n).toString();await c.query('UPDATE accounts SET revision=$2 WHERE id=$1',[s.account,next]);const out={...result,revision:next};await c.query('INSERT INTO mutation_receipts VALUES($1,$2,$3,$4,$5)',[s.account,requestId,d,out,this.now()+DAY]);return out;
   },true);
  }
- async edit(s:Session,input:unknown){const r=record(input,['requestId','revision','edit']);const e=record(r.edit,['mode','itemIds','tagIds','newTags']);requireValue(e.mode==='single'||e.mode==='bulk');const ids=array(e.itemIds,1000).map(x=>{key(x);return String(x);});distinct(ids);const tagIds=array(e.tagIds,2000).map(x=>text(x,100));distinct(tagIds);const drafts=array(e.newTags,2000).map(x=>{const t=record(x,['id','name']);return {id:text(t.id,100),name:cleanTagName(text(t.name))};});distinct(drafts.map(t=>t.id));
+ async edit(s:Session,input:unknown){const r=record(input,['requestId','revision','edit']);const e=record(r.edit,['mode','itemIds','tagIds','newTags','moves']);requireValue(e.mode==='single'||e.mode==='bulk');const ids=array(e.itemIds,1000).map(x=>{key(x);return String(x);});distinct(ids);const tagIds=array(e.tagIds,2000).map(x=>text(x,100));distinct(tagIds);const drafts=array(e.newTags,2000).map(x=>{const t=record(x,['id','name','group']);return {id:text(t.id,100),name:cleanTagName(text(t.name)),...readTagGroup(t.group)};});distinct(drafts.map(t=>t.id));
+  const moves=e.moves===undefined?[]:array(e.moves,2000).map(x=>{
+   const move=record(x,['id','group']);requireValue(isTagGroup(move.group),'Invalid tag group');
+   return {id:uuid(move.id),group:move.group};
+  });distinct(moves.map(move=>move.id));
   return this.mutation(s,uuid(r.requestId),revision(r.revision),r,async(c,a)=>{
-   const remap=new Map(drafts.map(t=>[t.id,randomUUID()]));const edit:TagEdit={mode:e.mode as 'single'|'bulk',itemIds:ids,tagIds:tagIds.map(x=>remap.get(x)??uuid(x)),newTags:drafts.map(t=>({id:remap.get(t.id)!,name:t.name}))};let next:Library;
+   const remap=new Map(drafts.map(t=>[t.id,randomUUID()]));const edit:TagEdit={mode:e.mode as 'single'|'bulk',itemIds:ids,tagIds:tagIds.map(x=>remap.get(x)??uuid(x)),newTags:drafts.map(t=>({...t,id:remap.get(t.id)!})),moves};let next:Library;
    try{next=applyTagEdit(await this.load(c,s.account),edit);}catch{throw new Fault(422,'Invalid tag edit; nothing changed');}
    const value=this.validateExport({format:'playlist-organiser',version:1,binding:a.binding,revision:a.revision,tags:next.tags,annotations:next.annotations},a.binding);
    await this.persistOrganisation(c,s.account,value);return {};
@@ -88,8 +104,10 @@ export class Store {
   const count=await c.query('SELECT count(*) FROM restore_previews WHERE account_id=$1',[s.account]);if(Number(count.rows[0].count)>=10)throw new Fault(429,'Too many restore previews');
   await c.query('INSERT INTO restore_previews VALUES($1,$2,$3,$4,$5,$6,$7)',[s.account,id,s.hash,value,digest(value),a.revision,this.now()+300000]);
   const assignments=(v:ExportData)=>new Set(v.annotations.flatMap(a=>a.tagIds.map(t=>`${a.itemId}/${t}`)));const before=assignments(old),after=assignments(value);const beforeTags=new Set(old.tags.map(t=>`${t.id}/${t.name}`)),afterTags=new Set(value.tags.map(t=>`${t.id}/${t.name}`));
+  const oldGroups=new Map(old.tags.map(t=>[t.id,t.group]));
+  const groupsChanged=value.tags.filter(t=>oldGroups.has(t.id)&&oldGroups.get(t.id)!==t.group).length;
   const library=await this.load(c,s.account);
-  return {id,revision:a.revision,tagsAdded:[...afterTags].filter(x=>!beforeTags.has(x)).length,tagsRemoved:[...beforeTags].filter(x=>!afterTags.has(x)).length,assignmentsAdded:[...after].filter(x=>!before.has(x)).length,assignmentsRemoved:[...before].filter(x=>!after.has(x)).length,affectedItems:new Set([...old.annotations,...value.annotations].filter(a=>[...before,...after].some(x=>x.startsWith(a.itemId+'/')&&before.has(x)!==after.has(x))).map(a=>a.itemId)).size,unavailableItems:value.annotations.filter(a=>!library.items.some(i=>i.id===a.itemId&&i.available)).length};
+  return {id,groupsChanged,revision:a.revision,tagsAdded:[...afterTags].filter(x=>!beforeTags.has(x)).length,tagsRemoved:[...beforeTags].filter(x=>!afterTags.has(x)).length,assignmentsAdded:[...after].filter(x=>!before.has(x)).length,assignmentsRemoved:[...before].filter(x=>!after.has(x)).length,affectedItems:new Set([...old.annotations,...value.annotations].filter(a=>[...before,...after].some(x=>x.startsWith(a.itemId+'/')&&before.has(x)!==after.has(x))).map(a=>a.itemId)).size,unavailableItems:value.annotations.filter(a=>!library.items.some(i=>i.id===a.itemId&&i.available)).length};
  },true);}
  async restore(s:Session,input:unknown){const r=record(input,['requestId','revision','previewId','confirm']);requireValue(r.confirm===true,'Confirmation required');const id=uuid(r.previewId);return this.mutation(s,uuid(r.requestId),revision(r.revision),r,async(c,a)=>{
   const found=await c.query('SELECT * FROM restore_previews WHERE account_id=$1 AND id=$2 AND session_hash=$3',[s.account,id,s.hash]);const p=found.rows[0];if(!p||Number(p.expires_ms)<=this.now()||p.revision!==a.revision)throw new Fault(409,'Preview expired or changed');requireValue(digest(p.payload)===p.digest,'Preview integrity failure');const data=this.validateExport(p.payload,a.binding);const old=await this.exportAt(c,s.account,a),snapshot=randomUUID();

@@ -179,7 +179,7 @@ export function launcher(config, execute, save, state = { owner: config.owner, r
     }
     for(let n=0;n<2;n++){
       const migration=await create('container',['--name',`${config.owner}-migration-${n}`,...constraints,'--network',config.network,...Object.entries(migrationEnv).flatMap(([k,v])=>['-e',`${k}=${v}`]),config.image,'node','runtime/server/migrate.js']);
-      const output=await run(['start','-a',migration.id]);assert.equal((await verify(migration)).State.ExitCode,0,'Migration failed');assert.equal(output,'Migration complete');await remove(migration);
+      const output=await run(['start','-a',migration.id]);assert.equal((await verify(migration)).State.ExitCode,0,'Migration failed');assert.equal(output,'Migration complete (schema 003)');await remove(migration);
     }
     async function rejectedMigration(env) {
       const c=await create('container',['--name',`${config.owner}-rejected-migration-${++serial}`,...constraints,'--network',config.network,...Object.entries(env).flatMap(([k,v])=>['-e',`${k}=${v}`]),config.image,'node','runtime/server/migrate.js']);
