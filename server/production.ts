@@ -1,12 +1,9 @@
-import { executable, processHost } from './executable.ts';
+import { processHost } from './executable.ts';
+import { prepareProcess } from './process-preparation.ts';
 import { releaseDependencies } from './release-dependencies.ts';
-// Apply only under the consolidated pilot execution approval.
+import { hostedConfig } from './hosted-config.ts';
+import { startHosted } from './hosted.ts';
 try {
-  executable(process.env, {
-    dependencies: releaseDependencies((url, init) => fetch(url, init)),
-    host: processHost(process),
-  });
-} catch {
-  process.stderr.write('Application configuration-failed\n');
-  process.exitCode = 1;
-}
+  hostedConfig(process.env);
+  prepareProcess(()=>startHosted(process.env,releaseDependencies((url,init)=>fetch(url,init))),processHost(process));
+} catch {process.stderr.write('Application configuration-failed\n');process.exitCode=1;}

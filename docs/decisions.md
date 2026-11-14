@@ -129,3 +129,13 @@ Owner approves the complete execution scope in docs/pilot-approval.md using incl
 ## D065 — Tested image registry alias and one setup retry
 
 Owner approves publishing the same tested image under spotify_playlist_organiser, verifying its digest and retrying setup once. No rebuild or new credentials. The existing short-lived release-job token is used; no server allowlist change. Workflow-only quality checks and reviewed PR/merge support this correction; no runtime/source-image change.
+
+
+## D066 — Host-run migrations and token-length diagnosis
+
+Owner confirms operator diagnosed token refusal: helper limited tokens to255 characters versus current GitHub tokens around520; operator is fixing it. No credentials change. Owner directs retry once updated helper is installed, but first changes deployment contract: host runs a JSON-array MIGRATE_COMMAND from the new image with app stopped, supplying MIGRATION_DATABASE_URL and JOURNAL_MIGRATION_DATABASE_URL; app receives DATABASE_URL and JOURNAL_DATABASE_URL with row-only runtime permissions. App must not run schema migrations at startup. This supersedes D059 startup migration/owning-runtime-role assumptions. Read the operator README “One-shot runs” before final command/workflow wiring. Separate journal availability/roles and exact one-shot environment/exit/timeout contract remain to be confirmed from that source; do not silently restore historical journal behaviour or invent new keys. No immediate dispatch of old image, secret changes or server provisioning.
+
+
+## D067 — Authoritative hosting contract checklist implementation
+
+Owner supplies docs/home-hosting.md as the exact replacement for earlier hosting contracts, then approves completing the resulting checklist. Implement restricted two-database runtime, separate owner migration/task commands, append-only journal, mirrored local configuration and synthetic verification. Preserve credentials/settings; no deploy retry or remote workflow activation is inferred from this local implementation request. D064 build/test counters still bound executable verification. Use existing versioned snapshot master keys with a distinct HKDF journal purpose; retain versions while immutable journal history needs them. New storage budgets fail writes explicitly rather than silently removing organisation.

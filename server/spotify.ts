@@ -25,7 +25,7 @@ export class SpotifyTransport {
   constructor(clientId: string, callback: string, send: Transport, now = Date.now) {
     requireValue(/^[a-zA-Z0-9]{32}$/.test(clientId), 'Client configuration required');
     const url = new URL(callback);
-    requireValue(url.protocol === 'https:' && !url.username && !url.password && !url.search && !url.hash && url.pathname === '/callback');
+    requireValue((url.protocol === 'https:' || callback === 'http://127.0.0.1:3000/callback') && !url.username && !url.password && !url.search && !url.hash && url.pathname === '/callback');
     this.clientId = clientId; this.callback = callback; this.send = send; this.now = now;
   }
   private async json(url: string, init: RequestInit, signal: AbortSignal, refreshing = false): Promise<Record<string, unknown>> {

@@ -1,5 +1,8 @@
 # Production startup and setup — D060
 
+**D067 hosting supersession:** [home-hosting.md](home-hosting.md) is authoritative; [hosted operations](hosted-operations.md) supplies current commands. Earlier single-database, startup migration, missing-journal and manual-only workflow statements below are historical. Keep the pilot's approved execution counters; this notice does not activate workflows or authorise deployment.
+
+
 This is preparation, not execution approval. The [fixed platform contract](platform-contract.md) is authoritative. The executable still refuses activation. Historical separate-journal/external-job procedures are superseded; do not use the old disposable rehearsal as a current release check.
 
 ## Current composition

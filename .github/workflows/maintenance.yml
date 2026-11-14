@@ -1,0 +1,27 @@
+name: Maintenance
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: Reviewed operator task (app is stopped temporarily)
+        required: true
+        type: choice
+        options: [reconcile, rotate-snapshots]
+      inventory:
+        description: For reconcile, independently verified journal digest from backup inventory
+        type: string
+        default: ''
+permissions:
+  contents: read
+jobs:
+  task:
+    if: ${{ github.repository == 'Capture418/Spotify_Playlist_Organiser' && github.ref == 'refs/heads/main' }}
+    runs-on: [self-hosted, music-deploy]
+    concurrency:
+      group: deploy
+      cancel-in-progress: false
+    steps:
+      - run: /opt/music-runner/request-task
+        env:
+          TASK_COMMAND: ${{ format('["node","runtime/server/task.js",{0},{1}]', toJSON(inputs.task), toJSON(inputs.inventory)) }}
+          APP_SECRETS: ${{ toJSON(secrets) }}

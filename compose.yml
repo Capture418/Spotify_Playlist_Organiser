@@ -1,5 +1,3 @@
-# Preparation only. Do not run until image downloads/database creation are approved.
-# The app currently exits deliberately; it is not a live-login demo.
 name: spotify-organiser-local
 services:
   db:
@@ -11,7 +9,7 @@ services:
       POSTGRES_PASSWORD: invented-local-admin-only
     volumes:
       - music-db:/var/lib/postgresql/data
-      - ./db/init/10-app-role.sql:/docker-entrypoint-initdb.d/10-app-role.sql:ro
+      - ./db/init/30-hosted.sql:/docker-entrypoint-initdb.d/30-hosted.sql:ro
     ports:
       - "127.0.0.1:55434:5432"
     healthcheck:
@@ -19,17 +17,45 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+  migrate:
+    build: .
+    platform: linux/amd64
+    command: ["node", "runtime/server/migrate.js"]
+    healthcheck:
+      disable: true
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://music_app:invented-local-app-only@db:5432/music
+      JOURNAL_DATABASE_URL: postgres://music_journal_app:invented-local-journal-app-only@db:5432/music_journal
+      MIGRATION_DATABASE_URL: postgres://music_migrator:invented-local-migrator-only@db:5432/music
+      JOURNAL_MIGRATION_DATABASE_URL: postgres://music_journal_migrator:invented-local-journal-migrator-only@db:5432/music_journal
+      PORT: "3000"
+      NODE_ENV: development
+      ORGANISER_ORIGIN: http://127.0.0.1:3000
+      ORGANISER_CALLBACK: http://127.0.0.1:3000/callback
+    user: "1000:1000"
+    read_only: true
+    tmpfs: ["/tmp:size=67108864,mode=1777"]
+    mem_limit: 512m
+    cpus: 1.0
+    cap_drop: [ALL]
+    pids_limit: 256
+    stop_grace_period: 20s
+    depends_on:
+      db:
+        condition: service_healthy
   app:
+    command: ["node", "runtime/server/local.js"]
     build: .
     platform: linux/amd64
     env_file: .env
     environment:
       DATABASE_URL: postgres://music_app:invented-local-app-only@db:5432/music
-      MIGRATION_DATABASE_URL: postgres://music_migrator:invented-local-migrator-only@db:5432/music
       JOURNAL_DATABASE_URL: postgres://music_journal_app:invented-local-journal-app-only@db:5432/music_journal
-      JOURNAL_MIGRATION_DATABASE_URL: postgres://music_journal_migrator:invented-local-journal-migrator-only@db:5432/music_journal
       PORT: "3000"
-      NODE_ENV: production
+      NODE_ENV: development
+      ORGANISER_ORIGIN: http://127.0.0.1:3000
+      ORGANISER_CALLBACK: http://127.0.0.1:3000/callback
     ports:
       - "127.0.0.1:3000:3000"
     user: "1000:1000"
@@ -38,7 +64,12 @@ services:
       - /tmp:size=67108864,mode=1777
     mem_limit: 512m
     cpus: 1.0
+    cap_drop: [ALL]
+    pids_limit: 256
+    stop_grace_period: 20s
     depends_on:
+      migrate:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
     healthcheck:

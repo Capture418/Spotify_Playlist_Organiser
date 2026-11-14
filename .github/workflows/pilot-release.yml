@@ -1,15 +1,8 @@
 name: Pilot image release
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
-    inputs:
-      operation:
-        description: Copy approved tested image, or build a separately authorised candidate
-        type: choice
-        required: true
-        default: copy-approved-image
-        options:
-          - copy-approved-image
-          - build
 permissions:
   contents: read
 concurrency:
@@ -17,7 +10,9 @@ concurrency:
   cancel-in-progress: false
 jobs:
   release:
-    if: ${{ github.repository == 'Capture418/Spotify_Playlist_Organiser' && github.ref == 'refs/heads/main' && inputs.operation == 'build' }}
+    outputs:
+      image: ${{ steps.publish.outputs.image }}
+    if: ${{ github.repository == 'Capture418/Spotify_Playlist_Organiser' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
@@ -52,12 +47,13 @@ jobs:
             node scripts/ci/run.mjs cleanup
           fi
       - name: Publish the verified image without rebuilding
+        id: publish
         env:
           REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -eu
           image="$(cat .work/ci/candidate.id)"
-          target="ghcr.io/capture418/spotify-playlist-organiser:$GITHUB_SHA"
+          target="ghcr.io/capture418/spotify_playlist_organiser:$GITHUB_SHA"
           printf '%s' "$REGISTRY_TOKEN" | docker --config .work/ci/docker-config --host unix:///var/run/docker.sock login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
           docker --config .work/ci/docker-config --host unix:///var/run/docker.sock tag "$image" "$target"
           docker --config .work/ci/docker-config --host unix:///var/run/docker.sock push "$target"
@@ -66,32 +62,21 @@ jobs:
           actual="$(docker --config .work/ci/docker-config --host unix:///var/run/docker.sock image inspect "$digest" --format '{{.Id}}')"
           test "$actual" = "$image"
           printf 'Verified image: `%s`\nSource: `%s`\n' "$digest" "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          printf 'image=%s\n' "$digest" >> "$GITHUB_OUTPUT"
           docker --config .work/ci/docker-config --host unix:///var/run/docker.sock logout ghcr.io
-  republish:
-    if: ${{ github.repository == 'Capture418/Spotify_Playlist_Organiser' && github.ref == 'refs/heads/main' && inputs.operation == 'copy-approved-image' }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
+  deploy:
+    needs: release
+    if: ${{ github.repository == 'Capture418/Spotify_Playlist_Organiser' && github.ref == 'refs/heads/main' }}
+    runs-on: [self-hosted, music-deploy]
     permissions:
-      packages: write
+      packages: read
+    concurrency:
+      group: deploy
+      cancel-in-progress: false
     steps:
-      - name: Copy only the approved tested digest and verify identity
+      - run: /opt/music-runner/request-deploy
         env:
-          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -eu
-          digest=sha256:30f0e3d6c4e85248b7cb42f14b0c68d1f8ea8a424a1a95db5d2530e01b56a9f1
-          expected=sha256:db1f246dcc39e0c66d4421cf1dd5647cb8bac7f154a5b0ad077a494aa6caf775
-          source="ghcr.io/capture418/spotify-playlist-organiser@$digest"
-          destination=ghcr.io/capture418/spotify_playlist_organiser
-          tag="$destination:7ed509e4bf605f267340dedd904acbee5d60a070"
-          export DOCKER_CONFIG="$RUNNER_TEMP/pilot-publish"
-          mkdir -p "$DOCKER_CONFIG"
-          trap 'docker logout ghcr.io >/dev/null 2>&1; rm -rf "$DOCKER_CONFIG"' EXIT
-          printf '%s' "$REGISTRY_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
-          docker pull --platform linux/amd64 "$source"
-          test "$(docker image inspect "$source" --format '{{.Id}}')" = "$expected"
-          docker tag "$source" "$tag"
-          docker push "$tag"
-          docker pull --platform linux/amd64 "$destination@$digest"
-          test "$(docker image inspect "$destination@$digest" --format '{{.Id}}')" = "$expected"
-          printf 'Verified unchanged manifest: %s@%s\nVerified unchanged image: %s\n' "$destination" "$digest" "$expected"
+          IMAGE: ${{ needs.release.outputs.image }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_SECRETS: ${{ toJSON(secrets) }}
+          MIGRATE_COMMAND: '["node","runtime/server/migrate.js"]'

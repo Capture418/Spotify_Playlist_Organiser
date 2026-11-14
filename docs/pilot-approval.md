@@ -1,5 +1,8 @@
 # Consolidated private pilot approval package — D063
 
+**D067 hosting supersession:** [home-hosting.md](home-hosting.md) is authoritative; [hosted operations](hosted-operations.md) supplies current commands. Earlier single-database, startup migration, missing-journal and manual-only workflow statements below are historical. Keep the pilot's approved execution counters; this notice does not activate workflows or authorise deployment.
+
+
 Status: **approved for bounded execution under D064**. The following proposal records the approved scope; its preparation-era wording is retained as context. D062 is accepted. Credentials, real Spotify access, publication/merging and deployment have not been authorised by preparation. This package groups those actions into one bounded decision. Routine implementation and fixes inside the accepted design do not need further checkpoint approvals.
 
 ## Outcome to review

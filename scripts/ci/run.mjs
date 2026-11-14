@@ -1,5 +1,5 @@
 // Inactive draft entry. Running containers is a separate approval, never part of npm check.
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
@@ -13,11 +13,15 @@ const mode = process.argv[2];
 try {
   if (!['run', 'cleanup', 'cancellation-hold'].includes(mode)) throw Error('Expected run, cleanup or cancellation-hold');
   const image = readFileSync(resolve(directory, 'candidate.id'), 'utf8').trim();
-  const config = {...plan(process.env, root, image), singleDatabase:true};
+  const config = {...plan(process.env, root, image), hosted:true};
   mkdirSync(resolve(directory, 'docker-config'), { recursive: true });
   function execute(args, input) {
     // Ignore inherited Docker context/auth and unrelated environment; no shell interpolation.
     try {
+      if(args[0]==='logs'){
+        const r=spawnSync('docker',['--config',resolve(directory,'docker-config'),'--host','unix:///var/run/docker.sock',...args],{cwd:root,env:{PATH:process.env.PATH,LANG:'C.UTF-8'},encoding:'utf8',timeout:120000,maxBuffer:16*1024*1024});
+        if(r.error||r.status!==0)throw Error('Log capture failed');return r.stdout+r.stderr;
+      }
       return execFileSync('docker', ['--config', resolve(directory, 'docker-config'), '--host', 'unix:///var/run/docker.sock', ...args], {
         cwd: root, env: { PATH: process.env.PATH, LANG: 'C.UTF-8' }, input,
         encoding: 'utf8', timeout: 120000, maxBuffer: 16 * 1024 * 1024, stdio: ['pipe', 'pipe', 'pipe'],
