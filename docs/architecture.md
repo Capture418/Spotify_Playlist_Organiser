@@ -3,8 +3,6 @@
 **Current hosting authority (D067):** [home hosting](home-hosting.md) supersedes older hosting sections below. Production now uses `hosted.ts` with two restricted runtime connections; `migrate.ts` is the host-run owner command. The journal is append-only encrypted intent/completion rows, bound to the app database by identity. [Hosted operations](hosted-operations.md) records recovery, key retention, dump budgets and exact local/host commands. Historical platform/startup modules remain for regression evidence and are not production entry points.
 
 
-**D066 pending adaptation:** Host-run one-shot migrations replace startup migrations; application credentials have row-only permissions. Current code/image still follows the old startup path and is not deployable under this changed contract. Runtime and migration database settings must be split after reviewing the operator’s “One-shot runs” README. Do not interpret historical journal implementation as confirmation of provisioned infrastructure.
-
 **Historical sections:** Earlier D059–D066 notes below describe the evolution of the project, not the active runtime contract. D067 above supersedes their hosting and entry-point statements.
 
 
@@ -33,9 +31,9 @@ One repository/package; no framework expansion, telemetry, remote fonts or exter
 
 ## Persistence and security preparation
 
-PostgreSQL stores account-scoped catalogue/organisation, sessions, receipts and encrypted restore snapshots. The current platform uses the supplied database-owning non-superuser role for migration and runtime in one database. Minimal deletion records commit atomically with cascading account deletion and share the accepted backup loss window. Applied migrations are versioned/checksummed; rollback swaps application images, so schema changes must remain compatible with the previous release.
+PostgreSQL stores account-scoped catalogue/organisation, sessions, receipts and encrypted restore snapshots. The current platform uses separate owner migration and restricted runtime roles in the app and journal databases. App-local deletion records commit with cascading account deletion; the independent append-only journal retains intent/completion across app-only restores. Applied migrations are versioned/checksummed; rollback swaps application images, so schema changes must remain compatible with the previous release.
 
-Owner login is PKCE with explicit configured binding and exactly the approved read scopes. There is no first-visitor owner creation or implicit bootstrap. Production sessions use Secure/HttpOnly/SameSite cookies; state/CSRF/origin checks and bounded transport remain mandatory. Credentials are never browser-persistent. Versioned credential and snapshot keys are separate purposes; retained versions support recovery. Independent journal code is historical. See the [foundation](s04b-foundation-spec.md) and [lifecycle plan](s04c-operational-plan.md).
+Owner login is PKCE with explicit configured binding and exactly the approved read scopes. There is no first-visitor owner creation or implicit bootstrap. Production sessions use Secure/HttpOnly/SameSite cookies; state/CSRF/origin checks and bounded transport remain mandatory. Credentials are never browser-persistent. Versioned credential and snapshot keys are separate purposes; retained versions support recovery. The hosted append-only journal uses a distinct derived encryption purpose; older singleton/file adapters remain historical. See the [foundation](s04b-foundation-spec.md) and [lifecycle plan](s04c-operational-plan.md).
 
 `hostedConfig` validates only the two runtime URLs and rejects migration credentials. `hosted.ts` verifies schemas and the app/journal identity binding, composes both health checks, and selects setup or connected mode without DDL. `migrate.ts` applies public-schema migrations separately with owner URLs. Independent append-only deletion intent/completion records fence app-only restores; setup remains closed after use. The local-only executable supports exact loopback HTTP while production keeps HTTPS requirements. The old platform/application/executable factories remain solely for regression evidence. See [hosted operations](hosted-operations.md).
 
@@ -43,7 +41,7 @@ Production application requests require canonical Host and a single forwarded HT
 
 ## Verification and deployment boundary
 
-Host tests cover domain, validation, mocked HTTP/configuration/startup, security/lifecycle mechanics and CI resource plans. Actual disposable database tests are separate from the ordinary gate. D051 approves normal PR CI for all same-repository PR branches targeting main on GitHub-hosted Linux; D064 adds manual-only publish/deploy jobs for the approved pilot. Runner installations and synthetic resources are approved within included allowance; merging and required-check settings remain separate. Local image IDs are not registry digests or deployment approval.
+Host tests cover domain, validation, mocked HTTP/configuration/startup, security/lifecycle mechanics and CI resource plans. Actual disposable database tests are separate from the ordinary gate. D051 approves normal PR CI for all same-repository PR branches targeting main on GitHub-hosted Linux; D067 prepares a main-push build/test/publish/deploy chain and manual deploy/task definitions, still local pending execution approval. Runner installations and synthetic resources are approved within included allowance; merging and required-check settings remain separate. Local image IDs are not registry digests or deployment approval.
 
 No personal operational history, live-data verification counts, actual endpoint or recovery-custody location is part of this public summary. Deployment requires separately approved configuration, restricted access, backups/recovery, credentials, dependency review and device checks. See [deployment preparation](home-deployment.md).
 

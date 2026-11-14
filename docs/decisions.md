@@ -139,3 +139,8 @@ Owner confirms operator diagnosed token refusal: helper limited tokens to255 cha
 ## D067 — Authoritative hosting contract checklist implementation
 
 Owner supplies docs/home-hosting.md as the exact replacement for earlier hosting contracts, then approves completing the resulting checklist. Implement restricted two-database runtime, separate owner migration/task commands, append-only journal, mirrored local configuration and synthetic verification. Preserve credentials/settings; no deploy retry or remote workflow activation is inferred from this local implementation request. D064 build/test counters still bound executable verification. Use existing versioned snapshot master keys with a distinct HKDF journal purpose; retain versions while immutable journal history needs them. New storage budgets fail writes explicitly rather than silently removing organisation.
+
+
+## D068 — D067 accepted; release review and approval-package preparation
+
+Owner accepts D067 and approves release review plus preparation of one package for remaining CI, merge and deployment, including an allowance extension. This is preparation only. Existing counters remain3/3 builds and6/6 synthetic attempts; proposed increases, pushes, workflow activation, merging, secret changes and deployment are not authorised yet. See docs/release-approval.md for the concrete proposed sequence, bounds and secure handoffs.

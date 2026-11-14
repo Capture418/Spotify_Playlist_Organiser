@@ -1,5 +1,8 @@
 # Consolidated private pilot approval package — D063
 
+**Current proposal:** use [the remaining release package](release-approval.md) for D068 review. It records D067 acceptance and proposes a bounded extension; it is not yet execution approval. Historical D064 counters remain exhausted.
+
+
 **D067 hosting supersession:** [home-hosting.md](home-hosting.md) is authoritative; [hosted operations](hosted-operations.md) supplies current commands. Earlier single-database, startup migration, missing-journal and manual-only workflow statements below are historical. Keep the pilot's approved execution counters; this notice does not activate workflows or authorise deployment.
 
 

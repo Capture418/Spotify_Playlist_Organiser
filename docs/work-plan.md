@@ -4,9 +4,9 @@ Updated: 14 November2026.
 
 ## Current task
 
-D067 hosting-contract checklist implementation is complete locally and awaiting owner review. Authority: [home hosting contract](home-hosting.md). Production uses two restricted runtime connections, owner migrations run separately, and the journal is append-only. Current executable/operational guidance: [hosted operations](hosted-operations.md). The original audit below is preserved as historical evidence; see the D067 completion record for resolved items.
+D068: D067 is accepted. Release self-review and the [remaining approval package](release-approval.md) are prepared for owner review. No execution extension is approved yet. Authoritative [home hosting contract](home-hosting.md) unchanged. Reviewed implementation0d21e2d on codex/hosting-contract; documentation-only preparation follows.
 
-Counters: candidate builds **3/3**, synthetic attempts **6/6**. Latest exact local image is `sha256:a4bd3a55e59d5b8cad54820ca46a8e06eaac1b67173f4ba11c5df81e9a1ec1c2`; final verification passed with cleanup. Successful hosted deployments remain zero. No push, merge, workflow activation, credentials/settings change or deploy retry occurred in D067. Any further candidate/CI resource execution needs an explicit extension of the existing limits; do not push this runtime change and inadvertently trigger another PR build.
+Counters remain **3/3 candidate builds and6/6 synthetic attempts**. Successful hosted deployments remain zero in recorded evidence. Proposed extension: three additional builds (two planned plus one contingency) and four synthetic attempts, with bounded reviewed publication/merge/activation/setup/normal deployment. Do not push or trigger CI before explicit approval. Local image evidence and complete D067 results are below.
 
 ## Existing implementation
 
@@ -499,3 +499,16 @@ Private local evidence: `.work/d067-quality.log`, `.work/d067-image-build.log`, 
 Constitution review: one package and approved read-only product scope retained; no new feature, service, telemetry, credentials, host provisioning or real-data operation. Known limits: online/VPN use, four-hour restore loss window, retained journal keys, bounded storage and no hosted result yet. The contract's known proxy-log risk remains accepted; only begin Spotify sign-in after a successful deployment and healthy app.
 
 Next task after review: prepare/approve the updated release execution. The new workflows require a PR image check and a main release build, so request a bounded extension before any push (recommended at most two further candidate builds and four synthetic attempts, included allowance only), together with reviewed PR/merge, workflow activation and one setup deployment of the resulting tested digest. Then retain the secure consent and same-digest return-to-normal handoffs. This is a proposal, not new authorisation; no more execution is implied by D067 completion.
+
+
+## D068 release review and package — 14 November 2026
+
+Owner accepted D067 and authorised this preparation. Confirmed project cwd and clean initial working tree. Read canonical documents and exact hosting contract; reviewed runtime/migration/journal/capacity/task code, actual workflow source and D067 logs. Performed a second self-review, not independent assurance. No new release-blocking code finding identified; corrected contradictory active architecture prose without changing runtime/workflow bytes.
+
+Read GitHub main SHA792915aed4c51fa8b9c29a562becbf12b52683a2 and open PR inventory (none), then fetched main to correct the stale local tracking ref. Reviewed the actual release diff against that refreshed base; no unrelated current PR needs merging. Fetch/read-only API calls did not trigger CI. No credentials/secrets read, new image or synthetic run, push, merge, settings change or deployment.
+
+Prepared docs/release-approval.md with explicit merge-triggered deployment warning, three-build/four-test proposed extension (lifetime6/10), one release PR, up to four bounded setup/normal deploy requests, unchanged existing credentials except coordinated deletion of the two setup secrets, health-before-consent requirement, same-digest normal deployment, failure handling and actual-device acceptance. The third proposed build is a contingency; earlier two-build recommendation was a proposal, not a cap extension. Existing caps remain unchanged until approval.
+
+Validation: documentation links/foundation checks and existing workflow-policy/launcher mocked checks; no runtime changes require another image. The D067222-test/full-image results remain historical evidence, not rerun claims. Actual result: `npm run check:foundation` passed documentation checks and all36 foundation/mock tests, including workflow digest/inventory and launcher policy checks. `git diff --check` passed. The fetched main tree matches the already-incorporated PR6 branch commit; no new main-only source delta was found.
+
+Constitution review: accepted hosting/design preserved; package distinguishes proposals from authorisation, self-review from independent audit, and synthetic proof from live/device results. Next task is owner approval of that one package, then execution within its counters and secure handoffs. No additional settled-platform questions for Dad.
