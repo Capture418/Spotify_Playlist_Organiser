@@ -9,7 +9,7 @@ Before planning or editing, read:
 
 These are the source of truth for this snapshot. Surface conflicts before affected work. Work only in this project and inspect Git status before changes. Preserve user work; never initialise or alter another repository. Use one package and small reviewable changes, without a multi-agent hierarchy. Follow the canonical constitution rather than inventing competing rules.
 
-**Current boundary (D068):** Owner accepts D067 and authorises release review and one remaining-execution approval package only. Read [home hosting](docs/home-hosting.md) and the proposed [release package](docs/release-approval.md). Existing counters are exhausted at3 builds/6 synthetic attempts. Proposed extensions are not approved. No push, merge, workflow activation, new resource execution, credentials/settings change or deployment until the package is approved. Keep real values outside source/logs/chat.
+**Current boundary (D069):** Owner approved [the remaining release package](docs/release-approval.md): three additional candidate builds/four synthetic attempts (lifetime caps6/10), reviewed PR/merge/workflow activation and four bounded setup/normal deploy requests. Follow its exact limits and secure handoffs; included allowance only. No unrelated settings, provisioning, new credentials, production maintenance or destructive real-data operations. Track every execution in the work plan. Keep real values outside source/logs/chat.
 
 Use a descriptive `codex/` branch. Never push directly to main or merge without owner approval. Normal PR workflow execution is authorised by D051; local database/container execution is not implied by ordinary checks. Do not weaken environment, resource-ownership, proxy or production guards to make a test pass.
 

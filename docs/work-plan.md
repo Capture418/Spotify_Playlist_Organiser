@@ -4,9 +4,9 @@ Updated: 14 November2026.
 
 ## Current task
 
-D068: D067 is accepted. Release self-review and the [remaining approval package](release-approval.md) are prepared for owner review. No execution extension is approved yet. Authoritative [home hosting contract](home-hosting.md) unchanged. Reviewed implementation0d21e2d on codex/hosting-contract; documentation-only preparation follows.
+D069: owner approved [the remaining release package](release-approval.md). Execute the reviewed release PR, Linux CI and merge-triggered verified-image/setup deployment, then private setup and same-digest normal deployment. User confirms retained token/keys, registered HTTPS callback and included allowance with paid usage blocked.
 
-Counters remain **3/3 candidate builds and6/6 synthetic attempts**. Successful hosted deployments remain zero in recorded evidence. Proposed extension: three additional builds (two planned plus one contingency) and four synthetic attempts, with bounded reviewed publication/merge/activation/setup/normal deployment. Do not push or trigger CI before explicit approval. Local image evidence and complete D067 results are below.
+Starting counters: **3/6 candidate builds,6/10 synthetic attempts,0/4 new deploy requests**. Successful hosted deployments remain zero before this sequence. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
 
 ## Existing implementation
 
@@ -512,3 +512,8 @@ Prepared docs/release-approval.md with explicit merge-triggered deployment warni
 Validation: documentation links/foundation checks and existing workflow-policy/launcher mocked checks; no runtime changes require another image. The D067222-test/full-image results remain historical evidence, not rerun claims. Actual result: `npm run check:foundation` passed documentation checks and all36 foundation/mock tests, including workflow digest/inventory and launcher policy checks. `git diff --check` passed. The fetched main tree matches the already-incorporated PR6 branch commit; no new main-only source delta was found.
 
 Constitution review: accepted hosting/design preserved; package distinguishes proposals from authorisation, self-review from independent audit, and synthetic proof from live/device results. Next task is owner approval of that one package, then execution within its counters and secure handoffs. No additional settled-platform questions for Dad.
+
+
+## D069 preflight — 14 November 2026
+
+Approval recorded before release publication. Confirmed clean project working tree; names-only GitHub inventory contains all11 expected APP settings and no additional reserved overrides. Latest five Actions runs are completed, with no active deploy observed. Existing operator contract and reviewed source retained. Current npm audit returned zero vulnerabilities at all severities; no dependency change/install. Rechecked Spotify official PKCE/scopes documentation (https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow and https://developer.spotify.com/documentation/web-api/concepts/scopes); no new scope or client secret requested. Owner confirmed private custody/callback/allowance. Local foundation validation precedes push; PR/main CI will supply fresh Linux/full-image results.

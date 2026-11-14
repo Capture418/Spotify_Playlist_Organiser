@@ -144,3 +144,8 @@ Owner supplies docs/home-hosting.md as the exact replacement for earlier hosting
 ## D068 — D067 accepted; release review and approval-package preparation
 
 Owner accepts D067 and approves release review plus preparation of one package for remaining CI, merge and deployment, including an allowance extension. This is preparation only. Existing counters remain3/3 builds and6/6 synthetic attempts; proposed increases, pushes, workflow activation, merging, secret changes and deployment are not authorised yet. See docs/release-approval.md for the concrete proposed sequence, bounds and secure handoffs.
+
+
+## D069 — Remaining pilot release execution approved
+
+Owner approves docs/release-approval.md, including up to three additional builds and four synthetic attempts (lifetime6/10), reviewed branch push/PR/merge, workflow activation, verified-image publication and four bounded setup/normal deploy requests. Included allowance only. Reuse existing credentials, with private setup/consent and iPhone handoffs; coordinated removal of both setup secrets after setup is included. Package exclusions and stop conditions remain binding. Owner confirms retained token/keys, exact HTTPS callback and available included allowance with paid usage blocked.

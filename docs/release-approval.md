@@ -1,6 +1,6 @@
 # Remaining pilot release approval package — D068 preparation
 
-Status: **proposed, not approved for execution**. The owner accepted D067 and authorised this review/package only. This package supersedes conflicting execution instructions in the older pilot proposal once explicitly approved. Hosting authority remains the unchanged [home hosting contract](home-hosting.md).
+Status: **approved for bounded execution under D069**. The owner explicitly approved this package, its build/test extension, reviewed PR/merge and bounded deployments, using included allowance only. Proposal wording below records the now-approved scope. This package supersedes conflicting execution instructions in the older pilot proposal. Hosting authority remains the unchanged [home hosting contract](home-hosting.md).
 
 ## Outcome
 
