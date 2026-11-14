@@ -149,3 +149,8 @@ Owner accepts D067 and approves release review plus preparation of one package f
 ## D069 — Remaining pilot release execution approved
 
 Owner approves docs/release-approval.md, including up to three additional builds and four synthetic attempts (lifetime6/10), reviewed branch push/PR/merge, workflow activation, verified-image publication and four bounded setup/normal deploy requests. Included allowance only. Reuse existing credentials, with private setup/consent and iPhone handoffs; coordinated removal of both setup secrets after setup is included. Package exclusions and stop conditions remain binding. Owner confirms retained token/keys, exact HTTPS callback and available included allowance with paid usage blocked.
+
+
+## D070 — Setup-form correction execution and one-build extension
+
+Owner approves one extra candidate build (lifetime cap7), publication/reviewed merge of the prepared Safari setup-form correction after CI passes, and corrective setup deployment. Included allowance only; synthetic cap10 and new deployment cap4 remain unchanged. No credential changes or bypass of origin/CSRF/privacy checks. Existing private setup and same-digest normal-mode handoffs remain.

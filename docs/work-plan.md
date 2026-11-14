@@ -6,7 +6,7 @@ Updated: 14 November2026.
 
 D069: owner approved [the remaining release package](release-approval.md). Execute the reviewed release PR, Linux CI and merge-triggered verified-image/setup deployment, then private setup and same-digest normal deployment. User confirms retained token/keys, registered HTTPS callback and included allowance with paid usage blocked.
 
-Starting counters: **3/6 candidate builds,6/10 synthetic attempts,0/4 new deploy requests**. Successful hosted deployments remain zero before this sequence. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
+Current counters: **5/7 candidate builds,8/10 synthetic attempts,1/4 new deploy requests** (D070 extension approved). One successful hosted setup deployment is now verified; normal mode and live library/device checks remain pending. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
 
 ## Existing implementation
 
@@ -517,3 +517,33 @@ Constitution review: accepted hosting/design preserved; package distinguishes pr
 ## D069 preflight — 14 November 2026
 
 Approval recorded before release publication. Confirmed clean project working tree; names-only GitHub inventory contains all11 expected APP settings and no additional reserved overrides. Latest five Actions runs are completed, with no active deploy observed. Existing operator contract and reviewed source retained. Current npm audit returned zero vulnerabilities at all severities; no dependency change/install. Rechecked Spotify official PKCE/scopes documentation (https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow and https://developer.spotify.com/documentation/web-api/concepts/scopes); no new scope or client secret requested. Owner confirmed private custody/callback/allowance. Local foundation validation precedes push; PR/main CI will supply fresh Linux/full-image results.
+
+
+## D069 PR and release gate — 14 November 2026
+
+Release PR7 published at headfc9f54cacd61488f63790a3e76509859b038de51. GitHub Linux run43601440151 passed quality and exact-image synthetic scenarios plus scoped cleanup; candidate image6d5dd0a0cf8ed0a5f7476680922a7b6abe8141f58a4bcf73451dcbd49dcca110. This consumed one additional build/test (lifetime4/6 and7/10). Reviewed the successful exact head and merged with match-head protection at13:48:08UTC, producing mainb7a9d842605553b64276235682ad0fcd6d94f308. No required-check/settings changes.
+
+Automatic main release43601581067 is action_required at GitHub's security gate. Requested owner approval of the existing run, not another dispatch. No main candidate or deploy has executed at this checkpoint; deployment count remains0/4. Pre-deploy HTTPS health returned502, consistent with no working app yet. Credentials unchanged. These evidence edits remain local to avoid another main release trigger.
+
+
+## D069 setup deployment succeeded — 14 November 2026
+
+Owner approved the existing GitHub security gate. Run43601581067 on merged sourceb7a9d842605553b64276235682ad0fcd6d94f308 completed successfully. Release job132467574817 passed quality, candidate build, synthetic verification, scoped cleanup and publication without rebuilding. Published verified image: `ghcr.io/capture418/spotify_playlist_organiser@sha256:40d70bf3cf37bce3f10e90598b2fa881c4b56e4d864d63a69b2fc3bb71886e37`. This is the digest to reuse for normal-mode deployment.
+
+Dependent deploy job132467788868 completed at13:50:46UTC. Safe extracted log markers confirm `Migration complete`, `Application ready` and `deployed`. The reviewed workflow passes the release output directly into this job; the helper log does not independently expose its digest, so no remote image inspection is claimed. HTTPS /health returned200 with minimal ok status, and GET / returned200 with the setup unlock form. No OAuth initiated, token entered, secret changed or library imported during these checks.
+
+Counters now5/6 builds,8/10 synthetic attempts,1/4 new deploy requests. Await private owner setup: open the healthy site, enter the existing saved setup token only in its form, then complete browser consent/verified-owner confirmation with guidance. After confirmed setup, delete both setup secrets together and redeploy this exact digest via the manual deploy workflow; do not rebuild. Evidence stays local, with no post-merge main push.
+
+
+## D069 setup form correction prepared — 14 November 2026
+
+Owner reports generic error immediately after Unlock setup. Safari UI confirms /setup/unlock error page; live /health remains200. Source review found setup HTML's `Referrer-Policy: no-referrer` conflicts with strict native-form Origin validation. Reproduced in actual Safari with a separate invented-data loopback form: original policy submitted `Origin: null`, while `origin` policy submitted the exact loopback origin and an origin-only Referer. No real token read/submitted, no production POST/retry, no request bodies recorded. The local proof server was stopped. Private evidence `.work/setup-browser-proof.json` contains only the two invented test headers. MDN documents this browser behaviour: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Referrer-Policy . This reproduces a concrete cause matching the observed failure; the real token's correctness is not inferred.
+
+Prepared a minimal correction: HTML setup form pages use origin-only referrer policy; callback/error responses retain no-referrer. Strict canonical Origin rejection, cookie flags, CSRF/session/PKCE and secret-safe error output remain intact. Regression assertions cover form policy, rejection of null Origin before unlock, and callback error privacy. Full `npm run check` passed222 tests, lint/types/frontend/backend builds and project/lockfile checks; whitespace check passed. No image/DB rehearsal or deployment consumed.
+
+Release allowance blocker: lifetime builds5/6 leaves one, but the unchanged required PR verification plus main release needs two builds. Tests8/10 leave the required two attempts. The correction is prepared locally before asking for approval. Proposed narrow amendment: **one extra candidate build (lifetime cap7), one corrective PR/merge, and the already-budgeted corrective setup deployment**; test cap10 and deploy cap4 remain unchanged, included allowance only. No weakening/skipping PR image checks, no credential changes and no push until approved. The normal-mode handoff will use the newly verified corrective digest.
+
+
+## D070 corrective release authorised — 14 November 2026
+
+Owner approves the prepared Safari form correction, one extra build and corrective PR/merge/setup deployment. Counters begin5/7 builds,8/10 synthetic attempts,1/4 deploy requests. Remote main remainsb7a9d842605553b64276235682ad0fcd6d94f308; local corrective branch is clean before approval-record edits. Preserve full PR/main quality and image checks; no new credentials/settings or additional retry allowance.

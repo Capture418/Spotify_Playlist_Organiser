@@ -35,7 +35,9 @@ export function setupServer(setup: Setup, canonical: string, health: () => Promi
       const matches = (req.headers.cookie ?? '').split(';').map(s => s.trim()).filter(s => s.startsWith(cookieName+'='));
       const id = matches.length === 1 ? matches[0]!.slice(cookieName.length+1) : '';
       const redirect = (to: string) => { res.writeHead(303, {Location: to}); res.end(); };
-      const html = (body: string) => { res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'}); res.end(page(body)); };
+      // Native form POSTs become Origin:null under no-referrer (including Safari).
+      // Form pages expose only their origin; callback/error responses retain no-referrer.
+      const html = (body: string) => { res.setHeader('Referrer-Policy', 'origin'); res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'}); res.end(page(body)); };
       if (url.pathname === '/callback' && req.method === 'GET') {
         const q = url.searchParams;
         if ([...q.keys()].some(k => !['code','state'].includes(k)) || ['code','state'].some(k => q.getAll(k).length !== 1)) { setup.cancel(id); throw new Fault(403, 'Authorisation rejected'); }
