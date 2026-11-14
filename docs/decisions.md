@@ -226,3 +226,11 @@ The owner accepts the D084 changes and requests a CI and deployment approval pac
 ## D086 — MuLO release execution approved
 
 Owner approved the MuLO package with included Actions allowance only. Approved scope is two builds, two disposable test attempts, the reviewed PR and merge, one deployment and one conditional rollback.
+
+## D088 — MuLO subtitle accepted locally
+
+The owner accepted the local subtitle and requested the release package.
+
+## D089 — MuLO subtitle release approved
+
+The owner approved the [subtitle release package](subtitle-release-approval.md) using included allowance only. Lifetime caps are 21 builds, 24 disposable attempts and 11 deployment requests.
