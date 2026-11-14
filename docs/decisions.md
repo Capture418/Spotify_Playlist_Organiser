@@ -169,3 +169,8 @@ Owner approves two additional candidate builds and two synthetic attempts (lifet
 ## D073 — Pilot accepted — 14 November 2026
 
 Owner explicitly accepts the pilot after the recorded Mac/iPhone, Spotify links, Home Screen, shared-tag persistence, export, concurrent-edit recovery, VPN, keyboard,200% zoom and bounded browser-network checks passed. Accepted running release is maina0645c5aa96dc5c2d500ff29dfa2d0c12181a599, image `ghcr.io/capture418/spotify_playlist_organiser@sha256:0ab3a14b5e0e6446f7f3858d5909ecf2589bbdfe58369f8d4ae4d9be4cb28179`. Existing online/VPN and backup/recovery limitations remain unchanged. Acceptance closes the pilot; it does not authorise further releases, installations, spending, provisioning, credentials, maintenance or features.
+
+
+## D074 — Direct Spotify artwork local implementation approved
+
+Owner approves direct artwork loading from Spotify image servers, local implementation and tests. Scope: existing cards, unmodified artwork, attribution, neutral fallback and narrowly validated image destinations. Existing metadata cache may retain selected URLs, not image binaries; no new scopes or credentials. Browser image requests reveal device IP/image requests to Spotify infrastructure. Deployment, pushes/CI resources and installations remain separately gated; no release allowance extended.

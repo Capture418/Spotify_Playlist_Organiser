@@ -27,7 +27,7 @@ The PWA has a same-origin manifest, local generated icons, standalone display me
 - `scripts/ci`: portable injected launcher; fake-executor tests run in the normal host gate.
 - `public`: manifest and project-owned icons, reproducible with Node built-ins.
 
-One repository/package; no framework expansion, telemetry, remote fonts or external artwork loading. UI renders untrusted metadata as text. Spotify is authoritative for imported metadata; the organiser owns tags. Partial refresh failures never erase organisation data.
+One repository/package; no framework expansion, telemetry, remote fonts ; D074 permits validated direct Spotify image requests with no-referrer and anonymous CORS. UI renders untrusted metadata as text. Spotify is authoritative for imported metadata; the organiser owns tags. Partial refresh failures never erase organisation data.
 
 ## Persistence and security preparation
 
@@ -71,3 +71,6 @@ D061 joins the validated application to `prepareProcess` through the injected `e
 
 
 D063 records D062 acceptance and prepares `docs/pilot-approval.md`. `release-dependencies.ts` supplies an inert, tested transport/pool adapter; the proposed activation diff stays unapplied in `docs/release/pilot-activation.patch`. The default entry still refuses. The package combines release verification, publication, secure credential handoffs, setup/normal deployment and owner acceptance; none of that operational scope is approved by preparation.
+
+
+D074 local artwork implementation retains one validated image URL in existing expiring metadata JSON, never image bytes or organisation exports. Exact HTTPS image origins are centralised in src/domain/artwork.ts and reused by CSP, import selection, storage normalisation and rendering. Missing old fields and invalid URLs become null; catalogue import remains usable. No schema migration. Artwork fits without cropping; failed/missing art gets a neutral fallback. Bulk selection is outside the art. Official white Spotify logo is served locally. Browser image loads are lazy, no-referrer and anonymous CORS; hosts without CORS support fall back safely. Source/domain allowlist changes require review. Production remains the accepted D073 pilot until separately approved release.

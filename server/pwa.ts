@@ -1,5 +1,6 @@
 /** Public, non-personal assets only; never turn a URL into an arbitrary file path. */
 const assets = new Map([
+  ['/spotify/logo-white.svg', 'image/svg+xml'],
   ['/manifest.webmanifest', 'application/manifest+json'],
   ['/icons/library.svg', 'image/svg+xml'],
   ['/icons/apple-touch-icon.png', 'image/png'],

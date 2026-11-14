@@ -1,3 +1,4 @@
+import { SpotifyArtwork } from '../../components/SpotifyArtwork.tsx';
 import { DemoArtwork } from '../../components/DemoArtwork.tsx';
 import { Icon } from '../../components/Icon.tsx';
 import { itemLabel, spotifyLink } from '../../domain/library.ts';
@@ -17,7 +18,7 @@ export function LibraryCard({ item, tags, selecting, selected, onSelect, onEdit 
   return (
     <article className={`item-card${selected ? ' is-selected' : ''}`} aria-labelledby={`title-${item.id}`}>
       <div className="artwork-wrap">
-        <DemoArtwork itemId={item.id} title={item.title} />
+        {item.source === 'spotify' ? <SpotifyArtwork key={item.id} url={item.available ? item.artworkUrl : null} title={item.title} /> : <DemoArtwork itemId={item.id} title={item.title} />}
         {selecting && (
           <label className="item-selector">
             <input type="checkbox" checked={selected} onChange={onSelect} aria-label={`Select ${itemLabel(item)}`} />
@@ -34,6 +35,7 @@ export function LibraryCard({ item, tags, selecting, selected, onSelect, onEdit 
             {tags.map(tag => <li key={tag.id}>{tag.name}</li>)}
           </ul>
         ) : <p className="untagged">Not tagged yet</p>}
+        {spotifyHref && <a href={spotifyHref} target="_blank" rel="noopener noreferrer" aria-label="View on Spotify"><img className="spotify-attribution" src="/spotify/logo-white.svg" alt="Spotify" width="80" /></a>}
         <div className="card-actions">
           <button type="button" className="edit-button" onClick={onEdit} aria-label={`Edit tags for ${itemLabel(item)}`}>
             <Icon name="tag" /> <span>Edit tags</span>

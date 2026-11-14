@@ -1,3 +1,4 @@
+import { ARTWORK_ORIGINS } from '../src/domain/artwork.ts';
 import { pwaAssetType } from './pwa.ts';
 import { databaseHealth } from './health.ts';
 import { randomBytes } from 'node:crypto';
@@ -31,7 +32,7 @@ export function appServer(store:Store,options:Options){
  }
  function json(res:ServerResponse,status:number,value:unknown){res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));}
  const server=createServer(async(req,res)=>{
-  res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('Content-Security-Policy',"default-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
+  res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('Content-Security-Policy',"default-src 'self'; connect-src 'self'; img-src 'self' data: "+ARTWORK_ORIGINS.join(" ")+"; style-src 'self'; script-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
   try{
    // Internal container probes use a loopback Host. Exempt only this fixed,
    // read-only endpoint; all application and OAuth routes retain Host checks.

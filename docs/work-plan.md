@@ -4,7 +4,7 @@ Updated: 14 November2026.
 
 ## Current status — pilot accepted (D073)
 
-Owner accepted the working pilot on14 November2026 after the recorded acceptance checks passed. Music Library Organiser is running in normal mode with read-only Spotify playlists/albums, persistent shared tags, Mac/iPhone access and the online-only Home Screen app. No active implementation task remains.
+Owner accepted the working pilot on14 November2026 after the recorded acceptance checks passed. Music Library Organiser is running in normal mode with read-only Spotify playlists/albums, persistent shared tags, Mac/iPhone access and the online-only Home Screen app. D074 local artwork implementation and tests completed; owner review and separate release approval pending.
 
 Final execution counters: **11/11 candidate builds,14/14 synthetic attempts,5/5 deploy requests**. All allowances are exhausted. Do not push evidence to main or trigger another release. Future work requires a separately scoped task and applicable approvals. Historical evidence below is retained; earlier pending statuses are superseded by D073.
 
@@ -659,3 +659,27 @@ Ready for explicit owner pilot acceptance: no outstanding acceptance defect iden
 ## D073 acceptance recorded
 
 Owner explicitly stated “I accept pilot”. Recorded acceptance in the decision log against the D072 deployed image and completed final evidence. Documentation-only change with clean initial Git status; whitespace validation passed. No runtime tests repeated, private data altered, push, merge, build or deployment. Evidence committed locally only. Next step is ordinary use and gathering any future improvement requests; no new development scope inferred.
+
+
+## Post-pilot artwork styling preparation
+
+Owner requests Spotify album and playlist artwork in the Organiser while retaining accepted functionality. Inspected clean Git state, canonical design and current mapping/store/card/CSP: images are currently discarded, artworkUrl is null-only, cards render DemoArtwork, and image policy permits only same-origin/data images. No runtime change yet.
+
+Recommended bounded design: keep the existing card layout; carry one validated Spotify-provided cover URL through the existing expiring metadata cache; lazy-load images at suitable card resolution, with no-referrer and a neutral missing/failed-image fallback. Keep full artwork visible without cropping, text overlays or distortions. Move bulk-selection control outside the image area and add official Spotify attribution next to the existing link, following current design guidance. No image binary storage, new scopes, credentials, dependencies, artwork in organisation exports or changes to tag semantics. Existing cache expiry and storage limits remain enforced; missing/malformed artwork must not break catalogue import. Test old records without artwork and broken image loads.
+
+Image delivery is the remaining security/privacy design decision: recommend direct requests to narrowly allowlisted Spotify image hosts rather than introducing a server image proxy. Direct delivery exposes device IP and requested image to Spotify's image infrastructure; no organiser cookies, OAuth token or page Referer is deliberately sent. It changes the previous same-origin-only network behaviour and needs an explicit bounded image-policy exception. Alternative: authenticated bounded server proxy, adding fetch/redirect/size/type controls and server load. Do not implement either until delivery is resolved.
+
+Sources reviewed: https://developer.spotify.com/documentation/design , https://developer.spotify.com/documentation/web-api/reference/get-users-saved-albums , https://developer.spotify.com/documentation/web-api/reference/get-a-list-of-current-users-playlists . Design guidance requires original artwork and Spotify attribution/link. Proposed local verification uses invented fixtures; no live image fetch/import performed. Current pilot remains accepted and deployed. Execution counters remain exhausted; push/CI/merge/deploy need a future release package. No code changes or tests claimed for this preparation.
+
+
+## D074 local artwork implementation and verification
+
+Owner approved direct Spotify image-server loading and local tests; deployment remains gated. Implemented shared exact-origin HTTPS URL validation and bounded image-size selection (prefer smallest provided width at least300px). Approved image origins: i.scdn.co, mosaic.scdn.co, image-cdn-ak.spotifycdn.com and image-cdn-fa.spotifycdn.com. Reject credentials, non-default origins/ports, queries/fragments, malformed paths and unapproved destinations; unsupported hosts fall back rather than widening policy silently. Import maps one URL from existing collection responses; Store normalises it into existing expiring metadata JSON and revalidates on reads. Old/null/expired/invalid/unavailable metadata falls back safely. Organisation export remains metadata-free. No schema or dependency change.
+
+Cards lazy-load uncropped artwork with no-referrer and anonymous CORS, use a neutral fallback on missing/error, and retain demo artwork for invented demo records. Selection control is below artwork. Official unmodified white Spotify logo downloaded from the reviewed design asset archive, inspected for active/external SVG content and served through the explicit public-asset allowlist; provenance recorded under public/spotify. Packaging verifies the logo is copied into runtime assets. Same-origin API/script policies remain; image CSP alone adds the four explicit origins. Anonymous CORS omits cross-origin credentials; unsupported CORS responses safely fall back. Actual CDN behaviour is not yet verified against the owner's library.
+
+Full npm run check passed227 tests, lint, types, project/lockfile checks and frontend/backend build. New tests cover hostile/invalid URLs, size selection and missing responses, album/playlist transport mapping, old/expired/invalid cached metadata and export exclusion. Storage tests use a fake client; no actual database rehearsal was run or authorised. Existing role/capacity limits and cache expiry remain unchanged. Technical-lead self-review, not independent security audit.
+
+Browser review on loopback used an ignored React fixture with invented cards and a temporary service worker intercepting approved-host image requests with synthetic success/404 responses. Actual component displayed successful artwork and missing/broken fallbacks, intact card links/attribution, and selection below the image. No live Spotify image fetch or real account/library accessed. This test-only worker is not in production source; explicitly unregistered via fixture cleanup, then loopback Vite stopped. Browser desktop evidence only; actual Mac/iPhone/CDN/CORS and responsive/zoom/network release checks remain before artwork release acceptance.
+
+No push, CI, Docker/database creation, install, merge or deployment. Prior counters unchanged11/11,14/14,5/5. Accepted pilot remains running unchanged. Next: owner reviews local styling; prepare a separate bounded release allowance and actual-device artwork checks if approved. A catalogue refresh after eventual deployment will populate image URLs for existing records; until then old records display fallback and retain their tags.

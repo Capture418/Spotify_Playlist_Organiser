@@ -52,7 +52,7 @@ test('429 stops subsequent upstream requests until explicit later retry, without
   await assert.rejects(api.identity('fake',signal())); await assert.rejects(api.identity('fake',signal())); assert.equal(calls,1);
   now=120001;assert.equal(await api.identity('fake',signal()),'invented');assert.equal(calls,2);
 });
-test('collection mapping validates destination and drops track/artwork/profile payloads', async () => {
+test('collection mapping validates destination and drops unsafe artwork and track/profile payloads', async () => {
   const id='A'.repeat(22);
   for(const kind of ['playlist','album'] as const) {
     const item=kind==='playlist'?{id,name:'Invented',owner:{display_name:'Invented owner'},external_urls:{spotify:`https://open.spotify.com/playlist/${id}`},tracks:{private:'discard'}}:{album:{id,name:'Invented',artists:[{name:'Invented artist'}],external_urls:{spotify:`https://open.spotify.com/album/${id}`},images:[{url:'https://evil.invalid'}],tracks:{private:'discard'}}};
@@ -61,4 +61,13 @@ test('collection mapping validates destination and drops track/artwork/profile p
     const bad=new SpotifyTransport(client,callback,async()=>Response.json({offset:0,limit:kind==='playlist'?50:10,total:2,next:'https://evil.invalid/?offset=1',items:[item]}));
     await assert.rejects(bad.page(kind,0,'fake',signal()));
   }
+});
+
+test('album and playlist import retain only the selected validated artwork URL', async () => {
+ const id='A'.repeat(22), url='https://i.scdn.co/image/invented300';
+ for(const kind of ['playlist','album'] as const){
+  const data={id,name:'Invented',owner:{display_name:'Invented'},artists:[{name:'Invented'}],external_urls:{spotify:`https://open.spotify.com/${kind}/${id}`},images:[{width:640,url:'https://i.scdn.co/image/invented640'},{width:300,url}],tracks:{private:'discard'}};
+  const api=new SpotifyTransport(client,callback,async()=>Response.json({offset:0,limit:kind==='playlist'?50:10,total:1,next:null,items:[kind==='album'?{album:data}:data]}));
+  const page=await api.page(kind,0,'fake',signal());assert.equal(page.items[0]!.artworkUrl,url);assert.doesNotMatch(JSON.stringify(page),/private|images|tracks/);
+ }
 });
