@@ -4,9 +4,9 @@ Updated: 14 November2026.
 
 ## Current status — pilot accepted (D073)
 
-Owner accepted the working pilot on14 November2026 after the recorded acceptance checks passed. Music Library Organiser is running in normal mode with read-only Spotify playlists/albums, persistent shared tags, Mac/iPhone access and the online-only Home Screen app. D076 artwork release execution approved; CI/publication and device checks in progress.
+Owner accepted the working pilot on14 November2026 after the recorded acceptance checks passed. Music Library Organiser is running in normal mode with read-only Spotify playlists/albums, persistent shared tags, Mac/iPhone access and the online-only Home Screen app. D076 artwork release deployed and healthy; owner real-artwork/device acceptance checks pending.
 
-Final execution counters: **11/11 candidate builds,14/14 synthetic attempts,5/5 deploy requests**. All allowances are exhausted. Do not push evidence to main or trigger another release. Future work requires a separately scoped task and applicable approvals. Historical evidence below is retained; earlier pending statuses are superseded by D073.
+Current D076 counters: **13/15 candidate builds,16/18 synthetic attempts,6/8 deploy requests**. Remaining reserve is bounded to one diagnosed corrective PR/main pair and corrective/return-to-pilot deployments. Do not push evidence to main or trigger another release. Future work requires a separately scoped task and applicable approvals. Historical evidence below is retained; earlier pending statuses are superseded by D073.
 
 ## Existing implementation
 
@@ -698,3 +698,12 @@ Owner approves artwork release package. Clean initial tree; fetched unchanged ma
 
 
 D076 initial PR11 run43608030874 failed at host quality before candidate build or disposable verification. The isolated foundation-test copy omitted the new artwork approval document linked by AGENTS.md. Added that document to the fixture copy list; no validation weakened or runtime changed. Earlier pre-publication command batch did not propagate this foundation test failure correctly; CI caught it. Re-running full host gate with explicit exit checking before the corrected push. No build/synthetic/deployment consumed by this failed run (steps skipped); counters remain11/15,14/18,5/8.
+
+
+## D076 artwork deployment verified — 14 November 2026
+
+Corrected PR11 head4df8ae594f8aa153f59be9abba8a3ecd0bf52d41 passed run43608177826: quality, candidate build, actual disposable PG/runtime checks including artwork persistence/logo/CSP/export assertions, and scoped cleanup. Final exact-head review and merge at15:06:10UTC produced main23e300239c6f62e4dc72f0c673fa1481331d233a. Earlier run43608030874 failed before image/database execution; no resource allowance consumed by it. No workflow, credentials, dependencies or schema changed. Current dependency audit zero vulnerabilities.
+
+Automatic release43608340533 succeeded: release132487702887 passed build/test/cleanup and verified publication; deploy132487949083 reports Migration complete, Application ready and deployed. Artwork image: `ghcr.io/capture418/spotify_playlist_organiser@sha256:b83fd60160dc2d16ee3b5920ac9994554564ea5efdbafce0ae902f065b493aae`. Safe markers only extracted; raw production logs not retained/displayed. Public HTTPS checks: health200 minimal ok, root200 normal HTML with four exact image CSP origins, official logo200 image/svg+xml. These establish deployment/public asset delivery, not real image CDN acceptance.
+
+Counters13/15 builds,16/18 synthetic attempts,6/8 deployments. Reserved correction pair and corrective/return-to-pilot requests remain bounded by package; no automatic retries. Evidence local only. Owner next reloads root and Refresh catalogue once, checks representative albums/standard/custom playlists, correct artwork/full-cover layout, preserved tags, filters/links and scrolling. Then actual iPhone Safari/Home Screen/VPN checks. Final desktop keyboard/200% zoom/network image credentials/referrer review remains before artwork acceptance; no real import/refresh or private image inspection done by agent in deployment checks.
