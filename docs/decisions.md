@@ -159,3 +159,8 @@ Owner approves one extra candidate build (lifetime cap7), publication/reviewed m
 ## D071 — Safari authorisation handoff correction approved
 
 Owner approves two additional candidate builds and two disposable synthetic attempts (lifetime caps9/12), corrective branch push/PR and merge after passing CI, and one additional setup deployment (total cap5). Included allowance only. Preserve normal and corrective-normal deployment slots, existing credentials and all security checks. Execute the prepared explicit Spotify link correction; no unrelated changes or automatic retries beyond these limits.
+
+
+## D072 — Imported Spotify card links corrective release
+
+Owner approves two additional candidate builds and two synthetic attempts (lifetime caps11/14), corrective PR publication and merge after passing CI, and use of the remaining corrective-normal deployment (cap5 unchanged). Included allowance only. Publish the prepared validated playlist/album link correction; no credentials, schema, dependencies, workflow changes or unrelated features.

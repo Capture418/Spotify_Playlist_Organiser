@@ -64,3 +64,10 @@ Suggested approval: **“I approve the remaining pilot release package in docs/r
 The prepared setup handoff fix replaces the CSP-blocked external form redirect with a validated explicit Continue to Spotify link. Local full quality gate passed222 tests; actual Safari completed the compiled setup flow using only in-memory invented storage and mocked Spotify. No new permissions, credentials or relaxed form policy.
 
 Requested execution scope: push one corrective branch/PR, review and merge only after successful checks, then the automatic main release and one corrective setup deployment. Add **two candidate builds** (lifetime cap9) and **two disposable synthetic attempts** (lifetime cap12) for the required PR and main checks. Add **one corrective setup deployment** (total deployment cap5) so normal and one diagnosed corrective-normal deployment remain available. Existing usage is7 builds,10 attempts,2 deploy requests. Included allowance only; no blind retries or new credentials. All other D069/D070 exclusions remain in force. Owner explicitly approved this amendment and its corrective PR/merge/setup execution.
+
+
+## D072 card-link correction — approved
+
+Replace the unconditional demo-disabled Open in Spotify control with a validated canonical link for available imported items. Local223-test quality gate and invented rendered-card verification passed. Request two additional builds and two synthetic attempts (lifetime caps11/14), one corrective PR/merge after CI, and the already-budgeted corrective-normal deployment (deployment cap5 unchanged). Included allowance only; no new credentials, schema or dependencies. Actual Mac/iPhone link acceptance follows deployment.
+
+Owner approved this correction, its two-build/two-test extension and use of the remaining corrective deployment.

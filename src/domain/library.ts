@@ -11,6 +11,16 @@ export type LibraryItem = Readonly<{
   artworkUrl: null;
 } & ({ kind: 'playlist'; ownerLabel: string } | { kind: 'album'; artists: readonly string[] })>;
 
+/** Only canonical Spotify destinations matching the item's type-qualified identity. */
+export function spotifyLink(item: LibraryItem): string | null {
+  const prefix = `${item.kind}:`;
+  if (item.source !== 'spotify' || !item.available || !item.id.startsWith(prefix)) return null;
+  const id = item.id.slice(prefix.length);
+  if (!/^[A-Za-z0-9]{22}$/.test(id)) return null;
+  const expected = `https://open.spotify.com/${item.kind}/${id}`;
+  return item.spotifyUrl === expected ? expected : null;
+}
+
 export function itemKey(kind: ItemKind, sourceId: string): string {
   return `${kind}:${sourceId}`;
 }
