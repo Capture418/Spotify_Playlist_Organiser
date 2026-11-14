@@ -154,3 +154,8 @@ Owner approves docs/release-approval.md, including up to three additional builds
 ## D070 — Setup-form correction execution and one-build extension
 
 Owner approves one extra candidate build (lifetime cap7), publication/reviewed merge of the prepared Safari setup-form correction after CI passes, and corrective setup deployment. Included allowance only; synthetic cap10 and new deployment cap4 remain unchanged. No credential changes or bypass of origin/CSRF/privacy checks. Existing private setup and same-digest normal-mode handoffs remain.
+
+
+## D071 — Safari authorisation handoff correction approved
+
+Owner approves two additional candidate builds and two disposable synthetic attempts (lifetime caps9/12), corrective branch push/PR and merge after passing CI, and one additional setup deployment (total cap5). Included allowance only. Preserve normal and corrective-normal deployment slots, existing credentials and all security checks. Execute the prepared explicit Spotify link correction; no unrelated changes or automatic retries beyond these limits.

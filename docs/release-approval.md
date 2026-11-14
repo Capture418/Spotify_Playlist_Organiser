@@ -57,3 +57,10 @@ Existing contract risks remain accepted: VPN/online access, short deploy downtim
 No new decision is needed from Dad on the settled contract. User interaction is needed only for GitHub security prompts if presented, private token/consent/setup steps, coordinated setup-secret removal and actual iPhone review. Ask one platform question only if a demonstrated requirement cannot be met within the contract.
 
 Suggested approval: **“I approve the remaining pilot release package in docs/release-approval.md, including up to three additional builds, four synthetic attempts, the reviewed PR/merge and workflow activation, and the bounded setup/normal deployments. Use included allowance only and guide me through the private setup and iPhone checks.”**
+
+
+## D071 second Safari correction amendment — approved
+
+The prepared setup handoff fix replaces the CSP-blocked external form redirect with a validated explicit Continue to Spotify link. Local full quality gate passed222 tests; actual Safari completed the compiled setup flow using only in-memory invented storage and mocked Spotify. No new permissions, credentials or relaxed form policy.
+
+Requested execution scope: push one corrective branch/PR, review and merge only after successful checks, then the automatic main release and one corrective setup deployment. Add **two candidate builds** (lifetime cap9) and **two disposable synthetic attempts** (lifetime cap12) for the required PR and main checks. Add **one corrective setup deployment** (total deployment cap5) so normal and one diagnosed corrective-normal deployment remain available. Existing usage is7 builds,10 attempts,2 deploy requests. Included allowance only; no blind retries or new credentials. All other D069/D070 exclusions remain in force. Owner explicitly approved this amendment and its corrective PR/merge/setup execution.

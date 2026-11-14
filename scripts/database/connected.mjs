@@ -46,9 +46,9 @@ async function setupVerification(){
  const page=await setupRequest('/',cookie);assert.equal(page.status,200);const csrf=/name="csrf" value="([A-Za-z0-9_-]+)"/.exec(page.text)[1];
  assert.equal((await setupRequest('/setup/confirm',cookie,{csrf,confirm:'yes'})).status,403);
  assert.equal((await setupRequest('/setup/begin',cookie,{csrf:'wrong'})).status,403);
- const begin=await setupRequest('/setup/begin',cookie,{csrf});assert.equal(begin.status,303);const url=new URL(begin.headers.location);
+ const begin=await setupRequest('/setup/begin',cookie,{csrf});assert.equal(begin.status,200);assert.equal(begin.headers.location,undefined);assert.match(begin.headers['content-security-policy'],/form-action 'self';/);const url=new URL(/href="([^"]+)"/.exec(begin.text)[1].replaceAll('&amp;','&'));
  identity='different-owner';assert.equal((await setupRequest('/callback?code=invented&state='+url.searchParams.get('state'),cookie)).status,403);identity=config.owner.binding;
- const again=await setupRequest('/setup/begin',cookie,{csrf});const state=new URL(again.headers.location).searchParams.get('state');
+ const again=await setupRequest('/setup/begin',cookie,{csrf});assert.equal(again.status,200);const state=new URL(/href="([^"]+)"/.exec(again.text)[1].replaceAll('&amp;','&')).searchParams.get('state');
  const verified=await setupRequest('/callback?code=invented&state='+state,cookie);assert.equal(verified.status,303);assert.equal(verified.headers.location,'/');
  const confirm=await setupRequest('/setup/confirm',cookie,{csrf,confirm:'yes'});assert.equal(confirm.status,200);
  assert.equal((await runtime.query('SELECT count(*) AS n FROM accounts')).rows[0].n,'1');assert.equal((await runtime.query('SELECT count(*) AS n FROM connections')).rows[0].n,'0');
