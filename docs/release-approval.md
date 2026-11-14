@@ -6,7 +6,7 @@ Status: **approved for bounded execution under D069**. The owner explicitly appr
 
 ## Outcome
 
-A working Music Library Organiser at the existing HTTPS site, with the existing owner's playlists and saved albums imported read-only, persistent shared tags usable on Mac and iPhone, and online-only Home Screen installation. No new infrastructure, scopes, account model or product features.
+A working MuLO at the existing HTTPS site, with the existing owner's playlists and saved albums imported read-only, persistent shared tags usable on Mac and iPhone, and online-only Home Screen installation. No new infrastructure, scopes, account model or product features.
 
 ## Reviewed candidate and evidence
 

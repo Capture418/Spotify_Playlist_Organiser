@@ -66,7 +66,7 @@ export function LibraryScreen({ remote, connected = false, onReload, onRefresh, 
     <div className={`app-shell${selecting ? ' is-selecting' : ''}`}>
       <a className="skip-link" href="#library">Skip to library</a>
       <header className="app-header">
-        <div className="brand"><span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>Music Library Organiser</div>
+        <div className="brand"><span className="brand-mark" aria-hidden="true"><i /><i /><i /></span><span>MuLO: Music Library Organiser</span></div>
         <div className="header-actions">
         <span className="demo-badge"><span aria-hidden="true" />{connected ? 'Connected library' : remote ? 'Synthetic library' : 'Local demo'}</span>
         {onReload && onRefresh && onSettings && <LibraryActions onReload={onReload} onRefresh={onRefresh} onSettings={onSettings} disabled={reloadDisabled || editor !== null}/>}
@@ -77,12 +77,13 @@ export function LibraryScreen({ remote, connected = false, onReload, onRefresh, 
         <div className="page-intro">
           <p className="eyebrow">LESS SCROLLING. MORE LISTENING.</p>
           <h1>Your library.</h1>
-          <p className="intro-copy">A few tags. Playlists and albums, together.</p>
         </div>
-        <div className="demo-notice" id="demo-notice">
-          <span className="notice-symbol" aria-hidden="true">i</span>
-          {connected ? <p>Spotify access is read-only. Your tags are saved to your private library.</p> : <p><strong>{remote ? 'Synthetic library.' : 'Try the demo.'}</strong> These playlists and albums are invented. {remote ? 'Changes save to the local database after confirmation.' : 'Changes reset on reload.'} Spotify isn’t connected.</p>}
-        </div>
+        {!connected && (
+          <div className="demo-notice" id="demo-notice">
+            <span className="notice-symbol" aria-hidden="true">i</span>
+            <p><strong>{remote ? 'Synthetic library.' : 'Try the demo.'}</strong> These playlists and albums are invented. {remote ? 'Changes save to the local database after confirmation.' : 'Changes reset on reload.'} Spotify isn’t connected.</p>
+          </div>
+        )}
         <section className="filter-panel" aria-label="Find items">
           <div className="library-views" role="group" aria-label="Library type">
             {(['all', 'playlist', 'album'] as const).map(value => (

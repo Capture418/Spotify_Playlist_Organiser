@@ -1,4 +1,4 @@
-# Music Library Organiser
+# MuLO
 
 A responsive personal organiser for Spotify playlists and saved albums. Shared tags, match-all filtering and all-word search help find music; Spotify remains the player.
 

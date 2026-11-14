@@ -41,7 +41,6 @@ h1, h2, h3, p { margin: 0; }
 .page-intro { padding: 43px 0 25px; }
 .eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 1.9px; color: var(--accent); line-height: 1.6; }
 h1 { font-size: clamp(36px, 4.8vw, 56px); font-weight: 650; letter-spacing: -2px; line-height: 1.12; margin: 10px 0 12px; }
-.intro-copy { color: var(--muted); font-size: 16px; line-height: 1.6; }
 .demo-notice { display: flex; align-items: flex-start; gap: 10px; background: #1c211b; border: 1px solid #303a2b; padding: 12px 15px; border-radius: 9px; color: #bcc5b4; font-size: 12px; line-height: 1.65; }
 .demo-notice strong { color: #e2e8dc; font-weight: 600; }
 .notice-symbol { flex: 0 0 auto; width: 15px; height: 15px; border: 1px solid #98a98a; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 650; margin-top: 3px; line-height: 1; }
@@ -168,7 +167,6 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
   .demo-badge { font-size: 10px; padding: 6px 8px; }
   .page-intro { padding-top: 30px; }
   h1 { letter-spacing: -1.4px; }
-  .intro-copy { font-size: 14px; }
   .demo-notice { font-size: 11px; padding: 11px 12px; }
   .filter-panel { margin-top: 23px; }
   .filter-chip { padding: 8px 13px; font-size: 12px; }

@@ -12,7 +12,7 @@ async function form(req: IncomingMessage, fields: string[]) {
   if ([...data.keys()].some(k => !fields.includes(k)) || fields.some(k => data.getAll(k).length !== 1)) throw new Fault(422, 'Invalid form');
   return data;
 }
-const page = (body: string) => '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Music Library Organiser setup</title></head><body><main><h1>Music Library Organiser setup</h1>'+body+'</main></body></html>';
+const page = (body: string) => '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>MuLO setup</title></head><body><main><h1>MuLO setup</h1>'+body+'</main></body></html>';
 export function setupServer(setup: Setup, canonical: string, health: () => Promise<unknown>, local = false) {
   if(local&&canonical!=='http://127.0.0.1:3000')throw Error('Invalid local setup');
   const cookieName=local?'setup-local':'__Host-setup';
