@@ -730,3 +730,39 @@ Preparation validation: npm run check:foundation passed36 tests and project chec
 ## D079 execution preflight
 
 Clean initial tree, main unchanged23e3002, no open PR or active run observed. Existing nine normal-mode setting names present, setup settings absent; values not read. npm audit reports zero vulnerabilities. Owner reaffirms included allowance only; prior paid-usage-blocked confirmation retained, no billing change. Starting counters13/17 builds,16/20 synthetic attempts,6/9 deployments. Full local gate before publication; exact reviewed PR/main sequence next.
+
+
+## D079 deployment verified — 14 November 2026
+
+Full local npm run check passed227 tests and all quality/build gates before publication. PR12 head84dc2bc305549f8e18dbfcb4764853e7039ad1ad passed CI43609468955, including candidate build, disposable PostgreSQL/runtime checks and scoped cleanup. Exact-head/base review confirmed unchanged main23e3002; merged at15:19:46UTC to c145189fd6da25ef8e18e5a218d6d1142bc79cc7. No workflow, schema, dependency or credential changes.
+
+Release43609587174 succeeded: release job132491477183 passed build/test/cleanup and tested-image publication; deploy job132491732662 succeeded. Verified digest `ghcr.io/capture418/spotify_playlist_organiser@sha256:9de566dcf8ee1e710d9206670c452baef65feceacd65776fd9bbdd6ae2ab08cb`. Safe markers confirm Migration complete, Application ready and deployed. Raw logs not saved/displayed. HTTPS health200 JSON and root200 HTML. Counters15/17 builds,18/20 synthetic attempts,7/9 deployment requests. No corrective attempt used.
+
+Actual Safari: new button visible; clicking reload returns authenticated library and resets transient search. Option-Tab traversed controls to Reload app; Space activated it successfully. Site Page Zoom explicitly selected and observed at200%; header button and type controls reflowed within viewport. Restored actual-size view, closed inspector and restored original search. No save/import/restore/delete or sign-out action performed. Network metadata during reload showed same-origin document/manifest/JS/CSS/session/library/logo; lazy image requests observed only at i.scdn.co and mosaic.scdn.co (three domains including app). No catalogue refresh request observed. No HAR, cookies or private payloads retained. Image-header detail inspection did not succeed through Safari accessibility controls; no claim that request-header omission was directly verified. Source protections remain anonymous CORS/no-referrer, unchanged and covered by earlier review. Remaining artwork acceptance: direct image-header confirmation and complete enlarged card/editor review, alongside owner final acceptance.
+
+Next: owner checks Reload app on actual iPhone Safari/Home Screen, saved tags/artwork and links, transient-view reset, editor guard and offline-disabled behaviour. Device acceptance remains pending; health/CI are not device evidence. Remaining correction/rollback allowances stay reserved, no automatic further release. Evidence-only update committed locally to avoid triggering another deployment.
+
+
+## D080 compact library controls — local task
+
+Owner reports Reload app works well and approves the proposed compact menu: Reload app, Refresh from Spotify, Settings & data. Move existing account/export/recovery controls into a modal panel, separate higher-impact actions, and remove routine polling success from the permanent header. Preserve API semantics, confirmations, busy/offline guards, keyboard/focus and error visibility. Clean starting tree; local implementation and invented browser/full quality checks only. New feature publication is not within D079 correction reserves.
+
+D080 implementation: added LibraryActions disclosure and native SettingsPanel dialog; connected header now contains the compact trigger, with no permanent storage control section. Refresh from Spotify reuses existing refresh/import; account/data controls retain handlers, preview/confirmation and busy/offline guards. Modal close/Escape cancels pending confirmation UI and restores focus; no write occurs on close. Higher-impact account actions are visually separated. Routine successful polling is silent and no longer replaces operation errors. No dependencies, schema, API, scopes, service worker or credential changes.
+
+Verification: npm run check passed227 tests plus lint, types, project/lockfile checks and frontend/backend builds. Invented connected-browser fixture used intercepted in-page fetch responses, no live account/database/Spotify access. At390×844 menu and settings panel fit with legible labels/touch targets. Verified modal focus, Escape dismissal/focus return, deletion confirmation visible but not submitted, closing clears it, snapshot preview retains disabled replacement until explicit confirmation, and Close cancels preview. Mock refresh failure remains visible outside menu; Reload app and refresh were disabled while its request was pending. At1280px DOM measurements confirmed no horizontal overflow and the settings content fit its panel; screenshot surface remained cropped, so desktop geometry evidence is distinguished from full visual review. Enter opened menu; Escape dismissed panel. Preview tab closed, viewport reset and loopback server stopped. No real iPhone or hosted check claimed.
+
+Technical-lead self-review against constitution: local approved layout only; no publication or resource allowance consumed. User's positive Reload app report recorded, without inferring unreported exhaustive checks or artwork acceptance. Remaining actual iPhone/release and prior artwork acceptance items stay explicit. Next: owner reviews local layout, then a bounded CI/deployment package if wanted.
+
+
+## D081 menu release preparation
+
+Confirmed project working directory and clean tree on codex/library-actions-menu. Owner accepts D080 locally. Fetched mainc145189 and reviewed candidate diff plus unchanged PR/main/manual deploy workflows; no open PR and latest two runs completed successfully. Prepared docs/menu-release-approval.md: expected2 builds/2 synthetic attempts/1 deployment; maximum4/4/3 from recorded consumption15/18/7. Proposes reassigning unused D079 reserves and increasing lifetime caps by2/2/1 to19/22/10, not overlapping budgets. Rollback target is the verified owner-tested D079 image9de566d… with existing Reload app/artwork.
+
+Checklist covers actual iPhone menu/reload/refresh/settings, preservation, keyboard/modal/offline behaviour and safe export, excluding production restore/deletion/all-device sign-out. Remaining desktop/artwork evidence is explicitly carried forward. Prior227-test gate is implementation evidence, not a new test run. Added approval document to isolated foundation-copy inventory to validate the AGENTS link. No push, CI, image/database execution, install, merge, settings/credentials change or deployment. Next: explicit package approval, execution preflight (including advisories/current allowance) and bounded release.
+
+Preparation checks: npm run check:foundation passed36 tests and project validation; git diff --check passed. Constitution self-review confirms execution permissions remain proposed, with no private evidence or new runtime changes.
+
+
+## D082 execution preflight
+
+Clean initial tree and unchanged mainc145189; no open PR or active run observed. Existing nine normal-mode setting names retained, setup settings absent; no values read. npm audit zero vulnerabilities. Included-only approval and prior paid-usage-blocked confirmation retained; no billing/settings change. Starting consumption15/19 builds,18/22 synthetic attempts,7/10 deployments. Full installed-host gate and final diff review before publication.
