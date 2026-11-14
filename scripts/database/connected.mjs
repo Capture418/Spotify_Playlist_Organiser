@@ -1,6 +1,8 @@
 // Invented end-to-end fixture; mounted only into the disposable verification container.
 import assert from 'node:assert/strict';
-import { randomUUID } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { readFile } from 'node:fs/promises';
+import { createHash, randomUUID } from 'node:crypto';
 import { request } from 'node:http';
 import { Pool } from 'pg';
 import { startHosted } from '../runtime/server/hosted.js';
@@ -106,6 +108,50 @@ try{
  await running.close();running=undefined;assert.ok(pools.slice(1).every(p=>p.ended));await assert.rejects(http('/health'));
  running=await start();assert.deepEqual((await get('/api/export',a)).annotations,exported.annotations);
  console.log('PASS replace-only restore, encrypted recoverable snapshot, shutdown and persisted restart');
+ // Exercise the rollback image after an additive migration on disposable storage.
+ await running.close();running=undefined;
+ const migrationEnv={...env,
+  MIGRATION_DATABASE_URL:'postgres://music_migrator:invented-local-migrator-only@db:5432/music',
+  JOURNAL_MIGRATION_DATABASE_URL:'postgres://music_journal_migrator:invented-local-journal-migrator-only@db:5432/music_journal'};
+ const migrator=new Pool({connectionString:migrationEnv.MIGRATION_DATABASE_URL});
+ try {
+  const path=new URL('../runtime/server/migrations/004-tag-groups.sql',import.meta.url);
+  const sql=await readFile(path,'utf8');
+  const client=await migrator.connect();
+  try {
+   await client.query('BEGIN');
+   await client.query(sql);
+   await client.query('INSERT INTO schema_migrations(version,checksum) VALUES(4,$1)',[createHash('sha256').update(sql).digest('hex')]);
+   await client.query("UPDATE tags SET tag_group='Occasion' WHERE tag_id=$1",[exported.tags[0].id]);
+   await client.query('COMMIT');
+  } catch(error) { await client.query('ROLLBACK');throw error; }
+  finally {client.release();}
+  const runMigration=()=>execFileSync(process.execPath,['runtime/server/migrate.js'],{env:migrationEnv,encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:15000}).trim();
+  assert.equal(runMigration(),'Migration complete (schema 004)');
+  await migrator.query("INSERT INTO schema_migrations(version,checksum) VALUES(99,'invented')");
+  assert.throws(runMigration);
+  await migrator.query('DELETE FROM schema_migrations WHERE version=99');
+  await migrator.query("UPDATE schema_migrations SET checksum='invented' WHERE version=4");
+  assert.throws(runMigration);
+  await migrator.query('UPDATE schema_migrations SET checksum=$1 WHERE version=4',[createHash('sha256').update(sql).digest('hex')]);
+ } finally {await migrator.end();}
+ running=await start();
+ assert.equal((await http('/health',null,undefined,{Host:'127.0.0.1:3000','X-Forwarded-Proto':''})).status,200);
+ const grouped=await get('/api/export',a);
+ assert.deepEqual(grouped.tags,[{...exported.tags[0],group:'Occasion'}]);
+ assert.deepEqual(grouped.annotations,exported.annotations);
+ await post('/api/edit',a,{requestId:randomUUID(),revision:grouped.revision,edit:{
+  mode:'bulk',itemIds:grouped.annotations.map(item=>item.itemId),tagIds:[grouped.tags[0].id],newTags:[]}});
+ const legacy=await post('/api/restore/preview',a,exported);
+ assert.equal(legacy.groupsChanged,1);
+ const legacyRestore=await post('/api/restore/confirm',a,{previewId:legacy.id,revision:legacy.revision,requestId:randomUUID(),confirm:true});
+ const groupedRecovery=await post('/api/snapshots/preview',a,{id:legacyRestore.snapshot});
+ assert.equal(groupedRecovery.groupsChanged,1);
+ await post('/api/restore/confirm',a,{previewId:groupedRecovery.id,revision:groupedRecovery.revision,requestId:randomUUID(),confirm:true});
+ const afterRollback=await get('/api/export',a);
+ assert.deepEqual(afterRollback.tags,grouped.tags);
+ assert.deepEqual(afterRollback.annotations,grouped.annotations);
+ console.log('PASS schema 004 compatibility migration, hosted startup, tag edit and grouped snapshot recovery');
  await post('/api/signout',b,{});assert.equal((await http('/api/session',b)).status,401);
  // Both runtime roles lack DDL; journal can only append.
  await assert.rejects(runtime.query('CREATE TABLE forbidden(id int)'),/permission denied/);

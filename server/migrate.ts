@@ -1,6 +1,6 @@
 import { pathToFileURL } from 'node:url';
 import type { Pool, PoolConfig } from 'pg';
-import { database, migrate, transaction } from './database.ts';
+import { database, migrate, transaction, verifyTagGroupSchema } from './database.ts';
 import { migrationConfig } from './hosted-config.ts';
 import { migrateAppendJournal, verifyAppendJournal } from './append-journal.ts';
 import { JsonCipher } from './lifecycle.ts';
@@ -25,11 +25,12 @@ export async function migrateHosted(env:NodeJS.ProcessEnv,open:(config:PoolConfi
       }
       else if(existing.rows.length!==1||existing.rows[0].identity!==identity)throw Error('Journal binding mismatch');
     });
+    return await verifyTagGroupSchema(app) ? 4 : 3;
   } finally {await Promise.all(pools.map(p=>p.end()));}
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
   const timer=setTimeout(()=>{process.stderr.write('Migration timed out\n');process.exit(1);},840000);
-  try {await migrateHosted(process.env);process.stdout.write('Migration complete\n');}
+  try {const version=await migrateHosted(process.env);process.stdout.write(`Migration complete (schema 00${version})\n`);}
   catch{process.stderr.write('Migration failed\n');process.exitCode=1;}
   finally{clearTimeout(timer);}
 }
