@@ -6,7 +6,7 @@ Updated: 14 November2026.
 
 D069: owner approved [the remaining release package](release-approval.md). Execute the reviewed release PR, Linux CI and merge-triggered verified-image/setup deployment, then private setup and same-digest normal deployment. User confirms retained token/keys, registered HTTPS callback and included allowance with paid usage blocked.
 
-Current counters: **7/9 candidate builds,10/12 synthetic attempts,2/5 new deploy requests** (D070 corrective setup deployed). Initial and corrective hosted setup deployments are verified; D071 authorises execution of the second Safari handoff correction. Normal mode and live library/device checks remain pending. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
+Current counters: **9/11 candidate builds,12/14 synthetic attempts,4/5 new deploy requests** (D070 corrective setup deployed). Initial and corrective hosted setup deployments are verified; D071 second Safari handoff correction is deployed and healthy; owner confirms setup completed and closed. Normal mode is deployed and healthy; owner reports successful live sign-in/import and Mac checks1–3; Spotify card links require the local correction below. Remaining device checks are pending. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
 
 ## Existing implementation
 
@@ -576,3 +576,44 @@ Counters remain7/7 builds,10/10 disposable synthetic attempts,2/4 deploy request
 ## D071 execution preflight — 14 November 2026
 
 Owner approved the prepared correction and allowance extension. Working directory confirmed; only the five prepared correction/evidence files were modified. Read canonical authority, reviewed unchanged workflow and current remote main4af1396. Names-only secret inventory still contains the expected11 settings including both setup settings; latest release runs are complete/successful. No credential values accessed or settings changed. Counters begin7/9 builds,10/12 synthetic attempts,2/5 deployments. Existing full222-test and actual mocked Safari proof apply to unchanged runtime correction; foundation checks will validate the approval documentation before publication.
+
+
+## D071 corrective setup deployment succeeded — 14 November 2026
+
+PR9 at exact head22607188f376a3e280271ee5842b69625f8022e1 passed CI43604034175: quality gate, candidate build, disposable PostgreSQL/runtime checks and scoped cleanup. Final review confirmed only the seven correction/approval/evidence files changed, with no workflow, dependency, schema or credential changes. Current dependency audit reported zero vulnerabilities. Merged with match-head protection at14:18:23UTC to main4dc0a6af4ea692dbc0a3bdb129cb4eddcb9be2d9.
+
+Automatic release43604164808 succeeded. Release job132475095980 passed build/test/cleanup/publication; verified image is `ghcr.io/capture418/spotify_playlist_organiser@sha256:31a74404c29db584572f680adf36e1b500fcd7e3b2ac54da990d0ec5c4fe2655`. Deploy job132475332697 succeeded; safely extracted log markers confirm Migration complete, Application ready and deployed. Raw logs were neither retained nor displayed. The workflow passes its verified release digest directly to deploy; no independent host image inspection is claimed.
+
+Live HTTPS /health returned200 with minimal ok status and no-referrer. Root returned200 with setup unlock form and origin-only referrer policy. No real setup token, OAuth code or consent was submitted by the agent. Credentials/settings unchanged. Owner should open the root afresh, unlock with the same private token, choose Verify with Spotify, then Continue to Spotify, and review consent privately. Actual live consent/setup completion and iPhone testing remain pending.
+
+Counters now9/9 builds,12/12 synthetic attempts,3/5 deploy requests. No additional build/test/retry is authorised. Normal mode and one diagnosed corrective-normal deployment remain available using the new verified digest above, after confirmed setup and coordinated removal of both setup secrets. Evidence stays local to avoid another main release trigger. Constitution review: approved correction, unchanged safeguards, actual CI/health evidence recorded; mocked browser proof is not claimed as live or device acceptance.
+
+
+## Owner setup completed; normal deployment awaiting GitHub gate — 14 November 2026
+
+Owner reports Spotify approval, Configured owner verified, then Setup completed and closed after explicit confirmation. This is owner-observed live setup evidence; the agent did not handle credentials or consent. Confirmed clean local working tree, completed prior runs and expected eleven secret names. Remote main manual-deploy workflow matches reviewed local bytes. Under D069 return-to-normal authorisation, removed APP_SETUP_MODE and APP_SETUP_TOKEN together before dispatch; names-only verification confirms both absent and nine other settings retained. No secret values read or changed.
+
+Dispatched exactly one manual pilot-deploy.yml run43604663537 on main using verified image `ghcr.io/capture418/spotify_playlist_organiser@sha256:31a74404c29db584572f680adf36e1b500fcd7e3b2ac54da990d0ec5c4fe2655`. GitHub reports action_required with no jobs started. Owner must approve the existing run; do not dispatch a duplicate. Normal deployment/health are not yet claimed. Current hosted setup remains closed pending this mode switch. Counters9/9 builds,12/12 synthetic attempts,4/5 deploy requests; one diagnosed corrective-normal request remains. No build or synthetic resources consumed. Evidence remains local to avoid a release-triggering push.
+
+
+## Normal mode deployed and healthy — 14 November 2026
+
+Owner approved the existing GitHub gate. Manual run43604663537 and deploy job132476940435 completed successfully. Safe log extraction confirms Migration complete, Application ready and deployed; no raw logs retained or exposed. The dispatched image remains `ghcr.io/capture418/spotify_playlist_organiser@sha256:31a74404c29db584572f680adf36e1b500fcd7e3b2ac54da990d0ec5c4fe2655`; no rebuild or extra dispatch. HTTPS /health returned200 with minimal ok status; root returned200 with the normal app mount and without setup unlock form. This verifies server delivery, not authenticated library/browser acceptance.
+
+Next private owner handoff: reopen root, select Sign in / reconnect with Spotify, complete authorised login, then Refresh catalogue to import playlists and saved albums. Setup established the owner; normal sign-in establishes the working session. No real library fetched by the agent. Coverage, persistence, actual Mac/iPhone Safari and Home Screen checks remain pending. Counters unchanged9/9 builds,12/12 synthetic attempts,4/5 deployments. One diagnosed corrective-normal request remains; evidence local only.
+
+
+## Mac pilot link defect and local correction — 14 November 2026
+
+Owner reports playlists/albums imported, representative coverage and shared-tag filtering work, and tag assignments survive reload and catalogue refresh (Mac checks1–3). Open in Spotify shows a prohibited cursor. Source confirms LibraryCard always rendered the disabled demo placeholder, irrespective of imported source/URL. This is an application defect; no private catalogue inspection was needed.
+
+Prepared a local correction: available imported items with an exact canonical HTTPS Spotify URL matching their type-qualified22-character identity render a normal new-tab anchor with noopener/noreferrer and accessible label. Demo, unavailable, malformed or mismatched destinations remain disabled. Removed misleading demo wording from unavailable-item copy. No persistence, schema, credentials, scope, dependencies or workflow changes.
+
+Full npm run check passed223 tests, lint, types and frontend/backend builds. Added tests cover both item kinds and rejection of demo/unavailable/null/malformed/wrong-host/wrong-kind/wrong-ID/query/script destinations. Compiled LibraryCard and rendered it with React server rendering using invented playlist/album fixtures: real-source cards contain the exact enabled anchor, demo cards remain disabled without href. Initial ad-hoc render attempts failed due to TypeScript7 API/CLI differences; corrected CLI invocation passed. This is rendered-markup evidence, not actual Spotify/device navigation. git diff --check passed.
+
+No push, CI, container/database run or deployment. Counters unchanged9/9 builds,12/12 synthetic attempts,4/5 deployments. Proposed narrow release extension: two builds and two synthetic attempts (caps11/14), corrective PR/merge after passing checks and the already-budgeted one corrective-normal deployment (cap5 unchanged). No approval inferred. After deployment, owner retests playlist/album opening on Mac and iPhone; other private pilot checks can continue meanwhile.
+
+
+## D072 execution preflight
+
+Owner approved the local card-link correction, two additional builds/tests and remaining corrective deployment. Current main4dc0a6a and latest three runs are successful; no active deployment observed. Prepared source remains unchanged from the223-test full quality gate and rendered-card verification. Dependency audit rechecked before publication. Counters start9/11 builds,12/14 synthetic attempts,4/5 deployments. Preserve existing private data and credentials.

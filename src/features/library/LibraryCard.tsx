@@ -1,6 +1,6 @@
 import { DemoArtwork } from '../../components/DemoArtwork.tsx';
 import { Icon } from '../../components/Icon.tsx';
-import { itemLabel } from '../../domain/library.ts';
+import { itemLabel, spotifyLink } from '../../domain/library.ts';
 import type { LibraryItem, Tag } from '../../domain/library.ts';
 
 type Props = {
@@ -13,6 +13,7 @@ type Props = {
 };
 
 export function LibraryCard({ item, tags, selecting, selected, onSelect, onEdit }: Props) {
+  const spotifyHref = spotifyLink(item);
   return (
     <article className={`item-card${selected ? ' is-selected' : ''}`} aria-labelledby={`title-${item.id}`}>
       <div className="artwork-wrap">
@@ -27,7 +28,7 @@ export function LibraryCard({ item, tags, selecting, selected, onSelect, onEdit 
         <p className="item-type">{item.kind === 'album' ? 'Album' : 'Playlist'}{!item.available && ' · Unavailable'}</p>
         <h3 id={`title-${item.id}`}>{item.title}</h3>
         <p className="item-owner">{item.kind === 'album' ? item.artists.join(', ') : item.ownerLabel}</p>
-        {!item.available && <p className="unavailable-note">Missing from the demo library. Your tags are kept.</p>}
+        {!item.available && <p className="unavailable-note">Currently unavailable. Your tags are kept.</p>}
         {tags.length > 0 ? (
           <ul className="card-tags" aria-label={`Tags for ${item.title}`}>
             {tags.map(tag => <li key={tag.id}>{tag.name}</li>)}
@@ -37,10 +38,17 @@ export function LibraryCard({ item, tags, selecting, selected, onSelect, onEdit 
           <button type="button" className="edit-button" onClick={onEdit} aria-label={`Edit tags for ${itemLabel(item)}`}>
             <Icon name="tag" /> <span>Edit tags</span>
           </button>
-          <button type="button" className="spotify-preview" disabled
-            aria-describedby="demo-notice" title="Invented item — Spotify is not connected.">
-            <span>Open in Spotify</span><Icon name="arrow" />
-          </button>
+          {spotifyHref ? (
+            <a className="spotify-preview" href={spotifyHref} target="_blank" rel="noopener noreferrer"
+              aria-label={`Open ${itemLabel(item)} in Spotify (opens a new tab)`}>
+              <span>Open in Spotify</span><Icon name="arrow" />
+            </a>
+          ) : (
+            <button type="button" className="spotify-preview" disabled
+              title={item.source === 'demo' ? 'Invented item — Spotify is not connected.' : 'Spotify link unavailable.'}>
+              <span>Open in Spotify</span><Icon name="arrow" />
+            </button>
+          )}
         </div>
       </div>
     </article>
