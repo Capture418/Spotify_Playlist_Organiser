@@ -2,11 +2,11 @@
 
 Updated: 14 November2026.
 
-## Current task
+## Current status — pilot accepted (D073)
 
-D069: owner approved [the remaining release package](release-approval.md). Execute the reviewed release PR, Linux CI and merge-triggered verified-image/setup deployment, then private setup and same-digest normal deployment. User confirms retained token/keys, registered HTTPS callback and included allowance with paid usage blocked.
+Owner accepted the working pilot on14 November2026 after the recorded acceptance checks passed. Music Library Organiser is running in normal mode with read-only Spotify playlists/albums, persistent shared tags, Mac/iPhone access and the online-only Home Screen app. D076 artwork release execution approved; CI/publication and device checks in progress.
 
-Current counters: **9/11 candidate builds,12/14 synthetic attempts,4/5 new deploy requests** (D070 corrective setup deployed). Initial and corrective hosted setup deployments are verified; D071 second Safari handoff correction is deployed and healthy; owner confirms setup completed and closed. Normal mode is deployed and healthy; owner reports successful live sign-in/import and Mac checks1–3; Spotify card links require the local correction below. Remaining device checks are pending. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
+Final execution counters: **11/11 candidate builds,14/14 synthetic attempts,5/5 deploy requests**. All allowances are exhausted. Do not push evidence to main or trigger another release. Future work requires a separately scoped task and applicable approvals. Historical evidence below is retained; earlier pending statuses are superseded by D073.
 
 ## Existing implementation
 
@@ -617,3 +617,84 @@ No push, CI, container/database run or deployment. Counters unchanged9/9 builds,
 ## D072 execution preflight
 
 Owner approved the local card-link correction, two additional builds/tests and remaining corrective deployment. Current main4dc0a6a and latest three runs are successful; no active deployment observed. Prepared source remains unchanged from the223-test full quality gate and rendered-card verification. Dependency audit rechecked before publication. Counters start9/11 builds,12/14 synthetic attempts,4/5 deployments. Preserve existing private data and credentials.
+
+
+## D072 corrective normal deployment succeeded — 14 November 2026
+
+PR10 at5f3182a5c40eb10cb1faa9552834fd1b7ee222e0 passed CI43605657008, including full quality, candidate build, disposable PostgreSQL/runtime checks and scoped cleanup. Reviewed exact runtime diff and unchanged main baseline; merged with head protection at14:36:56UTC to maina0645c5aa96dc5c2d500ff29dfa2d0c12181a599. Names-only inventory confirms both setup settings remain absent, nine retained settings unchanged. Current dependency audit zero vulnerabilities.
+
+Automatic release43605791214 completed successfully: release job132480020071 and deploy job132480250470. Published verified image `ghcr.io/capture418/spotify_playlist_organiser@sha256:0ab3a14b5e0e6446f7f3858d5909ecf2589bbdfe58369f8d4ae4d9be4cb28179`. Safe log extraction confirms Migration complete, Application ready and deployed. Raw logs not retained/displayed. HTTPS health200 minimal ok; root200 normal app; served JavaScript includes corrected link markup/labels. No real catalogue, credentials or tags accessed or changed by the agent.
+
+Counters11/11 builds,14/14 synthetic attempts,5/5 deployments: all execution allowances exhausted; no automatic retries. Evidence committed locally only, without triggering another release. Constitution review: approved correction only, validated destinations preserved, tests and live delivery distinguished from device navigation. Owner should reload the app and retest one album and playlist on Mac, then continue iPhone Safari/Home Screen and cross-device persistence checks. Actual Spotify handoff remains pending owner verification.
+
+
+## Owner Mac/iPhone pilot evidence and acceptance remainder — 14 November 2026
+
+Owner confirms corrected album and playlist links work on Mac. Owner subsequently reports all six requested iPhone checks passed: Safari access/sign-in, shared Pilot test filtering, tag changes visible after Mac reload, correct Spotify playlist/album links, Add to Home Screen and reopen with search/filter/tagging, and usable touch/keyboard/editor controls. Tags sync between Mac and iPhone. These are explicit owner-observed actual-device results, not agent emulation. Together with earlier Mac coverage/filtering/reload/refresh preservation, the core private library workflow is working. No private titles, identifiers, screenshots or exports collected.
+
+Pilot acceptance is not yet declared: owner asked what remains, rather than accepting. Compare D069 release-approval step7:
+
+- Confirm Export organisation downloads successfully and retain the file privately; do not submit it to chat or exercise destructive restore.
+- Verify one reversible concurrent-edit conflict on a temporary-tag item: open its editor on both devices before either save, save on one, then try saving the older draft on the other. Expect a clear recoverable conflict, not silent overwriting. Synthetic CI covers conflict behaviour; actual two-device conflict is not yet reported.
+- Finish current-release Mac keyboard/200% zoom and browser network-request review; earlier invented-data evidence does not establish current deployed UI coverage.
+- Confirm access specifically over VPN away from home Wi-Fi if the successful iPhone checks used only home Wi-Fi. The supplied result does not distinguish those paths.
+- Owner explicitly accepts the pilot after remaining evidence is recorded.
+
+No new features, builds or deployment are required merely to complete these checks. Restore/deletion remain covered by synthetic evidence; production maintenance/backup restore tests remain excluded. Current runtime remains the D072 verified digest; counters11/11 builds,14/14 synthetic attempts,5/5 deployments unchanged. Documentation-only update, clean initial tree, whitespace validation; no runtime tests rerun, remote push or settings change. Evidence stays local to avoid active release triggers.
+
+
+## Final pilot checks passed; ready for owner acceptance — 14 November 2026
+
+Owner confirms private export, actual conflicting-edit recovery and VPN checks all passed. Together with prior actual Mac/iPhone, Spotify links, Home Screen, shared filtering and tag-persistence observations, the owner device checklist is complete. No export contents collected.
+
+Agent checked the deployed authenticated app in actual Mac Safari. Opened an existing item editor without changing its selections; keyboard traversal reached Cancel, tag controls, input and Save. Visible focus ring confirmed. Escape closed without saving. Safari uses Option-Tab to reach all controls with its current keyboard preferences; ordinary Tab reached the text field. Search-to-control traversal also checked. No write/save, refresh-import, deletion or export action performed.
+
+200% zoom explicitly confirmed in Safari Websites → Page Zoom for this site. Search/type/tag controls reflowed within the viewport. Editor text wrapped and its vertical scroll brought Cancel and Save fully into view when focused; visible focus and usable controls verified. Restored actual-size zoom, closed editor and inspector, and restored the original search after reload. No browser security preference changed.
+
+Safari Network inspected by request metadata only: reload produced document, manifest, local JS/CSS, session and library fetches, all on the application's own domain (six resources, one domain, zero redirects). An ordinary library poll was also observed on that same domain. No third-party request appeared during the observed normal page-load/poll window. Did not inspect cookies, response bodies, OAuth URLs or save a HAR. Source review corroborates same-origin API fetches and restrictive CSP; this bounded browser observation does not claim to capture server-side Spotify traffic or every possible future action. No private catalogue content or screenshots written to project evidence.
+
+Ready for explicit owner pilot acceptance: no outstanding acceptance defect identified in the agreed checks. Existing online/VPN-only and four-hour backup-loss limitations remain accepted; destructive recovery/deletion remain synthetic-only evidence. Owner acceptance itself is still pending and is not inferred from test passes. Deployed digest unchanged from D072. No runtime edits, new test/image execution, push, settings or deployment; counters remain11/11 builds,14/14 synthetic attempts,5/5 deployments. Documentation whitespace checked. Next action: owner acceptance, then record that decision locally without triggering another release.
+
+
+## D073 acceptance recorded
+
+Owner explicitly stated “I accept pilot”. Recorded acceptance in the decision log against the D072 deployed image and completed final evidence. Documentation-only change with clean initial Git status; whitespace validation passed. No runtime tests repeated, private data altered, push, merge, build or deployment. Evidence committed locally only. Next step is ordinary use and gathering any future improvement requests; no new development scope inferred.
+
+
+## Post-pilot artwork styling preparation
+
+Owner requests Spotify album and playlist artwork in the Organiser while retaining accepted functionality. Inspected clean Git state, canonical design and current mapping/store/card/CSP: images are currently discarded, artworkUrl is null-only, cards render DemoArtwork, and image policy permits only same-origin/data images. No runtime change yet.
+
+Recommended bounded design: keep the existing card layout; carry one validated Spotify-provided cover URL through the existing expiring metadata cache; lazy-load images at suitable card resolution, with no-referrer and a neutral missing/failed-image fallback. Keep full artwork visible without cropping, text overlays or distortions. Move bulk-selection control outside the image area and add official Spotify attribution next to the existing link, following current design guidance. No image binary storage, new scopes, credentials, dependencies, artwork in organisation exports or changes to tag semantics. Existing cache expiry and storage limits remain enforced; missing/malformed artwork must not break catalogue import. Test old records without artwork and broken image loads.
+
+Image delivery is the remaining security/privacy design decision: recommend direct requests to narrowly allowlisted Spotify image hosts rather than introducing a server image proxy. Direct delivery exposes device IP and requested image to Spotify's image infrastructure; no organiser cookies, OAuth token or page Referer is deliberately sent. It changes the previous same-origin-only network behaviour and needs an explicit bounded image-policy exception. Alternative: authenticated bounded server proxy, adding fetch/redirect/size/type controls and server load. Do not implement either until delivery is resolved.
+
+Sources reviewed: https://developer.spotify.com/documentation/design , https://developer.spotify.com/documentation/web-api/reference/get-users-saved-albums , https://developer.spotify.com/documentation/web-api/reference/get-a-list-of-current-users-playlists . Design guidance requires original artwork and Spotify attribution/link. Proposed local verification uses invented fixtures; no live image fetch/import performed. Current pilot remains accepted and deployed. Execution counters remain exhausted; push/CI/merge/deploy need a future release package. No code changes or tests claimed for this preparation.
+
+
+## D074 local artwork implementation and verification
+
+Owner approved direct Spotify image-server loading and local tests; deployment remains gated. Implemented shared exact-origin HTTPS URL validation and bounded image-size selection (prefer smallest provided width at least300px). Approved image origins: i.scdn.co, mosaic.scdn.co, image-cdn-ak.spotifycdn.com and image-cdn-fa.spotifycdn.com. Reject credentials, non-default origins/ports, queries/fragments, malformed paths and unapproved destinations; unsupported hosts fall back rather than widening policy silently. Import maps one URL from existing collection responses; Store normalises it into existing expiring metadata JSON and revalidates on reads. Old/null/expired/invalid/unavailable metadata falls back safely. Organisation export remains metadata-free. No schema or dependency change.
+
+Cards lazy-load uncropped artwork with no-referrer and anonymous CORS, use a neutral fallback on missing/error, and retain demo artwork for invented demo records. Selection control is below artwork. Official unmodified white Spotify logo downloaded from the reviewed design asset archive, inspected for active/external SVG content and served through the explicit public-asset allowlist; provenance recorded under public/spotify. Packaging verifies the logo is copied into runtime assets. Same-origin API/script policies remain; image CSP alone adds the four explicit origins. Anonymous CORS omits cross-origin credentials; unsupported CORS responses safely fall back. Actual CDN behaviour is not yet verified against the owner's library.
+
+Full npm run check passed227 tests, lint, types, project/lockfile checks and frontend/backend build. New tests cover hostile/invalid URLs, size selection and missing responses, album/playlist transport mapping, old/expired/invalid cached metadata and export exclusion. Storage tests use a fake client; no actual database rehearsal was run or authorised. Existing role/capacity limits and cache expiry remain unchanged. Technical-lead self-review, not independent security audit.
+
+Browser review on loopback used an ignored React fixture with invented cards and a temporary service worker intercepting approved-host image requests with synthetic success/404 responses. Actual component displayed successful artwork and missing/broken fallbacks, intact card links/attribution, and selection below the image. No live Spotify image fetch or real account/library accessed. This test-only worker is not in production source; explicitly unregistered via fixture cleanup, then loopback Vite stopped. Browser desktop evidence only; actual Mac/iPhone/CDN/CORS and responsive/zoom/network release checks remain before artwork release acceptance.
+
+No push, CI, Docker/database creation, install, merge or deployment. Prior counters unchanged11/11,14/14,5/5. Accepted pilot remains running unchanged. Next: owner reviews local styling; prepare a separate bounded release allowance and actual-device artwork checks if approved. A catalogue refresh after eventual deployment will populate image URLs for existing records; until then old records display fallback and retain their tags.
+
+
+## D075 artwork release package prepared
+
+Owner accepts local artwork changes and requests preparation only. Confirmed clean initial tree, fetched maina0645c5, no open PRs and latest runs successful. Reviewed refreshed-base diff, unchanged workflows, additive cache field, explicit image CSP and logo packaging. Prepared docs/artwork-release-approval.md: expected PR/main two builds/tests, reserves for one corrective pair (max4/4; proposed lifetime15/18), initial/corrective/return-to-pilot max3 deployments (proposed lifetime8). Existing limits remain exhausted until approval.
+
+Added assertions to the existing disposable mocked-Spotify scenario for actual PG artwork persistence, public logo MIME, CSP and export exclusion so approved CI will exercise them. Only syntax/host foundation checks run in preparation; no image/database execution or claim of those new assertions passing against PG. Existing227-test gate remains historical D074 evidence. Real CDN/CORS/performance and Mac/iPhone artwork review remain explicit acceptance gates. No push, merge, secrets/settings change or deployment.
+
+
+## D076 artwork execution preflight
+
+Owner approves artwork release package. Clean initial tree; fetched unchanged maina0645c5, prior runs completed successfully, names-only inventory retains nine expected settings with setup settings absent. No secret values accessed. Current dependency audit checked before publication; no dependency installation or workflow change. Counters begin11/15 builds,14/18 synthetic attempts,5/8 deployments. Preserve exact reviewed initial PR/main sequence and bounded correction/rollback controls.
+
+
+D076 initial PR11 run43608030874 failed at host quality before candidate build or disposable verification. The isolated foundation-test copy omitted the new artwork approval document linked by AGENTS.md. Added that document to the fixture copy list; no validation weakened or runtime changed. Earlier pre-publication command batch did not propagate this foundation test failure correctly; CI caught it. Re-running full host gate with explicit exit checking before the corrected push. No build/synthetic/deployment consumed by this failed run (steps skipped); counters remain11/15,14/18,5/8.

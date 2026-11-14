@@ -1,0 +1,1 @@
+Official unmodified Full_Logo_White_RGB.svg from https://developer.spotify.com/images/guidelines/design/2024-spotify-full-logo.zip . Used for Spotify content attribution under https://developer.spotify.com/documentation/design . Spotify retains its trademark rights.

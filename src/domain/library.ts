@@ -8,7 +8,7 @@ export type LibraryItem = Readonly<{
   available: boolean;
   source: 'demo' | 'spotify';
   spotifyUrl: string | null;
-  artworkUrl: null;
+  artworkUrl: string | null;
 } & ({ kind: 'playlist'; ownerLabel: string } | { kind: 'album'; artists: readonly string[] })>;
 
 /** Only canonical Spotify destinations matching the item's type-qualified identity. */

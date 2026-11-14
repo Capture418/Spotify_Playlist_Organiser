@@ -1,3 +1,4 @@
+import { selectArtwork } from '../src/domain/artwork.ts';
 import { album, playlist, pageUrl } from '../scripts/spotify/client.ts';
 import type { LibraryItem } from '../src/domain/library.ts';
 import type { Page } from './import.ts';
@@ -99,10 +100,10 @@ export class SpotifyTransport {
       items = data.items.map(value => {
         if (kind === 'playlist') {
           const p = playlist(value);
-          return { kind, id: `playlist:${p.id}`, title: text(p.name, 512), ownerLabel: text(p.owner || 'Spotify user'), available: true, source: 'spotify', spotifyUrl: p.url, artworkUrl: null };
+          return { kind, id: `playlist:${p.id}`, title: text(p.name, 512), ownerLabel: text(p.owner || 'Spotify user'), available: true, source: 'spotify', spotifyUrl: p.url, artworkUrl: selectArtwork(object(value).images) };
         }
         const a = album(value);
-        return { kind, id: `album:${a.id}`, title: text(a.name, 512), artists: a.artists.map(x => text(x)), available: true, source: 'spotify', spotifyUrl: a.url, artworkUrl: null };
+        return { kind, id: `album:${a.id}`, title: text(a.name, 512), artists: a.artists.map(x => text(x)), available: true, source: 'spotify', spotifyUrl: a.url, artworkUrl: selectArtwork(object(object(value).album).images) };
       });
     } catch { throw new Fault(503, 'Invalid Spotify collection'); }
     let next: number | null = null;

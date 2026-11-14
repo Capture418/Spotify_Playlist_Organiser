@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { pwaAssetType } from './pwa.ts';
 test('PWA assets form a fixed public allowlist, with no file traversal or private routes', () => {
-  for (const [path, type] of [['/manifest.webmanifest', 'application/manifest+json'], ['/icons/icon-192.png', 'image/png'], ['/icons/icon-512.png', 'image/png'], ['/icons/apple-touch-icon.png', 'image/png'], ['/icons/library.svg', 'image/svg+xml']]) assert.equal(pwaAssetType(path!), type);
+  for (const [path, type] of [['/spotify/logo-white.svg', 'image/svg+xml'], ['/manifest.webmanifest', 'application/manifest+json'], ['/icons/icon-192.png', 'image/png'], ['/icons/icon-512.png', 'image/png'], ['/icons/apple-touch-icon.png', 'image/png'], ['/icons/library.svg', 'image/svg+xml']]) assert.equal(pwaAssetType(path!), type);
   for (const path of ['/icons/../../.env', '/icons/%2e%2e/.env', '/.env', '/api/library', '/callback', '/icons/private.png', '/sw.js', '/']) assert.equal(pwaAssetType(path), undefined);
 });
 test('manifest and local icons have a stable same-origin identity and valid PNG dimensions', () => {

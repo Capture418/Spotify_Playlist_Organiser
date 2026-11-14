@@ -13,7 +13,7 @@ cpSync(new URL('../server/journal-migrations/', import.meta.url), new URL('serve
 cpSync(new URL('../dist/', import.meta.url), new URL('dist/', output), { recursive: true });
 const manifest = JSON.parse(readFileSync(new URL('dist/manifest.webmanifest', output), 'utf8'));
 assert.equal(manifest.name, 'Music Library Organiser');
-for (const file of ['manifest.webmanifest', 'icons/apple-touch-icon.png', 'icons/library.svg', ...manifest.icons.map(icon => icon.src.slice(1))]) {
+for (const file of ['spotify/logo-white.svg', 'manifest.webmanifest', 'icons/apple-touch-icon.png', 'icons/library.svg', ...manifest.icons.map(icon => icon.src.slice(1))]) {
   assert.deepEqual(readFileSync(new URL('dist/' + file, output)), readFileSync(new URL('../public/' + file, import.meta.url)));
 }
 console.log('Backend JavaScript and runtime assets built; live runtime requires explicit valid settings.');
