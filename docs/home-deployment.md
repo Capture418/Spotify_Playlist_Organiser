@@ -1,5 +1,8 @@
 # Deployment and CI preparation
 
+**D067 hosting supersession:** [home-hosting.md](home-hosting.md) is authoritative; [hosted operations](hosted-operations.md) supplies current commands. Earlier single-database, startup migration, missing-journal and manual-only workflow statements below are historical. Keep the pilot's approved execution counters; this notice does not activate workflows or authorise deployment.
+
+
 **D059 supersession:** `docs/platform-contract.md` is the current hosting target. Separate journal databases/roles and external operator jobs described below are historical implementation/preparation, not available infrastructure or launch requirements. No D058 rerun is planned. D060 implements the prepared single-database path. The current procedure is `docs/production-setup.md`; actual database/image verification is pending. The older procedures below must not be executed for this target.
 
 

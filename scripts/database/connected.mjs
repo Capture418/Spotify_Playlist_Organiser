@@ -3,16 +3,18 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { request } from 'node:http';
 import { Pool } from 'pg';
-import { executable } from '../runtime/server/executable.js';
-import { platformProductionConfig } from '../runtime/server/runtime-config.js';
+import { startHosted } from '../runtime/server/hosted.js';
+import { hostedConfig } from '../runtime/server/hosted-config.js';
+import {capacityPool} from '../runtime/server/capacity.js';
 import { SCOPES } from '../runtime/server/security.js';
 assert.equal(process.env.CONNECTED_DISPOSABLE,'synthetic-only');
 assert.equal(process.getuid(),1000);assert.equal(process.arch,'x64');
 const origin='https://music.example.invalid';
 const env={NODE_ENV:'production',PORT:'3000',ORGANISER_ORIGIN:origin,ORGANISER_CALLBACK:origin+'/callback',ORGANISER_ACCOUNT:'11111111-1111-4111-8111-111111111111',ORGANISER_OWNER:'invented-owner',SPOTIFY_CLIENT_ID:'a'.repeat(32)};
 env.DATABASE_URL='postgres://music_app:invented-local-app-only@db:5432/music';
-for(const [purpose,byte] of [['CREDENTIAL','11'],['SNAPSHOT','22']]){env[`ORGANISER_${purpose}_KEYS`]='invented:'+byte.repeat(32);env[`ORGANISER_${purpose}_CURRENT`]='invented';}
-const config=platformProductionConfig(env),pools=[];
+for(const [purpose,byte] of [['CREDENTIAL','11'],['SNAPSHOT','22']]){env[`ORGANISER_${purpose}_KEYS`]='v1:'+byte.repeat(32);env[`ORGANISER_${purpose}_CURRENT`]='v1';}
+env.JOURNAL_DATABASE_URL='postgres://music_journal_app:invented-local-journal-app-only@db:5432/music_journal';
+const config=hostedConfig(env),pools=[];
 function pool(c){const p=new Pool({...c,max:4,connectionTimeoutMillis:2000,statement_timeout:5000});p.on('error',()=>{});pools.push(p);return p;}
 const runtime=pool(config.databases.runtime);
 let mode='ok',identity=config.owner.binding,calls=0,running;
@@ -59,23 +61,29 @@ async function setupVerification(){
 async function get(path,s){const r=await http(path,s);assert.equal(r.status,200,r.text);return r.data();}
 async function post(path,s,body){const r=await http(path,s,body);assert.equal(r.status,200,r.text);return r.data();}
 async function start(){
- const before=pools.length,reports=[],exits=[];let stopped;
- const closed=new Promise(resolve=>{stopped=resolve;});
- const host={on:()=>{},off:()=>{},report:status=>reports.push(status),exit:code=>{exits.push(code);stopped();},deadline:(fn,ms)=>{const timer=setTimeout(fn,ms);return()=>clearTimeout(timer);}};
- const process=executable(env,{dependencies:{pool,transport},host});await process.started;
- assert.deepEqual(reports,['ready'],'Application startup failed');assert.equal(pools.length-before,1);
- return {close:async()=>{process.stop();await closed;assert.deepEqual(exits,[0]);assert.ok(pools.slice(before).every(p=>p.ended));}};
+ const before=pools.length;const started=await startHosted(env,{pool,transport});assert.equal(pools.length-before,2);
+ return {close:async()=>{await started.close();assert.ok(pools.slice(before).every(p=>p.ended));}};
 }
 try{
  const row=(await runtime.query("SELECT current_database() AS db,current_setting('server_version_num') AS v,(SELECT rolsuper FROM pg_roles WHERE rolname=current_user) AS super")).rows[0];
  assert.equal(row.db,'music');assert.match(row.v,/^16\d{4}$/);assert.equal(row.super,false);
  assert.equal((await runtime.query('SELECT count(*) AS n FROM accounts')).rows[0].n,'0');
- await setupVerification(); // App startup itself migrates genuinely fresh storage.
+ await setupVerification(); // Host migration has already completed; runtime cannot run DDL.
+ const localEnv={...env,NODE_ENV:'development',ORGANISER_ORIGIN:'http://127.0.0.1:3000',ORGANISER_CALLBACK:'http://127.0.0.1:3000/callback'};
+ running=await startHosted(localEnv,{pool,transport},true);
+ const localHeaders={Host:'127.0.0.1:3000',Origin:'http://127.0.0.1:3000','X-Forwarded-Proto':''};
+ const localBegin=await http('/api/login',null,{},localHeaders);assert.equal(localBegin.status,200);
+ const localURL=new URL(localBegin.data().authorizeUrl);assert.equal(localURL.searchParams.get('redirect_uri'),localEnv.ORGANISER_CALLBACK);
+ assert.ok(!localBegin.headers['set-cookie'][0].includes('Secure'));
+ const localFinish=await http('/callback?code=invented&state='+localURL.searchParams.get('state'),null,undefined,{...localHeaders,Cookie:localBegin.headers['set-cookie'][0].split(';')[0]});assert.equal(localFinish.status,303);
+ assert.equal((await http('/api/session',null,undefined,{...localHeaders,Cookie:localFinish.headers['set-cookie'][0].split(';')[0]})).status,200);
+ await running.close();running=undefined;
+ console.log('PASS explicit local HTTP PKCE callback and session; no proxy bypass in production');
  running=await start();
  const root=await http('/');assert.equal(root.status,200);assert.match(root.text,/name="organiser-mode" content="connected"/);assert.match(root.text,/<title>Music Library Organiser<\/title>/);
  assert.equal((await http('/health',null,undefined,{Host:'127.0.0.1:3000','X-Forwarded-Proto':''})).status,200);
  assert.equal((await http('/',null,undefined,{Host:'wrong.invalid'})).status,403);assert.equal((await http('/api/library')).status,401);
- console.log('PASS single PG16 role/app-owned migrations/guard/startup, connected HTML and HTTP guards');
+ console.log('PASS restricted PG16 roles/host-run migrations/guard/startup, connected HTML and HTTP guards');
  let a=await login();mode='fail';assert.equal((await http('/api/refresh',a,{})).status,503);assert.equal((await get('/api/library',a)).library.items.length,0);mode='ok';await post('/api/refresh',a,{});
  let state=await get('/api/library',a);assert.equal(state.library.items.length,2);assert.deepEqual(state.library.items.map(i=>i.kind).sort(),['album','playlist']);
  console.log('PASS OAuth session/callback, failed initial import and successful retry');
@@ -85,6 +93,9 @@ try{
  state=await get('/api/library',b);assert.equal(state.library.tags.length,1);assert.ok(state.library.annotations.every(x=>x.tagIds.length===1));
  const exported=await get('/api/export',a);mode='fail';assert.equal((await http('/api/refresh',a,{})).status,503);mode='ok';assert.deepEqual(await get('/api/export',a),exported);await post('/api/refresh',a,{});assert.deepEqual((await get('/api/export',a)).annotations,exported.annotations);
  const old=a;a=await login(a);assert.equal((await http('/api/session',old)).status,401);assert.equal((await http('/api/session',b)).status,200);
+ await assert.rejects(capacityPool(runtime).query("UPDATE metadata_cache SET payload=jsonb_build_object('oversized',repeat('x',1100000))"),/Storage capacity/);
+ assert.deepEqual((await get('/api/export',a)).annotations,exported.annotations);
+ console.log('PASS oversized write rolled back without losing organisation');
  console.log('PASS shared playlist/album tags, cross-session conflict, failed refresh preservation and reconnect rotation');
  const preview=await post('/api/restore/preview',a,{...exported,tags:[],annotations:[]});await post('/api/restore/confirm',a,{previewId:preview.id,revision:preview.revision,requestId:randomUUID(),confirm:true});
  const saved=await get('/api/snapshots',a);assert.equal(saved.length,1);const recover=await post('/api/snapshots/preview',a,{id:saved[0].id});await post('/api/restore/confirm',a,{previewId:recover.id,revision:recover.revision,requestId:randomUUID(),confirm:true});assert.deepEqual((await get('/api/export',a)).annotations,exported.annotations);
@@ -92,18 +103,16 @@ try{
  running=await start();assert.deepEqual((await get('/api/export',a)).annotations,exported.annotations);
  console.log('PASS replace-only restore, encrypted recoverable snapshot, shutdown and persisted restart');
  await post('/api/signout',b,{});assert.equal((await http('/api/session',b)).status,401);
- // Inject a database failure after tombstone insertion to prove both changes roll back.
- await runtime.query("CREATE FUNCTION reject_test_delete() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'invented failure'; END $$; CREATE TRIGGER reject_test_delete BEFORE DELETE ON accounts FOR EACH ROW EXECUTE FUNCTION reject_test_delete()");
- try {
-  assert.ok((await http('/api/disconnect',a,{confirm:true})).status>=400);
-  assert.equal((await runtime.query('SELECT count(*) AS n FROM deletion_records')).rows[0].n,'0');
-  assert.equal((await runtime.query('SELECT count(*) AS n FROM accounts')).rows[0].n,'1');
-  assert.deepEqual((await get('/api/export',a)).annotations,exported.annotations);
- } finally { await runtime.query('DROP TRIGGER reject_test_delete ON accounts; DROP FUNCTION reject_test_delete()'); }
- console.log('PASS failed deletion rolls back tombstone and preserves account organisation');
+ // Both runtime roles lack DDL; journal can only append.
+ await assert.rejects(runtime.query('CREATE TABLE forbidden(id int)'),/permission denied/);
+ const jp=pool(config.journalDatabase);
+ for(const sql of ['CREATE TABLE forbidden(id int)','UPDATE journal_identity SET id=id','DELETE FROM journal_events'])await assert.rejects(jp.query(sql),/permission denied/);
+ await jp.end();
+ for(const [source,database] of [[config.databases.runtime,'music_journal'],[config.journalDatabase,'music']]){const other=pool({...source,database});try{await assert.rejects(other.query('SELECT 1'),/permission denied/);}finally{await other.end();}}
+ console.log('PASS runtime DDL and cross-database connections denied; journal UPDATE and DELETE denied');
  await post('/api/disconnect',a,{confirm:true});assert.equal((await http('/api/library',a)).status,401);assert.equal((await runtime.query('SELECT count(*) AS n FROM deletion_records')).rows[0].n,'1');
  assert.equal((await runtime.query('SELECT count(*) AS n FROM accounts')).rows[0].n,'0');
- await running.close();running=undefined;await assert.rejects(start(),/Application startup failed/);assert.ok(pools.slice(1).every(p=>p.ended));
+ await running.close();running=undefined;await assert.rejects(start(),/Hosted startup failed/);assert.ok(pools.slice(1).every(p=>p.ended));
  {env.SETUP_MODE='1';env.SETUP_TOKEN='s'.repeat(43);running=await start();assert.equal((await setupRequest('/setup/unlock','',{token:env.SETUP_TOKEN})).status,409);await running.close();running=undefined;console.log('PASS setup refuses deleted owner even after restored setup configuration');}
- assert.ok(calls>0);console.log('PASS signout, transactional deletion record, deleted owner blocks restart; all startup pools closed');
+ assert.ok(calls>0);console.log('PASS signout, independent append-only deletion record, deleted owner blocks restart; all startup pools closed');
 }finally{if(running)await running.close();await Promise.all(pools.filter(p=>!p.ended).map(p=>p.end()));}

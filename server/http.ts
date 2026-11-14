@@ -9,13 +9,17 @@ import type { Session } from './store.ts';
 import { Fault,record,uuid } from './validation.ts';
 import { cookie,equal } from './security.ts';
 type Auth={begin:(browser:string)=>Promise<string>;finish:(browser:string,state:string,code:string,oldToken?:string)=>Promise<{token:string;csrf:string}>;cancelLogin:(browser:string)=>void};
-type Options={connectedInterface?:boolean;harness?:boolean;auth?:Auth;disconnected?:()=>void;origin:string;production:boolean;syntheticLogin?:()=>Promise<{token:string;csrf:string}>;refresh?:(s:Session)=>Promise<void>};
+type Options={localOAuth?:boolean;health?:()=>Promise<unknown>;connectedInterface?:boolean;harness?:boolean;auth?:Auth;disconnected?:()=>void;origin:string;production:boolean;syntheticLogin?:()=>Promise<{token:string;csrf:string}>;refresh?:(s:Session)=>Promise<void>};
 async function body(req:IncomingMessage){if(req.headers['content-type']!=='application/json')throw new Fault(422,'JSON required');let size=0;const chunks:Buffer[]=[];for await(const chunk of req){size+=chunk.length;if(size>10*1024*1024)throw new Fault(422,'Request too large');chunks.push(chunk);}try{return JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw new Fault(422,'Invalid JSON');}}
 export function appServer(store:Store,options:Options){
  if(options.connectedInterface&&(!options.production||!options.auth||options.harness||options.syntheticLogin))throw Error('Connected interface requires production authentication');
  if(options.production&&options.harness)throw Error('Synthetic harness cannot be mounted in production');
  if(options.production&&options.syntheticLogin)throw Error('Synthetic auth cannot be mounted in production');
- const origin=new URL(options.origin);if(options.production&&(origin.protocol!=='https:'||origin.origin!==options.origin))throw Error('Production HTTPS origin required');if(options.auth&&!options.production)throw Error('OAuth requires production factory');if(!options.production&&(origin.hostname!=='127.0.0.1'||origin.protocol!=='http:'))throw Error('Synthetic server must be loopback');
+ const local=options.localOAuth===true;if(local&&(options.origin!=='http://127.0.0.1:3000'||!options.production||!options.auth||options.syntheticLogin||options.harness))throw Error('Invalid local OAuth factory');
+ const loginName=local?'organiser-local-login':'__Host-organiser-login';
+ const sessionName=local?'organiser-synthetic':'__Host-organiser';
+ const secure=local?'':' Secure;';
+ const origin=new URL(options.origin);if(options.production&&!local&&(origin.protocol!=='https:'||origin.origin!==options.origin))throw Error('Production HTTPS origin required');if(options.auth&&!options.production)throw Error('OAuth requires production factory');if(!options.production&&(origin.hostname!=='127.0.0.1'||origin.protocol!=='http:'))throw Error('Synthetic server must be loopback');
  const limits=new Map<string,{count:number;until:number}>();
  function rateLimit(key:string,maximum:number){
   const now=Date.now();
@@ -33,11 +37,11 @@ export function appServer(store:Store,options:Options){
    // read-only endpoint; all application and OAuth routes retain Host checks.
    if(req.url==='/health'){
     if(req.method!=='GET')throw new Fault(405,'Method rejected');
-    const status=await databaseHealth(()=>store.pool.query('SELECT 1'));
+    const status=await databaseHealth(options.health??(()=>store.pool.query('SELECT 1')));
     json(res,status,{status:status===200?'ok':'unavailable'});return;
    }
    if(req.headers.host!==origin.host)throw new Fault(403,'Host rejected');
-   if(options.production){
+   if(options.production&&!local){
     const raw=req.rawHeaders??[];
     const count=raw.filter((value,index)=>index%2===0&&value.toLowerCase()==='x-forwarded-proto').length;
     if(req.headers['x-forwarded-proto']!=='https'||count>1)throw new Fault(403,'HTTPS proxy required');
@@ -47,14 +51,14 @@ export function appServer(store:Store,options:Options){
     rateLimit('ip:'+(req.socket.remoteAddress??'unknown'),240);
     if(req.method!=='GET')throw new Fault(405,'Method rejected');
     const cookies=(name:string)=>(req.headers.cookie??'').split(';').map(x=>x.trim()).filter(x=>x.startsWith(name+'='));
-    const browsers=cookies('__Host-organiser-login');
+    const browsers=cookies(loginName);
     if(browsers.length!==1)throw new Fault(403,'Authorisation rejected');
-    const browser=browsers[0]!.slice('__Host-organiser-login='.length);
+    const browser=browsers[0]!.slice(loginName.length+1);
     const query=new URL(req.url!,origin).searchParams;
     if(!/^[a-zA-Z0-9_-]{43}$/.test(browser)||query.has('error')||query.getAll('state').length!==1||query.getAll('code').length!==1){options.auth.cancelLogin(browser);throw new Fault(403,'Authorisation rejected');}
-    const previous=cookies('__Host-organiser');
-    const login=await options.auth.finish(browser,query.get('state')!,query.get('code')!,previous.length===1?previous[0]!.slice('__Host-organiser='.length):undefined);
-    res.setHeader('Set-Cookie',[cookie(login.token,true),'__Host-organiser-login=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0']);
+    const previous=cookies(sessionName);
+    const login=await options.auth.finish(browser,query.get('state')!,query.get('code')!,previous.length===1?previous[0]!.slice(sessionName.length+1):undefined);
+    res.setHeader('Set-Cookie',[cookie(login.token,!local),`${loginName}=; Path=/; HttpOnly;${secure} SameSite=Lax; Max-Age=0`]);
     res.writeHead(303,{Location:options.connectedInterface?'/?connected=1':'/'});res.end();return;
    }
    if(!path.startsWith('/api/')){
@@ -73,11 +77,11 @@ export function appServer(store:Store,options:Options){
    if(path==='/api/login'&&write&&options.auth){
     record(await body(req),[]);const browser=randomBytes(32).toString('base64url');
     const location=await options.auth.begin(browser);
-    res.setHeader('Set-Cookie',`__Host-organiser-login=${browser}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=300`);
+    res.setHeader('Set-Cookie',`${loginName}=${browser}; Path=/; HttpOnly;${secure} SameSite=Lax; Max-Age=300`);
     json(res,200,{authorizeUrl:location});return;
    }
    if(path==='/api/synthetic-login'&&write&&options.syntheticLogin){const payload=record(await body(req),[]);void payload;const login=await options.syntheticLogin();res.setHeader('Set-Cookie',cookie(login.token,false));json(res,200,{csrf:login.csrf});return;}
-   const name=options.production?'__Host-organiser':'organiser-synthetic';const matches=(req.headers.cookie??'').split(';').map(s=>s.trim()).filter(s=>s.startsWith(name+'='));if(matches.length!==1)throw new Fault(401,'Sign in required');const session=await store.session(matches[0]!.slice(name.length+1));
+   const name=options.production&&!local?'__Host-organiser':'organiser-synthetic';const matches=(req.headers.cookie??'').split(';').map(s=>s.trim()).filter(s=>s.startsWith(name+'='));if(matches.length!==1)throw new Fault(401,'Sign in required');const session=await store.session(matches[0]!.slice(name.length+1));
    rateLimit('session:'+session.hash,120);
    if(write&&!equal(String(req.headers['x-csrf-token']??''),session.csrf))throw new Fault(403,'Form verification failed');
    if(path==='/api/session'&&!write){json(res,200,{csrf:session.csrf});return;}
@@ -92,8 +96,8 @@ export function appServer(store:Store,options:Options){
    if(path==='/api/restore/confirm'){json(res,200,await store.restore(session,input));return;}
    if(path==='/api/snapshots/preview'){const r=record(input,['id']);json(res,200,await store.snapshotPreview(session,uuid(r.id)));return;}
    if(path==='/api/refresh'&&options.refresh){record(input,[]);await options.refresh(session);json(res,200,{ok:true});return;}
-   if(path==='/api/signout'||path==='/api/signout-all'){record(input,[]);await store.signOut(session,path.endsWith('-all'));res.setHeader('Set-Cookie',cookie('',options.production)+'; Max-Age=0');json(res,200,{ok:true});return;}
-   if(path==='/api/disconnect'){const r=record(input,['confirm']);const deleted=await store.remove(session,r.confirm===true);options.disconnected?.();res.setHeader('Set-Cookie',cookie('',options.production)+'; Max-Age=0');json(res,200,{ok:true,...(deleted??{deleted:true,reconciled:true})});return;}
+   if(path==='/api/signout'||path==='/api/signout-all'){record(input,[]);await store.signOut(session,path.endsWith('-all'));res.setHeader('Set-Cookie',cookie('',options.production&&!local)+'; Max-Age=0');json(res,200,{ok:true});return;}
+   if(path==='/api/disconnect'){const r=record(input,['confirm']);const deleted=await store.remove(session,r.confirm===true);options.disconnected?.();res.setHeader('Set-Cookie',cookie('',options.production&&!local)+'; Max-Age=0');json(res,200,{ok:true,...(deleted??{deleted:true,reconciled:true})});return;}
    throw new Fault(404,'Not found');
   }catch(error){if(!res.headersSent)json(res,error instanceof Fault?error.status:503,{error:error instanceof Fault?error.message:'Service unavailable. Nothing is confirmed saved; retry safely.'});else res.end();}
  });

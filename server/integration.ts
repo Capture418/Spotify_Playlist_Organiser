@@ -105,7 +105,7 @@ export class Integration {
 }
 
 /** Prepared factory only. It never listens and the production executable remains blocked. */
-export async function preparedApplication(store: Store, owner: OwnerConfig, spotify: SpotifyTransport, vault: CredentialStore, journal?: Journal) {
+export async function preparedApplication(store: Store, owner: OwnerConfig, spotify: SpotifyTransport, vault: CredentialStore, journal?: Journal, runtime: {localOAuth?:boolean;health?:()=>Promise<unknown>} = {}) {
   requireValue(store.snapshotsCipher,'Snapshot encryption required');
   if (journal) await journal.read();
   const integration = new Integration(store, owner, spotify, vault);
@@ -113,7 +113,7 @@ export async function preparedApplication(store: Store, owner: OwnerConfig, spot
   store.deletion = journal ? new DeletionCoordinator(store.pool,journal,()=>integration.cancel()) : new AtomicDeletion(store.pool,()=>integration.cancel());
   const sweeper=await maintenance(store.pool,()=>{integration.cancel();void store.pool.query('UPDATE recovery_guard SET blocked=true').catch(()=>server.close());});
   const origin = new URL(spotify.callback).origin;
-  const server = appServer(store, { origin, production: true, connectedInterface: true, auth: integration, refresh: s => integration.refresh(s), disconnected: () => integration.cancel() });
+  const server = appServer(store, { origin, production: true, ...runtime, connectedInterface: true, auth: integration, refresh: s => integration.refresh(s), disconnected: () => integration.cancel() });
   const dispose = () => { sweeper.stop(); integration.cancel(); };
   server.on('close', dispose);
   return { server, integration, dispose };

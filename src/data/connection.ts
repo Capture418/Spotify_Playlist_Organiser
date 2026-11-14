@@ -10,7 +10,7 @@ export async function authorisationLocation(api: LibraryApi, origin: string): Pr
   if (url.origin !== 'https://accounts.spotify.com' || url.pathname !== '/authorize' || url.username || url.password || url.hash ||
       [...url.searchParams.keys()].some(key => !keys.includes(key)) || keys.some(key => url.searchParams.getAll(key).length !== 1) ||
       url.searchParams.get('response_type') !== 'code' || url.searchParams.get('code_challenge_method') !== 'S256' ||
-      url.searchParams.get('redirect_uri') !== origin + '/callback' || !origin.startsWith('https://') ||
+      url.searchParams.get('redirect_uri') !== origin + '/callback' || !(origin.startsWith('https://') || origin === 'http://127.0.0.1:3000') ||
       !/^[a-zA-Z0-9]{32}$/.test(url.searchParams.get('client_id') ?? '') ||
       !/^[a-zA-Z0-9_-]{43}$/.test(url.searchParams.get('state') ?? '') ||
       !/^[a-zA-Z0-9_-]{43}$/.test(url.searchParams.get('code_challenge') ?? '') ||

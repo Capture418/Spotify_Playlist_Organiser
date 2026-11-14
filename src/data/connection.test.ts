@@ -27,3 +27,11 @@ test('connected sign-in rejects redirected credentials, wrong callback, extra sc
   for (const value of [undefined,42,'not a URL']) await assert.rejects(authorisationLocation(response(value),origin));
   await assert.rejects(authorisationLocation(response(destination().href),'http://127.0.0.1'));
 });
+
+test('HTTP OAuth is accepted only for the exact explicit local origin',async()=>{
+ for(const local of ['http://127.0.0.1:3000','http://localhost:3000','http://127.0.0.1:4174','http://192.168.1.1:3000']){
+  const u=destination();u.searchParams.set('redirect_uri',local+'/callback');
+  if(local==='http://127.0.0.1:3000')assert.equal(await authorisationLocation(response(u.href),local),u.href);
+  else await assert.rejects(authorisationLocation(response(u.href),local));
+ }
+});

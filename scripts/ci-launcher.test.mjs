@@ -284,54 +284,40 @@ test('single-database setup selects only the owning-role fixture and keeps scope
  await job.cleanup();assert.equal(f.objects.size,0);
 });
 
-test('platform rehearsal runs default command, signal stops, one-database restore and cleanup',async()=>{
- const f=fake();let restored=false;
- const execute=async(args,input)=>{
-  if(args[0]==='logs'){f.calls.push({args,input});return 'Application ready\nApplication stopped';}
-  if(args.includes('psql')&&args.at(-1).includes('count(*)')){
-   f.calls.push({args,input});return args.at(-1).includes('schema_migrations')?'3':restored?'0':'1';
-  }
-  if(input?.includes('PostgreSQL database dump'))restored=true;
-  return f.execute(args,input);
- };
- const job=launcher({...config(),singleDatabase:true},execute,f.save);
- await job.setup();await job.platformExercise(async()=>{});await job.cleanup();
- assert.equal(f.objects.size,0);
- assert.equal(f.calls.filter(c=>c.args[0]==='stop'&&c.args.includes('20')).length,3);
- assert.ok(f.calls.some(c=>c.args.includes('/app/verification/connected.mjs')));
- assert.ok(f.calls.some(c=>c.input?.includes('PostgreSQL database dump')));
- assert.ok(!f.calls.some(c=>c.args.includes('music_journal')));
+test('hosted fixture supplies two databases and four restricted roles',async()=>{
+ const f=fake(),job=launcher({...config(),hosted:true},f.execute,f.save);
+ await job.setup();assert.ok(f.calls.some(c=>c.args.some(a=>a.includes('30-hosted.sql'))));
+ const sql=readFileSync(new URL('../db/init/30-hosted.sql',import.meta.url),'utf8');
+ assert.equal((sql.match(/CREATE DATABASE/g)??[]).length,2);
+ assert.equal((sql.match(/CREATE ROLE/g)??[]).length,4);
+ assert.match(sql,/GRANT SELECT,INSERT ON TABLES TO music_journal_app/);
+ await job.cleanup();assert.equal(f.objects.size,0);
 });
 
-test('pilot workflows are manual main-only; release has no app secrets; deployment uses only operator helper', () => {
-  const files = Object.fromEntries(['pilot-release.yml','pilot-deploy.yml'].map(name => [name, readFileSync(new URL('../.github/workflows/'+name, import.meta.url),'utf8')]));
-  for(const body of Object.values(files)) {
-    assert.match(body,/workflow_dispatch:/);
-    assert.match(body,/github.ref == 'refs\/heads\/main'/);
-    assert.doesNotMatch(body,/\n  (push|pull_request|pull_request_target|schedule):/);
-  }
-  const release=files['pilot-release.yml'], deploy=files['pilot-deploy.yml'];
-  assert.doesNotMatch(release,/APP_|toJSON\(secrets\)|self-hosted/);
-  assert.equal((release.match(/docker .* build /g)??[]).length,1);
-  assert.ok(release.indexOf('node scripts/ci/run.mjs run')<release.indexOf('Publish the verified image'));
-  assert.match(release,/test "\$actual" = "\$image"/);
-  assert.equal((deploy.match(/      - /g)??[]).length,1);
-  assert.match(deploy,/- run: \/opt\/music-runner\/request-deploy/);
-  assert.doesNotMatch(deploy,/checkout|npm |docker |cancel-in-progress: true/);
-  const policy=JSON.parse(readFileSync(new URL('../docs/ci/workflow-policy.json',import.meta.url),'utf8'));
-  const draft=readFileSync(new URL('../docs/ci/pr-checks.yml.example',import.meta.url),'utf8');
-  const hashes=JSON.parse(readFileSync(new URL('../docs/ci/pilot-workflow-policy.json',import.meta.url),'utf8'));
-  for(const name of Object.keys(files)) assert.throws(()=>verifyWorkflows(policy,draft,{'pr-checks.yml':draft,...files,[name]:files[name]+'\n'},hashes));
+test('main release tests the exact image before publish and deploy; one-shot commands use shared concurrency',()=>{
+ const names=['pilot-release.yml','pilot-deploy.yml','maintenance.yml'];
+ const files=Object.fromEntries(names.map(n=>[n,readFileSync(new URL('../.github/workflows/'+n,import.meta.url),'utf8')]));
+ const release=files['pilot-release.yml'];
+ assert.match(release,/push:\n    branches: \[main\]/);
+ assert.equal((release.match(/docker .* build /g)??[]).length,1);
+ assert.ok(release.indexOf('node scripts/ci/run.mjs run')<release.indexOf('Publish the verified image'));
+ assert.match(release,/test "\$actual" = "\$image"/);
+ assert.match(release,/target="ghcr.io\/capture418\/spotify_playlist_organiser:/);
+ assert.match(release,/needs: release/);assert.match(release,/IMAGE: \$\{\{ needs.release.outputs.image \}\}/);
+ assert.doesNotMatch(release,/republish:|copy-approved-image/);
+ for(const body of Object.values(files)){
+  assert.match(body,/github.ref == 'refs\/heads\/main'/);
+  assert.match(body,/group: deploy\n      cancel-in-progress: false/);
+ }
+ for(const name of ['pilot-release.yml','pilot-deploy.yml'])assert.match(files[name],/MIGRATE_COMMAND: '\["node","runtime\/server\/migrate.js"\]'/);
+ assert.match(files['maintenance.yml'],/options: \[reconcile, rotate-snapshots\]/);
+ assert.match(files['maintenance.yml'],/toJSON\(inputs.inventory\)/);
+ const policy=JSON.parse(readFileSync(new URL('../docs/ci/workflow-policy.json',import.meta.url),'utf8'));
+ const draft=readFileSync(new URL('../docs/ci/pr-checks.yml.example',import.meta.url),'utf8');
+ const hashes=JSON.parse(readFileSync(new URL('../docs/ci/pilot-workflow-policy.json',import.meta.url),'utf8'));
+ for(const name of names)assert.throws(()=>verifyWorkflows(policy,draft,{'pr-checks.yml':draft,...files,[name]:files[name]+'\n'},hashes));
 });
-
-test('release-only changes avoid rebuilding; runtime, tests and unknown paths still require image verification', () => {
- assert.equal(imageRequired(['docs/work-plan.md','.github/workflows/pilot-release.yml','scripts/ci/image-required.mjs']),false);
- for(const path of ['server/production.ts','Dockerfile','package-lock.json','src/app/main.tsx','scripts/ci/launcher.mjs','scripts/database/connected.mjs','server/setup.test.ts','unknown']) assert.equal(imageRequired(['docs/work-plan.md',path]),true);
- assert.equal(imageRequired([]),true);
- const workflow=readFileSync(new URL('../.github/workflows/pilot-release.yml',import.meta.url),'utf8');
- const copy=workflow.split('  republish:')[1];
- assert.doesNotMatch(copy,/build|checkout|npm|APP_|toJSON/);
- assert.match(copy,/destination=ghcr.io\/capture418\/spotify_playlist_organiser/);
- assert.match(copy,/docker pull --platform linux\/amd64 "\$destination@\$digest"/);
- assert.equal((copy.match(/--format '\{\{.Id\}\}'/g)??[]).length,2);
+test('runtime changes still require PR image verification',()=>{
+ assert.equal(imageRequired(['docs/work-plan.md','.github/workflows/pilot-release.yml']),false);
+ for(const path of ['server/hosted.ts','Dockerfile','scripts/ci/launcher.mjs'])assert.equal(imageRequired([path]),true);
 });

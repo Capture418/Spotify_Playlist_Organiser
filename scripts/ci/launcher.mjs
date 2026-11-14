@@ -1,7 +1,7 @@
 // Preparation only. No commands run on import; the CLI requires explicit CI approval.
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
-import { platformEnv } from './platform-env.mjs';
+import { platformEnv, migrationEnv } from './platform-env.mjs';
 export const postgres = 'postgres:16.16-alpine3.24@sha256:a2f7e20374cd8fd8ed4a588b79549e10589bea7b1686e77922f5ac741b80b8a1';
 const label = 'organiser.ci';
 export function plan(env, root, image, platform = process.platform) {
@@ -79,7 +79,7 @@ export function launcher(config, execute, save, state = { owner: config.owner, r
     const db = await create('container', ['--name', config.db, '--pull', 'never', '--platform', 'linux/amd64',
       '--network', config.network, '--network-alias', 'db', '--memory', '512m', '--cpus', '1',
       '--mount', `type=volume,src=${config.volume},dst=/var/lib/postgresql/data`,
-      '--mount', `type=bind,src=${resolve(config.root, config.singleDatabase ? 'db/init/20-platform.sql' : 'db/init/10-app-role.sql')},dst=/docker-entrypoint-initdb.d/10-init.sql,readonly`,
+      '--mount', `type=bind,src=${resolve(config.root, config.hosted ? 'db/init/30-hosted.sql' : config.singleDatabase ? 'db/init/20-platform.sql' : 'db/init/10-app-role.sql')},dst=/docker-entrypoint-initdb.d/10-init.sql,readonly`,
       '-e', 'POSTGRES_PASSWORD=invented-local-admin-only', '-e', 'POSTGRES_USER=postgres', '-e', 'POSTGRES_DB=postgres', postgres]);
     state.db = db.id; save(state); await run(['start', db.id]);
     report('PHASE synthetic database started; cancellation checkpoint');
@@ -93,7 +93,7 @@ export function launcher(config, execute, save, state = { owner: config.owner, r
     assert.match(identity, new RegExp('^' + database + ':16[0-9]{4}$'));
     return run(['exec', '-i', state.db, 'psql', '-X', '-v', 'ON_ERROR_STOP=1', '-U', 'postgres', '-d', database, ...(statement ? ['-c', statement] : [])], input);
   }
-  const constraints = ['--pull', 'never', '--platform', 'linux/amd64', '--user', '1000:1000', '--read-only', '--tmpfs', '/tmp:size=67108864,mode=1777', '--memory', '512m', '--cpus', '1', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges:true', '--pids-limit', '128'];
+  const constraints = ['--pull', 'never', '--platform', 'linux/amd64', '--user', '1000:1000', '--read-only', '--tmpfs', '/tmp:size=67108864,mode=1777', '--memory', '512m', '--cpus', '1', '--cap-drop', 'ALL', '--security-opt', 'no-new-privileges:true', '--pids-limit', '256'];
   async function runtimeCheck() {
     const c = await create('container', ['--name', `${config.owner}-runtime`, ...constraints, '--network', 'none',
       '--mount', `type=bind,src=${resolve(config.root, 'scripts/ci/runtime-check.mjs')},dst=/app/verification/runtime-check.mjs,readonly`,
@@ -151,7 +151,7 @@ export function launcher(config, execute, save, state = { owner: config.owner, r
     await harness('stale', inventory);
   }
   async function platformExercise(pause = () => new Promise(r => setTimeout(r, 1000))) {
-    assert.equal(config.singleDatabase,true);
+    assert.equal(config.hosted,true);
     await wait(async()=>{await sql('music','SELECT 1');return true;},pause);
     async function service(setup) {
       const env={...platformEnv};if(!setup){delete env.SETUP_MODE;delete env.SETUP_TOKEN;}
@@ -177,26 +177,59 @@ export function launcher(config, execute, save, state = { owner: config.owner, r
       assert.ok(logs.split('\n').every(line=>/^Application (ready|stopped)$/.test(line)),'Unexpected application log content');
       await remove(c);
     }
+    for(let n=0;n<2;n++){
+      const migration=await create('container',['--name',`${config.owner}-migration-${n}`,...constraints,'--network',config.network,...Object.entries(migrationEnv).flatMap(([k,v])=>['-e',`${k}=${v}`]),config.image,'node','runtime/server/migrate.js']);
+      const output=await run(['start','-a',migration.id]);assert.equal((await verify(migration)).State.ExitCode,0,'Migration failed');assert.equal(output,'Migration complete');await remove(migration);
+    }
+    async function rejectedMigration(env) {
+      const c=await create('container',['--name',`${config.owner}-rejected-migration-${++serial}`,...constraints,'--network',config.network,...Object.entries(env).flatMap(([k,v])=>['-e',`${k}=${v}`]),config.image,'node','runtime/server/migrate.js']);
+      await run(['start',c.id]);await run(['wait',c.id]);assert.equal((await verify(c)).State.ExitCode,1);
+      assert.equal(await run(['logs',c.id]),'Migration failed');await remove(c);
+    }
+    await rejectedMigration(platformEnv); // No fallback to runtime credentials.
+    const checksum=/[a-f0-9]{64}/.exec(await sql('music','SELECT checksum FROM schema_migrations WHERE version=1'))?.[0];assert.ok(checksum);
+    await sql('music',"UPDATE schema_migrations SET checksum=repeat('0',64) WHERE version=1");
+    await rejectedMigration(migrationEnv); // Incompatible history must not start an HTTP server.
+    await sql('music',`UPDATE schema_migrations SET checksum='${checksum}' WHERE version=1`);
     const first=await service(true);await ready(first.c,first.started);
     assert.match(await sql('music','SELECT count(*) FROM schema_migrations'),/3/);
+    await sql('music_journal',"REVOKE CONNECT ON DATABASE music_journal FROM music_journal_app; SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE usename='music_journal_app'");
+    await wait(async()=>await health(first.c)===503,pause);
+    await sql('music_journal','GRANT CONNECT ON DATABASE music_journal TO music_journal_app');
+    await wait(async()=>await health(first.c)===200,pause);
     await verify(resource(state.db));await run(['stop','-t','10',state.db]);
     await wait(async()=>await health(first.c)===503,pause);
     await run(['start',state.db]);await wait(async()=>await health(first.c)===200,pause);
     await stop(first.c);
     const dump=await run(['exec',state.db,'pg_dump','-U','postgres','--clean','--if-exists','-d','music']);
-    assert.match(dump,/PostgreSQL database dump/);
+    assert.match(dump,/PostgreSQL database dump/);assert.ok(Buffer.byteLength(dump)<5*1024*1024,'App dump exceeds host limit');
+    // Exercise a populated dump near the conservative capacity budget, then restore the empty fixture.
+    await sql('music',"INSERT INTO accounts(id,binding,generation) VALUES('11111111-1111-4111-8111-111111111111','invented-capacity','22222222-2222-4222-8222-222222222222'); INSERT INTO mutation_receipts VALUES('11111111-1111-4111-8111-111111111111','33333333-3333-4333-8333-333333333333','invented',jsonb_build_object('padding',repeat('x',900000)),1)");
+    const populated=await run(['exec',state.db,'pg_dump','-U','postgres','--clean','--if-exists','-d','music']);
+    assert.ok(Buffer.byteLength(populated)<5*1024*1024);report(`PASS populated app dump: ${Buffer.byteLength(populated)} bytes with 900000-byte synthetic payload`);
+    await sql('music',null,dump);
     const connected=await create('container',['--name',`${config.owner}-connected`,...constraints,'--network',config.network,
       '-e','CONNECTED_DISPOSABLE=synthetic-only','--mount',`type=bind,src=${resolve(config.root,'scripts/database/connected.mjs')},dst=/app/verification/connected.mjs,readonly`,
       '--entrypoint','node',config.image,'/app/verification/connected.mjs']);
-    await run(['start','-a',connected.id]);assert.equal((await verify(connected)).State.ExitCode,0,'Connected scenarios failed');await remove(connected);
+    const scenarios=await run(['start','-a',connected.id]);report(scenarios);assert.equal((await verify(connected)).State.ExitCode,0,'Connected scenarios failed');await remove(connected);
+    const journalDump=await run(['exec',state.db,'pg_dump','-U','postgres','--clean','--if-exists','-d','music_journal']);assert.ok(Buffer.byteLength(journalDump)<5*1024*1024,'Journal dump exceeds host limit');report(`PASS measured dumps: app ${Buffer.byteLength(dump)} bytes; journal ${Buffer.byteLength(journalDump)} bytes`);
     assert.match(await sql('music','SELECT count(*) FROM deletion_records'),/1/);
     await sql('music',null,dump);
     assert.match(await sql('music','SELECT count(*) FROM deletion_records'),/0/);
     // Deliberate synthetic owner fixture for the actual normal command; never used in production.
     await sql('music',"INSERT INTO accounts(id,binding,generation) VALUES('11111111-1111-4111-8111-111111111111','invented-owner','22222222-2222-4222-8222-222222222222')");
-    const normal=await service(false);await ready(normal.c,normal.started);await stop(normal.c);
-    const restarted=await service(false);await ready(restarted.c,restarted.started);await stop(restarted.c);
-    report('PASS single-database connected scenarios, default setup/normal startup, outage recovery, real SIGTERM and coherent backup restore loss model');
+    const blocked=await service(false);await run(['wait',blocked.c.id]);assert.equal((await verify(blocked.c)).State.ExitCode,1,'Independent journal must block resurrected owner');await remove(blocked.c);
+    // Reconciliation is an explicit owner task with independent inventory; a stale digest fails closed.
+    const inventoryRun=await create('container',['--name',`${config.owner}-inventory`,...constraints,'--network',config.network,...Object.entries(platformEnv).flatMap(([k,v])=>['-e',`${k}=${v}`]),config.image,'node','--input-type=module','-e',
+      "import {database} from './runtime/server/database.js';import {hostedConfig} from './runtime/server/hosted-config.js';import {AppendJournal} from './runtime/server/append-journal.js';import {JsonCipher} from './runtime/server/lifecycle.js';import {digest} from './runtime/server/validation.js';const c=hostedConfig(process.env),p=database(c.journalDatabase);try{console.log(digest(await new AppendJournal(p,new JsonCipher(c.journalKeys,c.snapshots.current,'journal')).read()));}finally{await p.end();}"]);
+    const inventory=await run(['start','-a',inventoryRun.id]);assert.match(inventory,/^[a-f0-9]{64}$/);await remove(inventoryRun);
+    for(const [n,expected,code] of [[0,'0'.repeat(64),1],[1,inventory,0]]){
+      const task=await create('container',['--name',`${config.owner}-task-${n}`,...constraints,'--network',config.network,...Object.entries(migrationEnv).flatMap(([k,v])=>['-e',`${k}=${v}`]),config.image,'node','runtime/server/task.js','reconcile',expected]);
+      await run(['start',task.id]);await run(['wait',task.id]);assert.equal((await verify(task)).State.ExitCode,code);await remove(task);
+    }
+    assert.match(await sql('music','SELECT count(*) FROM accounts'),/0/);
+    const closed=await service(true);await ready(closed.c,closed.started);await stop(closed.c);
+    report('PASS host-run repeatable migrations, restricted runtime, setup/connected scenarios, outage recovery, SIGTERM, dump limits and app-only restore fence');
   }
   return { setup, exercise, platformExercise, cleanup, preflight, state };
 }

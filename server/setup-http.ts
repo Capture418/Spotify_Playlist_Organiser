@@ -13,9 +13,12 @@ async function form(req: IncomingMessage, fields: string[]) {
   return data;
 }
 const page = (body: string) => '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Music Library Organiser setup</title></head><body><main><h1>Music Library Organiser setup</h1>'+body+'</main></body></html>';
-export function setupServer(setup: Setup, canonical: string, health: () => Promise<unknown>) {
+export function setupServer(setup: Setup, canonical: string, health: () => Promise<unknown>, local = false) {
+  if(local&&canonical!=='http://127.0.0.1:3000')throw Error('Invalid local setup');
+  const cookieName=local?'setup-local':'__Host-setup';
+  const sessionCookie=(id:string)=>local?`setup-local=${id}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${id?300:0}`:cookie(id);
   const origin = new URL(canonical);
-  if (origin.protocol !== 'https:' || origin.origin !== canonical) throw Error('Setup HTTPS origin required');
+  if ((!local && origin.protocol !== 'https:') || origin.origin !== canonical) throw Error('Setup HTTPS origin required');
   let requests = 0, until = 0;
   const server = createServer(async (req, res) => {
     res.setHeader('Cache-Control', 'no-store'); res.setHeader('Referrer-Policy', 'no-referrer'); res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -24,13 +27,13 @@ export function setupServer(setup: Setup, canonical: string, health: () => Promi
       if (req.url === '/health' && req.method === 'GET') {
         const status = await databaseHealth(health); res.writeHead(status, {'Content-Type': 'application/json'}); res.end(JSON.stringify({status: status === 200 ? 'ok' : 'unavailable'})); return;
       }
-      if (req.headers.host !== origin.host || req.headers['x-forwarded-proto'] !== 'https' || (req.rawHeaders ?? []).filter((v,i) => i % 2 === 0 && v.toLowerCase() === 'x-forwarded-proto').length > 1) throw new Fault(403, 'Request rejected');
+      if (req.headers.host !== origin.host || !local && (req.headers['x-forwarded-proto'] !== 'https' || (req.rawHeaders ?? []).filter((v,i) => i % 2 === 0 && v.toLowerCase() === 'x-forwarded-proto').length > 1)) throw new Fault(403, 'Request rejected');
       if (Date.now() >= until) { requests = 0; until = Date.now()+60000; }
       if (++requests > 120) throw new Fault(429, 'Try later');
       const url = new URL(req.url ?? '/', origin);
       if (url.origin !== origin.origin || (url.pathname !== '/callback' && url.search)) throw new Fault(403, 'Request rejected');
-      const matches = (req.headers.cookie ?? '').split(';').map(s => s.trim()).filter(s => s.startsWith('__Host-setup='));
-      const id = matches.length === 1 ? matches[0]!.slice('__Host-setup='.length) : '';
+      const matches = (req.headers.cookie ?? '').split(';').map(s => s.trim()).filter(s => s.startsWith(cookieName+'='));
+      const id = matches.length === 1 ? matches[0]!.slice(cookieName.length+1) : '';
       const redirect = (to: string) => { res.writeHead(303, {Location: to}); res.end(); };
       const html = (body: string) => { res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'}); res.end(page(body)); };
       if (url.pathname === '/callback' && req.method === 'GET') {
@@ -45,9 +48,9 @@ export function setupServer(setup: Setup, canonical: string, health: () => Promi
         html(view.verified ? `<p>Configured owner verified. Confirm to create the owner account once.</p><form method="post" action="/setup/confirm"><input type="hidden" name="csrf" value="${view.csrf}"><label><input type="checkbox" name="confirm" value="yes" required>Confirm owner setup</label><button>Complete setup</button></form>` : `<p>Verify the configured Spotify owner. No library will be imported during setup.</p><form method="post" action="/setup/begin"><input type="hidden" name="csrf" value="${view.csrf}"><button>Verify with Spotify</button></form>`); return;
       }
       if (req.method !== 'POST' || req.headers.origin !== canonical || req.headers['sec-fetch-site'] === 'cross-site') throw new Fault(403, 'Request rejected');
-      if (url.pathname === '/setup/unlock') { const data = await form(req, ['token']); const session = await setup.unlock(data.get('token')!); res.setHeader('Set-Cookie', cookie(session)); redirect('/'); return; }
+      if (url.pathname === '/setup/unlock') { const data = await form(req, ['token']); const session = await setup.unlock(data.get('token')!); res.setHeader('Set-Cookie', sessionCookie(session)); redirect('/'); return; }
       if (url.pathname === '/setup/begin') { const data = await form(req, ['csrf']); redirect(await setup.begin(id, data.get('csrf')!)); return; }
-      if (url.pathname === '/setup/confirm') { const data = await form(req, ['csrf','confirm']); await setup.confirm(id, data.get('csrf')!, data.get('confirm') === 'yes'); res.setHeader('Set-Cookie', cookie('')); html('<p>Setup completed and closed. Remove setup mode and token together, then deploy normal mode. If that deployment fails, contact the operator promptly.</p>'); return; }
+      if (url.pathname === '/setup/confirm') { const data = await form(req, ['csrf','confirm']); await setup.confirm(id, data.get('csrf')!, data.get('confirm') === 'yes'); res.setHeader('Set-Cookie', sessionCookie('')); html('<p>Setup completed and closed. Remove setup mode and token together, then deploy normal mode. If that deployment fails, contact the operator promptly.</p>'); return; }
       throw new Fault(404, 'Not found');
     } catch (error) {
       // Never log request URLs, bodies, headers, exceptions or OAuth responses.

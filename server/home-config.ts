@@ -5,7 +5,7 @@ type Setting = typeof names[number];
 function invalid(name: Setting): never { throw new Error(`Missing or invalid setting: ${name}`); }
 
 /** Private Docker-network contract only; never forwards libpq URL options or logs values. */
-function connection(env: NodeJS.ProcessEnv, name: Setting, expectedDatabase: string): PoolConfig {
+export function connection(env: NodeJS.ProcessEnv, name: Setting, expectedDatabase: string): PoolConfig {
   const value = env[name];
   if (!value || value.length > 4096 || (/['\\]/u.test(value) || [...value].some(c => c.charCodeAt(0) < 32 || c.charCodeAt(0) === 127))) return invalid(name);
   try {

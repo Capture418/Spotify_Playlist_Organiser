@@ -1,5 +1,8 @@
 # Lifecycle and operational requirements — public summary
 
+**D067 hosting supersession:** [home-hosting.md](home-hosting.md) is authoritative; [hosted operations](hosted-operations.md) supplies current commands. Earlier single-database, startup migration, missing-journal and manual-only workflow statements below are historical. Keep the pilot's approved execution counters; this notice does not activate workflows or authorise deployment.
+
+
 This document describes technical requirements only. Actual endpoint, operator identity, backup destination, vault/recovery location and private evidence are intentionally absent. Production activation and real data/credentials remain gated.
 
 ## Retention and failure behaviour
