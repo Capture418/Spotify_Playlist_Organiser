@@ -226,3 +226,8 @@ The owner accepts the D084 changes and requests a CI and deployment approval pac
 ## D086 — MuLO release execution approved
 
 Owner approved the MuLO package with included Actions allowance only. Approved scope is two builds, two disposable test attempts, the reviewed PR and merge, one deployment and one conditional rollback.
+
+
+## D087 — MuLO release accepted
+
+The owner explicitly accepted MuLO after the iPhone checks passed in Safari and the Home Screen app. The accepted deployment is the verified D086 release from main commit `e95799f0d8b82b6303f3ac6735da77b25ae0d712` (PR #14).

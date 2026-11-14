@@ -1,6 +1,6 @@
 # MuLO release approval package
 
-**Approved under D086 using included Actions allowance only.**
+**Approved under D086 using included Actions allowance only. The owner accepted the deployed release under D087 after the iPhone checks passed in Safari and the Home Screen app.**
 
 The release changes the library header to **MuLO: Music Library Organiser**, uses **MuLO** for the browser and Home Screen app names, and removes the subtext beneath “Your library.” and the connected library information box. D084 records the local quality gate with 227 passing tests, lint, type checks and both builds.
 

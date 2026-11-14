@@ -2,11 +2,9 @@
 
 Updated: 14 November2026.
 
-## Current status — pilot accepted (D073)
+## Current status — MuLO release accepted (D087)
 
-Owner accepted the working pilot on14 November2026 after the recorded acceptance checks passed. Music Library Organiser is running in normal mode with read-only Spotify playlists/albums, persistent shared tags, Mac/iPhone access and the online-only Home Screen app. D076 artwork release deployed and healthy; owner real-artwork/device acceptance checks pending.
-
-Current D076 counters: **13/15 candidate builds,16/18 synthetic attempts,6/8 deploy requests**. Remaining reserve is bounded to one diagnosed corrective PR/main pair and corrective/return-to-pilot deployments. Do not push evidence to main or trigger another release. Future work requires a separately scoped task and applicable approvals. Historical evidence below is retained; earlier pending statuses are superseded by D073.
+The owner confirmed that the deployed MuLO rebrand passed the iPhone checks in Safari and the Home Screen app and explicitly accepted the release. The verified deployment is recorded under D086 below. Release consumption is 19/19 builds, 22/22 disposable test attempts and 9/10 deployment requests. The release review is complete.
 
 ## Existing implementation
 
@@ -782,3 +780,13 @@ Foundation validation passed all 36 tests after adding the new approval document
 ## D086 MuLO release preflight
 
 Current main matches the accepted D083 source. No open PR or active run was found. The nine normal setting names are present and setup settings are absent. The npm advisory check found zero vulnerabilities. The isolated candidate passed the full local quality gate. Starting consumption is 17 builds, 20 disposable test attempts and 8 deployment requests. The owner approved included allowance only and previously confirmed paid usage is blocked.
+
+## D086 MuLO deployment verified
+
+PR #14 passed CI run 43613181203 at 0dac32aff930e3bf75e98651d6daa702701b5111, including image build, disposable PostgreSQL/runtime checks and cleanup. The superseded run 43613156965 was cancelled before image build or disposable testing after a local dependency symlink was removed from the candidate. Squash merge e95799f0d8b82b6303f3ac6735da77b25ae0d712 triggered release 43613318897. Build, disposable tests, cleanup, tested image publication and deploy all succeeded.
+
+Verified image: `ghcr.io/capture418/spotify_playlist_organiser@sha256:ccbfa18384a6e3a1a3d1def22dc218eb051156444ac892785f0af0d815e6b9f0`. Deployment reported migration complete, application ready and deployed. Live health returned HTTP 200, the root advertised connected mode and MuLO, and both manifest names were MuLO. Consumption is 19/19 builds, 22/22 disposable attempts and 9/10 deployments. No rollback was used.
+
+## D087 MuLO release acceptance
+
+The owner reported that the iPhone checks passed in Safari and the Home Screen app and accepted the D086 deployment. This records the owner's device checks and closes the release review.

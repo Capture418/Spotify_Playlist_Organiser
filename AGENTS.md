@@ -9,7 +9,7 @@ Before planning or editing, read:
 
 These are the source of truth for this snapshot. Surface conflicts before affected work. Work only in this project and inspect Git status before changes. Preserve user work; never initialise or alter another repository. Use one package and small reviewable changes, without a multi-agent hierarchy. Follow the canonical constitution rather than inventing competing rules.
 
-**Current boundary (D082):** Owner approved [the menu release package](docs/menu-release-approval.md), including reserve reassignment, reviewed PR/merge and bounded deployment. Lifetime caps19 builds/22 synthetic attempts/10 deployments; starting consumption15/18/7. Included allowance only. Follow package stop conditions and device handoffs; no new credentials/settings, provisioning, host installations or unrelated features.
+**Current boundary (D087):** The owner accepted the deployed MuLO release after the iPhone checks passed in Safari and the Home Screen app. Release consumption is 19/19 builds, 22/22 disposable test attempts and 9/10 deployments. Keep release evidence local. New work requires a scoped owner request and applicable approvals.
 
 Use a descriptive `codex/` branch. Never push directly to main or merge without owner approval. Normal PR workflow execution is authorised by D051; local database/container execution is not implied by ordinary checks. Do not weaken environment, resource-ownership, proxy or production guards to make a test pass.
 
