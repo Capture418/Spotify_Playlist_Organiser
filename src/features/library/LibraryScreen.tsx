@@ -77,6 +77,7 @@ export function LibraryScreen({ remote, connected = false, onReload, onRefresh, 
         <div className="page-intro">
           <p className="eyebrow">LESS SCROLLING. MORE LISTENING.</p>
           <h1>Your library.</h1>
+          <p className="intro-copy">Use tags to match the mood</p>
         </div>
         {!connected && (
           <div className="demo-notice" id="demo-notice">
