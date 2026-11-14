@@ -1,6 +1,6 @@
 # Compact menu release approval package
 
-Status: **preparation only; execution not yet approved** (D081, 14 November 2026).
+Status: **approved for bounded execution under D082** (14 November 2026). Owner approved this package using included allowance only; all limits and exclusions apply.
 
 ## Candidate and evidence
 

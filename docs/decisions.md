@@ -209,3 +209,8 @@ Owner approves the suggested top-right ellipsis menu with Reload app, Refresh fr
 ## D081 — Menu accepted locally; release preparation requested
 
 Owner is happy with D080 and requests a CI/deployment package including build/test allowance and iPhone verification. Preparation only. docs/menu-release-approval.md proposes reassignment of unused D079 reserves and lifetime caps19/22/10. Execution is not yet approved; existing caps/exclusions remain.
+
+
+## D082 — Menu release execution approved
+
+Owner approves docs/menu-release-approval.md using included allowance only. Reassign unused D079 reserves (not additional overlapping budgets), with lifetime caps19 builds/22 synthetic attempts/10 deployments, reviewed exact passing-head PR/merge, bounded deployments and iPhone handoff. Package exclusions and stop conditions remain binding.
