@@ -9,7 +9,7 @@ Before planning or editing, read:
 
 These are the source of truth for this snapshot. Surface conflicts before affected work. Work only in this project and inspect Git status before changes. Preserve user work; never initialise or alter another repository. Use one package and small reviewable changes, without a multi-agent hierarchy. Follow the canonical constitution rather than inventing competing rules.
 
-**Current boundary (D079):** Owner approved [the reload release package](docs/reload-release-approval.md), including reserve reassignment, reviewed PR/merge and bounded deployment. Lifetime caps17 builds/20 synthetic attempts/9 deployments; starting consumption13/16/6. Included allowance only. Follow package stop conditions and device handoffs. No new credentials/settings, provisioning, host installations or unrelated features.
+**Current boundary (D080):** Owner approved local compact library controls: ellipsis actions menu and Settings & data panel. Keep existing API, privacy and confirmation safeguards. Publication/CI image execution/merge/deployment for this feature require a separate release approval; D079 correction reserves are not reassigned. Current recorded consumption15/17 builds,18/20 synthetic attempts,7/9 deployments. No credentials/settings, provisioning, installations or unrelated features.
 
 Use a descriptive `codex/` branch. Never push directly to main or merge without owner approval. Normal PR workflow execution is authorised by D051; local database/container execution is not implied by ordinary checks. Do not weaken environment, resource-ownership, proxy or production guards to make a test pass.
 

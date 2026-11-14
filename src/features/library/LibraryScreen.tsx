@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
+import { LibraryActions } from './LibraryActions.tsx';
 import { Icon } from '../../components/Icon.tsx';
 import { createDemoLibrary } from '../../data/demo-library.ts';
 import { applyTagEdit, filterItems, tagIdsFor, tagsFor } from '../../domain/library.ts';
@@ -10,7 +12,7 @@ import type { RemoteLibrary } from '../../data/remote-library.ts';
 
 type EditorTarget = { mode: 'single' | 'bulk'; itemIds: readonly string[] };
 
-export function LibraryScreen({ remote, connected = false, onReload, reloadDisabled = false }: { remote?: RemoteLibrary; connected?: boolean; onReload?: () => void; reloadDisabled?: boolean }) {
+export function LibraryScreen({ remote, connected = false, onReload, onRefresh, onSettings, notice, reloadDisabled = false }: { remote?: RemoteLibrary; connected?: boolean; onReload?: () => void; onRefresh?: () => void; onSettings?: () => void; notice?: ReactNode; reloadDisabled?: boolean }) {
   const [library, setLibrary] = useState(() => remote?.state.library ?? createDemoLibrary());
   useEffect(() => { if (remote) setLibrary(remote.state.library); }, [remote?.state]);
   const [query, setQuery] = useState('');
@@ -66,10 +68,11 @@ export function LibraryScreen({ remote, connected = false, onReload, reloadDisab
       <header className="app-header">
         <div className="brand"><span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>Music Library Organiser</div>
         <div className="header-actions">
-        {onReload && <button type="button" className="secondary-button" disabled={reloadDisabled || editor !== null} onClick={onReload} title="Reload the app to check for updates. Saved tags are kept; search and selection reset.">Reload app</button>}
         <span className="demo-badge"><span aria-hidden="true" />{connected ? 'Connected library' : remote ? 'Synthetic library' : 'Local demo'}</span>
+        {onReload && onRefresh && onSettings && <LibraryActions onReload={onReload} onRefresh={onRefresh} onSettings={onSettings} disabled={reloadDisabled || editor !== null}/>}
         </div>
       </header>
+      {notice}
       <main id="library" tabIndex={-1}>
         <div className="page-intro">
           <p className="eyebrow">LESS SCROLLING. MORE LISTENING.</p>

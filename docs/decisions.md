@@ -199,3 +199,8 @@ Owner is happy with D077 and requests a CI/deployment approval package with buil
 ## D079 — Reload app release execution approved
 
 Owner approves docs/reload-release-approval.md using included allowance only, including CI, exact passing-head merge, deployment and iPhone handoff. Unused D076 reserves are reassigned (not additive); lifetime caps17 builds/20 synthetic attempts/9 deployments. Existing package exclusions and bounded correction/rollback apply.
+
+
+## D080 — Compact actions menu approved locally
+
+Owner approves the suggested top-right ellipsis menu with Reload app, Refresh from Spotify and a Settings & data panel. Export, restore, recovery and sign-out controls move into that panel, with all-device sign-out/deletion separated and existing confirmations retained. Routine up-to-date/recovery text leaves the permanent top bar; relevant progress/errors remain visible. User reports deployed Reload app works well; no exhaustive unreported device checks inferred. Local implementation authorised; separate release approval remains required.
