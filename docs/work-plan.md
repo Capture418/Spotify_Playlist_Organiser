@@ -4,9 +4,9 @@ Updated: 14 November2026.
 
 ## Current status — pilot accepted (D073)
 
-Owner accepted the working pilot on14 November2026 after the recorded acceptance checks passed. Music Library Organiser is running in normal mode with read-only Spotify playlists/albums, persistent shared tags, Mac/iPhone access and the online-only Home Screen app. D076 artwork release execution approved; CI/publication and device checks in progress.
+Owner accepted the working pilot on14 November2026 after the recorded acceptance checks passed. Music Library Organiser is running in normal mode with read-only Spotify playlists/albums, persistent shared tags, Mac/iPhone access and the online-only Home Screen app. D076 artwork release deployed and healthy; owner real-artwork/device acceptance checks pending.
 
-Final execution counters: **11/11 candidate builds,14/14 synthetic attempts,5/5 deploy requests**. All allowances are exhausted. Do not push evidence to main or trigger another release. Future work requires a separately scoped task and applicable approvals. Historical evidence below is retained; earlier pending statuses are superseded by D073.
+Current D076 counters: **13/15 candidate builds,16/18 synthetic attempts,6/8 deploy requests**. Remaining reserve is bounded to one diagnosed corrective PR/main pair and corrective/return-to-pilot deployments. Do not push evidence to main or trigger another release. Future work requires a separately scoped task and applicable approvals. Historical evidence below is retained; earlier pending statuses are superseded by D073.
 
 ## Existing implementation
 
@@ -698,3 +698,35 @@ Owner approves artwork release package. Clean initial tree; fetched unchanged ma
 
 
 D076 initial PR11 run43608030874 failed at host quality before candidate build or disposable verification. The isolated foundation-test copy omitted the new artwork approval document linked by AGENTS.md. Added that document to the fixture copy list; no validation weakened or runtime changed. Earlier pre-publication command batch did not propagate this foundation test failure correctly; CI caught it. Re-running full host gate with explicit exit checking before the corrected push. No build/synthetic/deployment consumed by this failed run (steps skipped); counters remain11/15,14/18,5/8.
+
+
+## D076 artwork deployment verified — 14 November 2026
+
+Corrected PR11 head4df8ae594f8aa153f59be9abba8a3ecd0bf52d41 passed run43608177826: quality, candidate build, actual disposable PG/runtime checks including artwork persistence/logo/CSP/export assertions, and scoped cleanup. Final exact-head review and merge at15:06:10UTC produced main23e300239c6f62e4dc72f0c673fa1481331d233a. Earlier run43608030874 failed before image/database execution; no resource allowance consumed by it. No workflow, credentials, dependencies or schema changed. Current dependency audit zero vulnerabilities.
+
+Automatic release43608340533 succeeded: release132487702887 passed build/test/cleanup and verified publication; deploy132487949083 reports Migration complete, Application ready and deployed. Artwork image: `ghcr.io/capture418/spotify_playlist_organiser@sha256:b83fd60160dc2d16ee3b5920ac9994554564ea5efdbafce0ae902f065b493aae`. Safe markers only extracted; raw production logs not retained/displayed. Public HTTPS checks: health200 minimal ok, root200 normal HTML with four exact image CSP origins, official logo200 image/svg+xml. These establish deployment/public asset delivery, not real image CDN acceptance.
+
+Counters13/15 builds,16/18 synthetic attempts,6/8 deployments. Reserved correction pair and corrective/return-to-pilot requests remain bounded by package; no automatic retries. Evidence local only. Owner next reloads root and Refresh catalogue once, checks representative albums/standard/custom playlists, correct artwork/full-cover layout, preserved tags, filters/links and scrolling. Then actual iPhone Safari/Home Screen/VPN checks. Final desktop keyboard/200% zoom/network image credentials/referrer review remains before artwork acceptance; no real import/refresh or private image inspection done by agent in deployment checks.
+
+
+## D077 app reload control — local task
+
+Owner reports artwork looks correct on Mac/iPhone including Home Screen and existing functionality works. Records actual device artwork success; final artwork keyboard/zoom/network review remains pending. Owner clarifies requested refresh is app reload, not catalogue import. Clean initial working tree, current code inspected. Add Reload app to connected header with44px minimum existing button style and wrapping at phone widths; use window.location.reload, keeping saved tags/session server-side while transient filters reset. Disable for busy/offline, modal editor and pending restore/deletion confirmation. Existing catalogue refresh stays separate. Local quality/browser verification follows; no push/deploy or use of artwork correction reserves.
+
+D077 local verification: full npm run check passed (227/227 tests, lint, typecheck, project/lockfile checks and frontend/backend builds). Initial typecheck caught an explicit undefined optional prop; corrected with conditional prop inclusion before the passing full run. Invented browser fixture at390×844 showed a clearly visible header button with no header clipping; clicking it changed the navigation marker from navigate to reload. Opening the tag editor made Reload app disabled; cancelling restored it. Keyboard Enter activation was also exercised after resetting the viewport. No real account data or Spotify requests used. Browser tab closed, viewport reset and loopback server stopped. Busy/offline/restore/delete guards reviewed in source; not independently exercised in the connected runtime. Real iPhone Home Screen verification remains after a separately approved release.
+
+Technical-lead self-review: no dependency, schema, API, scope, secret, caching or storage change. Saved server data is unaffected by a normal reload; transient UI state resets. No push, CI, image/database run, merge or deployment; counters remain13/15 builds,16/18 synthetic attempts,6/8 deployments. Next: owner review and a separately approved release scope for this new control; existing D076 artwork correction reserves are not automatically reassigned.
+
+
+## D078 reload release preparation
+
+Working directory confirmed; clean initial tree on codex/reload-app. Owner accepts local button. Fetched main23e3002 and reviewed the small runtime diff and existing PR/main/manual-deploy workflows. Prepared docs/reload-release-approval.md with expected2 builds/2 synthetic attempts/1 deployment, maximum4/4/3 from current consumption13/16/6. Proposes explicitly reassigning unused artwork reserves and increasing lifetime caps by2/2/1 to17/20/9, with one diagnosed corrective pair and rollback to the pre-change owner-tested artwork digest. No execution approval inferred.
+
+Scope includes iPhone Safari/Home Screen reload checks and pending desktop keyboard/zoom/artwork-network acceptance review. Prior227-test pass remains implementation evidence; no runtime gate or device test repeated for this documentation task. No push, CI, install, database/image execution, merge, secret/settings change or deployment. Check current runs/allowance/advisories at approved execution preflight; not claimed reverified here. Next: owner approval of the package, then bounded execution and private device handoff.
+
+Preparation validation: npm run check:foundation passed36 tests and project checks; git diff --check passed. Added the new approval document to the isolated foundation fixture so the AGENTS link is validated in CI. Constitution self-review complete; proposed permissions remain clearly unapproved.
+
+
+## D079 execution preflight
+
+Clean initial tree, main unchanged23e3002, no open PR or active run observed. Existing nine normal-mode setting names present, setup settings absent; values not read. npm audit reports zero vulnerabilities. Owner reaffirms included allowance only; prior paid-usage-blocked confirmation retained, no billing change. Starting counters13/17 builds,16/20 synthetic attempts,6/9 deployments. Full local gate before publication; exact reviewed PR/main sequence next.
