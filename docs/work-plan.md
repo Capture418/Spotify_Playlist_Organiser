@@ -6,7 +6,7 @@ Updated: 14 November2026.
 
 D069: owner approved [the remaining release package](release-approval.md). Execute the reviewed release PR, Linux CI and merge-triggered verified-image/setup deployment, then private setup and same-digest normal deployment. User confirms retained token/keys, registered HTTPS callback and included allowance with paid usage blocked.
 
-Current counters: **9/11 candidate builds,12/14 synthetic attempts,4/5 new deploy requests** (D070 corrective setup deployed). Initial and corrective hosted setup deployments are verified; D071 second Safari handoff correction is deployed and healthy; owner confirms setup completed and closed. Normal mode is deployed and healthy; owner reports successful live sign-in/import and Mac checks1–3; Spotify card links require the local correction below. Remaining device checks are pending. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
+Current counters: **11/11 candidate builds,14/14 synthetic attempts,5/5 new deploy requests** (D070 corrective setup deployed). Initial and corrective hosted setup deployments are verified; D071 second Safari handoff correction is deployed and healthy; owner confirms setup completed and closed. Normal mode is deployed and healthy; owner reports successful live sign-in/import and Mac checks1–3; Spotify card-link correction is deployed; actual Mac/iPhone retest is pending. Remaining device checks are pending. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
 
 ## Existing implementation
 
@@ -617,3 +617,12 @@ No push, CI, container/database run or deployment. Counters unchanged9/9 builds,
 ## D072 execution preflight
 
 Owner approved the local card-link correction, two additional builds/tests and remaining corrective deployment. Current main4dc0a6a and latest three runs are successful; no active deployment observed. Prepared source remains unchanged from the223-test full quality gate and rendered-card verification. Dependency audit rechecked before publication. Counters start9/11 builds,12/14 synthetic attempts,4/5 deployments. Preserve existing private data and credentials.
+
+
+## D072 corrective normal deployment succeeded — 14 November 2026
+
+PR10 at5f3182a5c40eb10cb1faa9552834fd1b7ee222e0 passed CI43605657008, including full quality, candidate build, disposable PostgreSQL/runtime checks and scoped cleanup. Reviewed exact runtime diff and unchanged main baseline; merged with head protection at14:36:56UTC to maina0645c5aa96dc5c2d500ff29dfa2d0c12181a599. Names-only inventory confirms both setup settings remain absent, nine retained settings unchanged. Current dependency audit zero vulnerabilities.
+
+Automatic release43605791214 completed successfully: release job132480020071 and deploy job132480250470. Published verified image `ghcr.io/capture418/spotify_playlist_organiser@sha256:0ab3a14b5e0e6446f7f3858d5909ecf2589bbdfe58369f8d4ae4d9be4cb28179`. Safe log extraction confirms Migration complete, Application ready and deployed. Raw logs not retained/displayed. HTTPS health200 minimal ok; root200 normal app; served JavaScript includes corrected link markup/labels. No real catalogue, credentials or tags accessed or changed by the agent.
+
+Counters11/11 builds,14/14 synthetic attempts,5/5 deployments: all execution allowances exhausted; no automatic retries. Evidence committed locally only, without triggering another release. Constitution review: approved correction only, validated destinations preserved, tests and live delivery distinguished from device navigation. Owner should reload the app and retest one album and playlist on Mac, then continue iPhone Safari/Home Screen and cross-device persistence checks. Actual Spotify handoff remains pending owner verification.
