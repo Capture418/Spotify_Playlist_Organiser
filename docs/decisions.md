@@ -238,3 +238,9 @@ The owner approved the [subtitle release package](subtitle-release-approval.md) 
 ## D093 — Compatibility release approved
 
 The owner approved the [compatibility release package](tag-group-compatibility-release-approval.md) using included allowance only. The first production deployment stays on schema 003. Tag groups and production migration 004 remain a separate release. Lifetime caps are 23 builds, 26 disposable test attempts and 12 deployment requests.
+
+## D095 — Tag groups and migration 004 release approved
+
+The owner approved the tag groups release package and production migration 004 using included allowance only. Lifetime caps are 25 builds, 28 disposable attempts and 13 deployment requests.
+
+The compatibility image was accepted under D094 after the owner confirmed the iPhone Safari and Home Screen checks passed on schema 003.

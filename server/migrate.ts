@@ -14,7 +14,7 @@ export async function migrateHosted(env:NodeJS.ProcessEnv,open:(config:PoolConfi
     for(const pool of pools)pool.on('error',()=>{});
     await migrateAppendJournal(journal);
     const identity=await verifyAppendJournal(journal);
-    await migrate(app,3,new JsonCipher(config.snapshots.keys,config.snapshots.current,'snapshot'),true,true);
+    await migrate(app,4,new JsonCipher(config.snapshots.keys,config.snapshots.current,'snapshot'),true);
     await transaction(app,async c=>{
       await c.query('CREATE TABLE IF NOT EXISTS public.hosted_journal_binding(singleton boolean PRIMARY KEY DEFAULT true CHECK(singleton),identity uuid NOT NULL)');
       const existing=await c.query('SELECT identity FROM public.hosted_journal_binding');

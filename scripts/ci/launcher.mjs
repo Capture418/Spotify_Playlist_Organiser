@@ -153,10 +153,10 @@ export function launcher(config, execute, save, state = { owner: config.owner, r
   async function platformExercise(pause = () => new Promise(r => setTimeout(r, 1000))) {
     assert.equal(config.hosted,true);
     await wait(async()=>{await sql('music','SELECT 1');return true;},pause);
-    async function service(setup) {
+    async function service(setup,image=config.image) {
       const env={...platformEnv};if(!setup){delete env.SETUP_MODE;delete env.SETUP_TOKEN;}
       const c=await create('container',['--name',`${config.owner}-default-${++serial}`,...constraints,'--network',config.network,
-        ...Object.entries(env).flatMap(([k,v])=>['-e',`${k}=${v}`]),config.image]);
+        ...Object.entries(env).flatMap(([k,v])=>['-e',`${k}=${v}`]),image]);
       const started=Date.now();await run(['start',c.id]);
       return {c,started};
     }
@@ -177,10 +177,34 @@ export function launcher(config, execute, save, state = { owner: config.owner, r
       assert.ok(logs.split('\n').every(line=>/^Application (ready|stopped)$/.test(line)),'Unexpected application log content');
       await remove(c);
     }
-    for(let n=0;n<2;n++){
-      const migration=await create('container',['--name',`${config.owner}-migration-${n}`,...constraints,'--network',config.network,...Object.entries(migrationEnv).flatMap(([k,v])=>['-e',`${k}=${v}`]),config.image,'node','runtime/server/migrate.js']);
-      const output=await run(['start','-a',migration.id]);assert.equal((await verify(migration)).State.ExitCode,0,'Migration failed');assert.equal(output,'Migration complete (schema 003)');await remove(migration);
+    const rollback = 'ghcr.io/capture418/spotify_playlist_organiser@sha256:13b7a1516a2236a386d022692b339f82f131f0d2aebec661385cd96c185ad0c5';
+    await run(['pull','--platform','linux/amd64',rollback]);
+    async function migrateImage(image, schema) {
+      const migration=await create('container',['--name',`${config.owner}-migration-${++serial}`,...constraints,'--network',config.network,...Object.entries(migrationEnv).flatMap(([k,v])=>['-e',`${k}=${v}`]),image,'node','runtime/server/migrate.js']);
+      const output=await run(['start','-a',migration.id]);
+      assert.equal((await verify(migration)).State.ExitCode,0);
+      assert.equal(output,`Migration complete (schema ${schema})`);
+      await remove(migration);
     }
+    await migrateImage(rollback,'003');
+    const account=platformEnv.ORGANISER_ACCOUNT;
+    const tag='33333333-3333-4333-8333-333333333333';
+    await sql('music',`INSERT INTO accounts(id,binding,generation) VALUES('${account}','invented-owner','22222222-2222-4222-8222-222222222222');
+      INSERT INTO tags(account_id,tag_id,name,canonical) VALUES('${account}','${tag}','Invented','invented');
+      INSERT INTO items(account_id,kind,spotify_id) VALUES('${account}','playlist','invented');
+      INSERT INTO assignments VALUES('${account}','playlist','invented','${tag}');`);
+    await migrateImage(config.image,'004');
+    assert.match(await sql('music','SELECT count(*) FROM tags JOIN assignments USING(account_id,tag_id) WHERE tag_group IS NULL'),/\b1\b/);
+    await migrateImage(config.image,'004');
+    await sql('music',"UPDATE tags SET tag_group='Genre'");
+    await migrateImage(rollback,'004');
+    const rolledBack=await service(false,rollback);
+    await ready(rolledBack.c,rolledBack.started);
+    await run(['exec',rolledBack.c.id,'node','--input-type=module','-e',
+      "import assert from 'node:assert/strict';import {randomUUID} from 'node:crypto';import {database} from './runtime/server/database.js';import {hostedConfig} from './runtime/server/hosted-config.js';import {Store} from './runtime/server/store.js';const config=hostedConfig(process.env),p=database(config.databases.runtime),store=new Store(p,config.owner.account,Date.now,true);try{const {token}=await store.issue(config.owner.account),session=await store.session(token),before=await store.export(session);await store.edit(session,{requestId:randomUUID(),revision:before.revision,edit:{mode:'single',itemIds:[before.annotations[0].itemId],tagIds:[before.tags[0].id],newTags:[]}});const after=await store.export(session);assert.equal(after.tags[0].group,'Genre');assert.deepEqual(after.annotations,before.annotations);}finally{await p.end();}"]);
+    await stop(rolledBack.c);
+    await sql('music',`DELETE FROM accounts WHERE id='${account}'`);
+    report('PASS schema 003 to 004 migration preserves assignments and the accepted rollback image preserves groups');
     async function rejectedMigration(env) {
       const c=await create('container',['--name',`${config.owner}-rejected-migration-${++serial}`,...constraints,'--network',config.network,...Object.entries(env).flatMap(([k,v])=>['-e',`${k}=${v}`]),config.image,'node','runtime/server/migrate.js']);
       await run(['start',c.id]);await run(['wait',c.id]);assert.equal((await verify(c)).State.ExitCode,1);
@@ -192,7 +216,7 @@ export function launcher(config, execute, save, state = { owner: config.owner, r
     await rejectedMigration(migrationEnv); // Incompatible history must not start an HTTP server.
     await sql('music',`UPDATE schema_migrations SET checksum='${checksum}' WHERE version=1`);
     const first=await service(true);await ready(first.c,first.started);
-    assert.match(await sql('music','SELECT count(*) FROM schema_migrations'),/3/);
+    assert.match(await sql('music','SELECT count(*) FROM schema_migrations'),/\b4\b/);
     await sql('music_journal',"REVOKE CONNECT ON DATABASE music_journal FROM music_journal_app; SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE usename='music_journal_app'");
     await wait(async()=>await health(first.c)===503,pause);
     await sql('music_journal','GRANT CONNECT ON DATABASE music_journal TO music_journal_app');

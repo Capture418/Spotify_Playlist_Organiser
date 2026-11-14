@@ -1,3 +1,4 @@
+import { TagGroups } from './TagGroups.tsx';
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { LibraryActions } from './LibraryActions.tsx';
@@ -55,7 +56,9 @@ export function LibraryScreen({ remote, connected = false, onReload, onRefresh, 
     // The modal makes the rest of the page inert; no concurrent UI edit can run.
     if (remote) await remote.save(edit, reapply);
     else setLibrary(applyTagEdit(library, edit));
-    setFeedback(edit.mode === 'bulk'
+    setFeedback(edit.mode === 'bulk' && !edit.tagIds.length && edit.moves?.length
+      ? 'Tag groups updated.'
+      : edit.mode === 'bulk'
       ? `Tags added to ${edit.itemIds.length} ${edit.itemIds.length === 1 ? 'item' : 'items'}. Existing tags were kept.`
       : `Tags updated for ${editorItems[0]?.title ?? 'this item'}.`);
     setEditor(null);
@@ -104,13 +107,11 @@ export function LibraryScreen({ remote, connected = false, onReload, onRefresh, 
           </div>
           <p className="search-hint" id="search-hint">Every word must match a title, tag or album artist.</p>
           <div className="filter-heading"><h2>Filter by tags</h2><span className="match-rule">Match all selected</span></div>
-          <div className="filter-tags" role="group" aria-label="Filter by tags">
-            {library.tags.map(tag => (
+          <TagGroups tags={library.tags} selected={filterTags} renderTag={tag => (
               <button key={tag.id} type="button" className="filter-chip" aria-pressed={filterTags.includes(tag.id)} onClick={() => toggleFilter(tag.id)}>
                 {filterTags.includes(tag.id) && <Icon name="check" />}{tag.name}
               </button>
-            ))}
-          </div>
+          )} />
         <label className="availability-control">
             <input type="checkbox" checked={showUnavailable} onChange={event => setShowUnavailable(event.target.checked)} />
             Show unavailable ({library.items.filter(item => !item.available).length})

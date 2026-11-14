@@ -1,9 +1,10 @@
+import { TagGroups } from './TagGroups.tsx';
 import { useEffect, useId, useRef, useState } from 'react';
 import type { FormEvent, RefObject } from 'react';
 import { Icon } from '../../components/Icon.tsx';
 import { ApiError } from '../../data/remote-library.ts';
-import { itemLabel, prepareTag } from '../../domain/library.ts';
-import type { LibraryItem, Tag, TagEdit } from '../../domain/library.ts';
+import { isTagGroup, itemLabel, prepareTag, tagGroups } from '../../domain/library.ts';
+import type { LibraryItem, Tag, TagEdit, TagGroup } from '../../domain/library.ts';
 
 type Props = {
   mode: 'single' | 'bulk';
@@ -27,6 +28,19 @@ export function TagEditor({ mode, items, tags, initialTagIds, returnFocus, onSav
   const [draftTags, setDraftTags] = useState<readonly Tag[]>(tags);
   const [picked, setPicked] = useState<readonly string[]>(initialTagIds);
   const [name, setName] = useState('');
+  const [group, setGroup] = useState<TagGroup>();
+  const [moveId, setMoveId] = useState('');
+  const [moveGroup, setMoveGroup] = useState<TagGroup>();
+  const existingIds = new Set(tags.map(tag => tag.id));
+  const canSaveSelection = mode !== 'bulk' || picked.length > 0 || !!name.trim();
+  const originalGroups = new Map(tags.map(tag => [tag.id, tag.group]));
+  const moves = draftTags.flatMap(tag => tag.group && originalGroups.has(tag.id) && originalGroups.get(tag.id) !== tag.group
+    ? [{ id: tag.id, group: tag.group }] : []);
+  function prepareNewTag() {
+    const result = prepareTag(draftTags, name, `demo-tag-${crypto.randomUUID()}`, group);
+    if (result.created && !group) throw new Error('Choose a group for the new tag.');
+    return result;
+  }
   const [feedback, setFeedback] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -54,7 +68,7 @@ export function TagEditor({ mode, items, tags, initialTagIds, returnFocus, onSav
   function createTag(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     try {
-      const result = prepareTag(draftTags, name, `demo-tag-${crypto.randomUUID()}`);
+      const result = prepareNewTag();
       if (result.created) setDraftTags(previous => [...previous, result.tag]);
       setPicked(previous => previous.includes(result.tag.id) ? previous : [...previous, result.tag.id]);
       setName('');
@@ -71,15 +85,15 @@ export function TagEditor({ mode, items, tags, initialTagIds, returnFocus, onSav
     try {
       // Save includes an unfinished, non-empty tag entry as well; it must not
       // silently discard text simply because Add tag was not pressed first.
-      const pending = name.trim() ? prepareTag(draftTags, name, `demo-tag-${crypto.randomUUID()}`) : null;
+      const pending = name.trim() ? prepareNewTag() : null;
       const appliedIds = pending ? [...new Set([...picked, pending.tag.id])] : picked;
       const appliedTags = pending?.created ? [...draftTags, pending.tag] : draftTags;
-      const existingIds = new Set(tags.map(tag => tag.id));
       const edit = retry.current ?? {
         mode,
         itemIds: items.map(item => item.id),
         tagIds: appliedIds,
         newTags: appliedTags.filter(tag => !existingIds.has(tag.id) && appliedIds.includes(tag.id)),
+        moves,
       };
       retry.current = edit;
       await onSave(edit, reapply);
@@ -110,15 +124,42 @@ export function TagEditor({ mode, items, tags, initialTagIds, returnFocus, onSav
           <ul>{items.map(item => <li key={item.id}>{itemLabel(item)}</li>)}</ul>
         </div>
       )}
-      <div className="editor-tags" role="group" aria-label={mode === 'bulk' ? 'Tags to add' : 'Item tags'}>
-        {draftTags.map(tag => (
+      <TagGroups tags={draftTags} selected={picked} renderTag={tag => (
           <button key={tag.id} type="button" className="tag-choice" aria-pressed={picked.includes(tag.id)} disabled={busy || !!retry.current} onClick={() => toggleTag(tag.id)}>
             {picked.includes(tag.id) && <Icon name="check" />}{tag.name}
           </button>
-        ))}
-      </div>
+      )} />
+      {tags.length > 0 && <details className="move-tag">
+        <summary>Move an existing tag</summary>
+        <fieldset disabled={busy || !!retry.current}>
+          <label>Tag to move <select value={moveId} onChange={event => setMoveId(event.target.value)}>
+            <option value="">Choose a tag</option>
+            {draftTags.filter(tag => existingIds.has(tag.id)).map(tag =>
+              <option key={tag.id} value={tag.id}>{tag.name} ({tag.group ?? 'Ungrouped'})</option>)}
+          </select></label>
+          <label>Destination group <select value={moveGroup ?? ''} onChange={event => {
+            const value = event.target.value;
+            setMoveGroup(isTagGroup(value) ? value : undefined);
+          }}>
+            <option value="">Choose a group</option>
+            {tagGroups.map(value => <option key={value}>{value}</option>)}
+          </select></label>
+          <button type="button" className="secondary-button" disabled={!moveId || !moveGroup} onClick={() => {
+            if (!moveGroup) return;
+            setDraftTags(previous => previous.map(tag => tag.id === moveId ? { ...tag, group: moveGroup } : tag));
+            setFeedback('Group updated in your draft. Apply your changes to save.');
+          }}>Move tag</button>
+        </fieldset>
+      </details>}
       <form className="new-tag-form" onSubmit={createTag}>
         <label htmlFor={newTagId}>Create a tag</label>
+        <label>New tag group <select disabled={busy || !!retry.current} value={group ?? ''} onChange={event => {
+          const value = event.target.value;
+          setGroup(isTagGroup(value) ? value : undefined);
+        }}>
+          <option value="">Choose a group</option>
+          {tagGroups.map(value => <option key={value}>{value}</option>)}
+        </select></label>
         <div className="new-tag-input">
           <input disabled={busy || !!retry.current} ref={newTagRef} id={newTagId} value={name} onChange={event => { setName(event.target.value); setError(''); }}
             placeholder="For example, Road trip" autoComplete="off" />
@@ -131,7 +172,7 @@ export function TagEditor({ mode, items, tags, initialTagIds, returnFocus, onSav
       <p className="editor-note">{persistent ? 'Saved only after server confirmation. Errors keep your draft.' : 'Demo edits only. Reloading resets this library.'}</p>
       <div className="editor-actions">
         <button type="button" className="secondary-button" disabled={busy} onClick={onCancel}>Cancel</button>
-        <button type="button" className="primary-button" onClick={() => void save(conflict)} disabled={busy || (mode === 'bulk' && picked.length === 0 && !name.trim())}>
+        <button type="button" className="primary-button" onClick={() => void save(conflict)} disabled={busy || (!canSaveSelection && moves.length === 0)}>
           {busy ? 'Saving…' : conflict ? 'Reapply my draft' : retry.current ? 'Retry same save' : mode === 'bulk' ? 'Apply tags' : 'Save tags'}
         </button>
       </div>
