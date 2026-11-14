@@ -6,7 +6,7 @@ Updated: 14 November2026.
 
 D069: owner approved [the remaining release package](release-approval.md). Execute the reviewed release PR, Linux CI and merge-triggered verified-image/setup deployment, then private setup and same-digest normal deployment. User confirms retained token/keys, registered HTTPS callback and included allowance with paid usage blocked.
 
-Starting counters: **3/6 candidate builds,6/10 synthetic attempts,0/4 new deploy requests**. Successful hosted deployments remain zero before this sequence. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
+Current counters: **4/6 candidate builds,7/10 synthetic attempts,0/4 new deploy requests**. Successful hosted deployments remain zero before this sequence. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
 
 ## Existing implementation
 
@@ -517,3 +517,10 @@ Constitution review: accepted hosting/design preserved; package distinguishes pr
 ## D069 preflight — 14 November 2026
 
 Approval recorded before release publication. Confirmed clean project working tree; names-only GitHub inventory contains all11 expected APP settings and no additional reserved overrides. Latest five Actions runs are completed, with no active deploy observed. Existing operator contract and reviewed source retained. Current npm audit returned zero vulnerabilities at all severities; no dependency change/install. Rechecked Spotify official PKCE/scopes documentation (https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow and https://developer.spotify.com/documentation/web-api/concepts/scopes); no new scope or client secret requested. Owner confirmed private custody/callback/allowance. Local foundation validation precedes push; PR/main CI will supply fresh Linux/full-image results.
+
+
+## D069 PR and release gate — 14 November 2026
+
+Release PR7 published at headfc9f54cacd61488f63790a3e76509859b038de51. GitHub Linux run43601440151 passed quality and exact-image synthetic scenarios plus scoped cleanup; candidate image6d5dd0a0cf8ed0a5f7476680922a7b6abe8141f58a4bcf73451dcbd49dcca110. This consumed one additional build/test (lifetime4/6 and7/10). Reviewed the successful exact head and merged with match-head protection at13:48:08UTC, producing mainb7a9d842605553b64276235682ad0fcd6d94f308. No required-check/settings changes.
+
+Automatic main release43601581067 is action_required at GitHub's security gate. Requested owner approval of the existing run, not another dispatch. No main candidate or deploy has executed at this checkpoint; deployment count remains0/4. Pre-deploy HTTPS health returned502, consistent with no working app yet. Credentials unchanged. These evidence edits remain local to avoid another main release trigger.
