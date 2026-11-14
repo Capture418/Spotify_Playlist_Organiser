@@ -6,7 +6,7 @@ Updated: 14 November2026.
 
 D069: owner approved [the remaining release package](release-approval.md). Execute the reviewed release PR, Linux CI and merge-triggered verified-image/setup deployment, then private setup and same-digest normal deployment. User confirms retained token/keys, registered HTTPS callback and included allowance with paid usage blocked.
 
-Current counters: **11/11 candidate builds,14/14 synthetic attempts,5/5 new deploy requests** (D070 corrective setup deployed). Initial and corrective hosted setup deployments are verified; D071 second Safari handoff correction is deployed and healthy; owner confirms setup completed and closed. Normal mode is deployed and healthy; owner reports successful live sign-in/import and Mac checks1–3; Spotify card-link correction is deployed; actual Mac/iPhone retest is pending. Remaining device checks are pending. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
+Current counters: **11/11 candidate builds,14/14 synthetic attempts,5/5 new deploy requests** (D070 corrective setup deployed). Initial and corrective hosted setup deployments are verified; D071 second Safari handoff correction is deployed and healthy; owner confirms setup completed and closed. Normal mode is deployed and healthy; owner reports successful live sign-in/import and Mac checks1–3; Spotify card links pass on Mac and iPhone. Owner confirms iPhone Safari/Home Screen checks and cross-device tag sync. Final acceptance checks below remain pending. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
 
 ## Existing implementation
 
@@ -626,3 +626,18 @@ PR10 at5f3182a5c40eb10cb1faa9552834fd1b7ee222e0 passed CI43605657008, including 
 Automatic release43605791214 completed successfully: release job132480020071 and deploy job132480250470. Published verified image `ghcr.io/capture418/spotify_playlist_organiser@sha256:0ab3a14b5e0e6446f7f3858d5909ecf2589bbdfe58369f8d4ae4d9be4cb28179`. Safe log extraction confirms Migration complete, Application ready and deployed. Raw logs not retained/displayed. HTTPS health200 minimal ok; root200 normal app; served JavaScript includes corrected link markup/labels. No real catalogue, credentials or tags accessed or changed by the agent.
 
 Counters11/11 builds,14/14 synthetic attempts,5/5 deployments: all execution allowances exhausted; no automatic retries. Evidence committed locally only, without triggering another release. Constitution review: approved correction only, validated destinations preserved, tests and live delivery distinguished from device navigation. Owner should reload the app and retest one album and playlist on Mac, then continue iPhone Safari/Home Screen and cross-device persistence checks. Actual Spotify handoff remains pending owner verification.
+
+
+## Owner Mac/iPhone pilot evidence and acceptance remainder — 14 November 2026
+
+Owner confirms corrected album and playlist links work on Mac. Owner subsequently reports all six requested iPhone checks passed: Safari access/sign-in, shared Pilot test filtering, tag changes visible after Mac reload, correct Spotify playlist/album links, Add to Home Screen and reopen with search/filter/tagging, and usable touch/keyboard/editor controls. Tags sync between Mac and iPhone. These are explicit owner-observed actual-device results, not agent emulation. Together with earlier Mac coverage/filtering/reload/refresh preservation, the core private library workflow is working. No private titles, identifiers, screenshots or exports collected.
+
+Pilot acceptance is not yet declared: owner asked what remains, rather than accepting. Compare D069 release-approval step7:
+
+- Confirm Export organisation downloads successfully and retain the file privately; do not submit it to chat or exercise destructive restore.
+- Verify one reversible concurrent-edit conflict on a temporary-tag item: open its editor on both devices before either save, save on one, then try saving the older draft on the other. Expect a clear recoverable conflict, not silent overwriting. Synthetic CI covers conflict behaviour; actual two-device conflict is not yet reported.
+- Finish current-release Mac keyboard/200% zoom and browser network-request review; earlier invented-data evidence does not establish current deployed UI coverage.
+- Confirm access specifically over VPN away from home Wi-Fi if the successful iPhone checks used only home Wi-Fi. The supplied result does not distinguish those paths.
+- Owner explicitly accepts the pilot after remaining evidence is recorded.
+
+No new features, builds or deployment are required merely to complete these checks. Restore/deletion remain covered by synthetic evidence; production maintenance/backup restore tests remain excluded. Current runtime remains the D072 verified digest; counters11/11 builds,14/14 synthetic attempts,5/5 deployments unchanged. Documentation-only update, clean initial tree, whitespace validation; no runtime tests rerun, remote push or settings change. Evidence stays local to avoid active release triggers.
