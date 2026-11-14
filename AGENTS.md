@@ -9,7 +9,7 @@ Before planning or editing, read:
 
 These are the source of truth for this snapshot. Surface conflicts before affected work. Work only in this project and inspect Git status before changes. Preserve user work; never initialise or alter another repository. Use one package and small reviewable changes, without a multi-agent hierarchy. Follow the canonical constitution rather than inventing competing rules.
 
-**Current boundary (D076):** Owner approved [the artwork release package](docs/artwork-release-approval.md), including reviewed PR/merge, CI and bounded deployments. Lifetime caps15 builds/18 synthetic attempts/8 deployments; included allowance only. Follow package counters, exclusions and private device handoffs. No new credentials/settings, host installs, provisioning or destructive real-data maintenance. Keep artwork origins narrowly validated and image binaries out of library storage/exports.
+**Current boundary (D078):** Reload app implementation D077 is accepted locally. [The reload release package](docs/reload-release-approval.md) is preparation only; proposed reserve reassignment and caps17/20/9 are not approved. D076 caps15/18/8 remain, with recorded consumption13/16/6 and reserves restricted to artwork corrections. No reload push/merge/deployment until package approval. Keep existing privacy, credentials and installation gates; no unrelated changes.
 
 Use a descriptive `codex/` branch. Never push directly to main or merge without owner approval. Normal PR workflow execution is authorised by D051; local database/container execution is not implied by ordinary checks. Do not weaken environment, resource-ownership, proxy or production guards to make a test pass.
 

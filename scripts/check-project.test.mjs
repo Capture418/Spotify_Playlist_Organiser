@@ -10,7 +10,7 @@ const fixturePath = 'tests/fixtures/demo-library.json';
 const files = [
   '.ai/constitution.md', '.editorconfig', '.gitignore', '.nvmrc', '.npmrc',
   'AGENTS.md', 'README.md', 'docs/architecture.md', 'docs/decisions.md', 'docs/work-plan.md',
-  'docs/artwork-release-approval.md', 'docs/release-approval.md', 'docs/home-hosting.md', 'docs/hosted-operations.md', 'docs/pilot-approval.md', 'docs/production-setup.md', 'docs/platform-contract.md', 'docs/ci/normal-pr-plan.md', 'docs/ci/rehearsal-readiness.md', 'docs/home-deployment.md', 'docs/s04c-operational-plan.md', 'docs/s04b-foundation-spec.md', 'docs/s04b2-setup-plan.md', 'docs/s04b2-artifact-review.md',
+  'docs/reload-release-approval.md', 'docs/artwork-release-approval.md', 'docs/release-approval.md', 'docs/home-hosting.md', 'docs/hosted-operations.md', 'docs/pilot-approval.md', 'docs/production-setup.md', 'docs/platform-contract.md', 'docs/ci/normal-pr-plan.md', 'docs/ci/rehearsal-readiness.md', 'docs/home-deployment.md', 'docs/s04c-operational-plan.md', 'docs/s04b-foundation-spec.md', 'docs/s04b2-setup-plan.md', 'docs/s04b2-artifact-review.md',
   'package.json', 'index.html', 'tsconfig.json', 'tsconfig.app.json', 'tsconfig.node.json',
   'vite.config.ts', 'src/app/main.tsx', 'scripts/check-project.mjs',
   'scripts/check-project.test.mjs', 'scripts/check-lockfile.mjs', 'scripts/check-lockfile.test.mjs', fixturePath,
