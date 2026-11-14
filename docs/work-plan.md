@@ -6,7 +6,7 @@ Updated: 14 November2026.
 
 D069: owner approved [the remaining release package](release-approval.md). Execute the reviewed release PR, Linux CI and merge-triggered verified-image/setup deployment, then private setup and same-digest normal deployment. User confirms retained token/keys, registered HTTPS callback and included allowance with paid usage blocked.
 
-Current counters: **5/7 candidate builds,8/10 synthetic attempts,1/4 new deploy requests** (D070 extension approved). One successful hosted setup deployment is now verified; normal mode and live library/device checks remain pending. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
+Current counters: **7/9 candidate builds,10/12 synthetic attempts,2/5 new deploy requests** (D070 corrective setup deployed). Initial and corrective hosted setup deployments are verified; D071 authorises execution of the second Safari handoff correction. Normal mode and live library/device checks remain pending. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
 
 ## Existing implementation
 
@@ -547,3 +547,32 @@ Release allowance blocker: lifetime builds5/6 leaves one, but the unchanged requ
 ## D070 corrective release authorised — 14 November 2026
 
 Owner approves the prepared Safari form correction, one extra build and corrective PR/merge/setup deployment. Counters begin5/7 builds,8/10 synthetic attempts,1/4 deploy requests. Remote main remainsb7a9d842605553b64276235682ad0fcd6d94f308; local corrective branch is clean before approval-record edits. Preserve full PR/main quality and image checks; no new credentials/settings or additional retry allowance.
+
+
+## D070 corrective setup deployment succeeded — 14 November 2026
+
+Corrective PR8 head6510a76b3013fe3d8e297e9a37b18f20684ac370 passed Linux CI43602519136, including full quality gate, image/synthetic verification and scoped cleanup. Exact passing head was merged with match-head protection at14:01:27UTC, producing main4af1396ae1eaced89c6a0fc4d91b7d6d813535b3.
+
+Automatic release43602681744 succeeded without a further user security prompt. Release job132470614230 passed quality, image build, synthetic checks, cleanup and verified publication. Corrective image: `ghcr.io/capture418/spotify_playlist_organiser@sha256:daec3941af596382a60394f296fed6965e001182c4240e19d1879aee7a5716fc`. Dependent deployment132470858387 succeeded with Migration complete, Application ready and deployed markers. No raw secret-bearing logs retained or shown.
+
+Live HTTPS verification: /health returned200 with ok status and no-referrer; / returned200 with setup unlock form and corrected `Referrer-Policy: origin`. No real token or OAuth submitted by the agent. User should open the root site afresh and retry the same saved setup token rather than reposting the cached error page. Credentials unchanged.
+
+Counters now7/7 builds,10/10 synthetic attempts,2/4 deployment requests. Build/test limits are exhausted; normal deployment and one corrective normal deployment remain authorised using the **new corrective digest above**, without rebuilding. Pending private owner setup/confirmation, coordinated deletion of both setup secrets, same-digest normal deployment, real import and device review. Evidence commit stays local; no further main push.
+
+
+## Safari Spotify handoff correction prepared — 14 November 2026
+
+Owner confirms unlock now works but Verify with Spotify does not navigate. Actual Safari reproduced the external POST redirect blocked by the setup page's `form-action self` CSP. Browser handling of redirects under this directive varies (https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/form-action). This is an application compatibility defect, not evidence of a bad token or server connection.
+
+Prepared a same-site response after the protected begin POST with an explicit Continue to Spotify link. The exact HTTPS Spotify authorisation host/path is checked and the link is HTML-escaped and no-referrer. CSP form-action self, strict Origin, CSRF, session-bound state/PKCE, owner verification and one-time closure remain intact. Updated HTTP regression assertions and the disposable database scenario's handoff parsing. Normal login already returns a JSON authorisation URL for navigation, rather than this native-form redirect.
+
+Actual installed Safari verification used the compiled setup server, real Setup/SpotifyTransport logic, an in-memory invented store and loopback mocked Spotify only: unlock → Verify with Spotify → Continue to Spotify → invented authorisation → callback → configured owner verified → confirmation → Setup completed and closed. The original blocked redirect was separately reproduced on loopback. No real token, consent, account or database was accessed by this verification. Both owned proof servers were stopped. Ignored local fixtures remain in .work. This is browser/in-memory evidence, not a new PostgreSQL/image rehearsal or an iPhone test.
+
+Full npm run check passed222 tests (zero failures), lint, types, project/lockfile checks and frontend/backend builds. Reviewed the correction and destination rejection cases as a technical-lead self-review, not independent assurance. No dependency, workflow, schema, credential or server setting changed. Constitution: bounded bug correction preserves the approved design and security protections; publication remains gated.
+
+Counters remain7/7 builds,10/10 disposable synthetic attempts,2/4 deploy requests. A concrete amendment is proposed in release-approval.md: two builds and two synthetic attempts for required PR/main checks, plus one additional corrective setup deployment, preserving the normal and corrective-normal slots. No push, merge, image execution or deploy until approved. After release, guide the owner through the new explicit link and private consent, then the existing same-digest normal-mode handoff and device review.
+
+
+## D071 execution preflight — 14 November 2026
+
+Owner approved the prepared correction and allowance extension. Working directory confirmed; only the five prepared correction/evidence files were modified. Read canonical authority, reviewed unchanged workflow and current remote main4af1396. Names-only secret inventory still contains the expected11 settings including both setup settings; latest release runs are complete/successful. No credential values accessed or settings changed. Counters begin7/9 builds,10/12 synthetic attempts,2/5 deployments. Existing full222-test and actual mocked Safari proof apply to unchanged runtime correction; foundation checks will validate the approval documentation before publication.

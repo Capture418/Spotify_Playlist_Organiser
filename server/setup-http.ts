@@ -51,7 +51,15 @@ export function setupServer(setup: Setup, canonical: string, health: () => Promi
       }
       if (req.method !== 'POST' || req.headers.origin !== canonical || req.headers['sec-fetch-site'] === 'cross-site') throw new Fault(403, 'Request rejected');
       if (url.pathname === '/setup/unlock') { const data = await form(req, ['token']); const session = await setup.unlock(data.get('token')!); res.setHeader('Set-Cookie', sessionCookie(session)); redirect('/'); return; }
-      if (url.pathname === '/setup/begin') { const data = await form(req, ['csrf']); redirect(await setup.begin(id, data.get('csrf')!)); return; }
+      if (url.pathname === '/setup/begin') {
+        const data = await form(req, ['csrf']);
+        const destination = new URL(await setup.begin(id, data.get('csrf')!));
+        if (destination.origin !== 'https://accounts.spotify.com' || destination.pathname !== '/authorize' || destination.username || destination.password || destination.hash) throw new Fault(403, 'Authorisation destination rejected');
+        const href = destination.href.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        // Keep form-action self: browsers can apply it to a POST's external redirects too.
+        // A deliberate link navigation carries only the existing PKCE request, never the POST body.
+        html(`<p>Your verification is ready. Continue to Spotify to review access, then return here.</p><a href="${href}" rel="noreferrer" referrerpolicy="no-referrer">Continue to Spotify</a>`); return;
+      }
       if (url.pathname === '/setup/confirm') { const data = await form(req, ['csrf','confirm']); await setup.confirm(id, data.get('csrf')!, data.get('confirm') === 'yes'); res.setHeader('Set-Cookie', sessionCookie('')); html('<p>Setup completed and closed. Remove setup mode and token together, then deploy normal mode. If that deployment fails, contact the operator promptly.</p>'); return; }
       throw new Fault(404, 'Not found');
     } catch (error) {
