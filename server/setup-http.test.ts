@@ -16,12 +16,13 @@ test('setup HTTP protects forms, suppresses secret errors, isolates routes and e
  }
  try{
   assert.equal((await request('/health','GET',{host:'127.0.0.1:3000','x-forwarded-proto':''})).status,200);healthy=false;assert.equal((await request('/health')).status,503);
-  const root=await request('/');assert.match(root.body,/type="password"/);assert.doesNotMatch(root.body,/Verify with Spotify/);assert.equal(root.headers['Referrer-Policy'],'no-referrer');
+  const root=await request('/');assert.match(root.body,/type="password"/);assert.doesNotMatch(root.body,/Verify with Spotify/);assert.equal(root.headers['Referrer-Policy'],'origin');
   assert.equal((await request('/?token=invented')).status,403);assert.equal((await request('/api/library')).status,403);
   assert.equal((await request('/setup/unlock','POST',{},'token=invented')).status,403);assert.equal(unlocked,0);
+  assert.equal((await request('/setup/unlock','POST',{origin:'null','content-type':'application/x-www-form-urlencoded'},'token=invented')).status,403);assert.equal(unlocked,0);
   const headers={origin:'https://music.example.invalid','content-type':'application/x-www-form-urlencoded'};
   assert.equal((await request('/setup/unlock','POST',headers,'token=a&token=b')).status,422);
   const ok=await request('/setup/unlock','POST',headers,'token=invented');assert.equal(ok.status,303);assert.match(String(ok.headers['Set-Cookie']),/Secure; HttpOnly; SameSite=Lax/);
-  const failed=await request('/callback?state=a&code=invented-private-code');assert.equal(failed.status,503);assert.doesNotMatch(failed.body,/invented-private-code/);
+  const failed=await request('/callback?state=a&code=invented-private-code');assert.equal(failed.status,503);assert.equal(failed.headers['Referrer-Policy'],'no-referrer');assert.doesNotMatch(failed.body,/invented-private-code/);
  }finally{server.removeAllListeners();}
 });
