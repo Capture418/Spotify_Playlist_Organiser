@@ -4,7 +4,7 @@ Updated: 14 November2026.
 
 ## Current status — pilot accepted (D073)
 
-Owner accepted the working pilot on14 November2026 after the recorded acceptance checks passed. Music Library Organiser is running in normal mode with read-only Spotify playlists/albums, persistent shared tags, Mac/iPhone access and the online-only Home Screen app. D074 local artwork implementation and tests completed; owner review and separate release approval pending.
+Owner accepted the working pilot on14 November2026 after the recorded acceptance checks passed. Music Library Organiser is running in normal mode with read-only Spotify playlists/albums, persistent shared tags, Mac/iPhone access and the online-only Home Screen app. D076 artwork release execution approved; CI/publication and device checks in progress.
 
 Final execution counters: **11/11 candidate builds,14/14 synthetic attempts,5/5 deploy requests**. All allowances are exhausted. Do not push evidence to main or trigger another release. Future work requires a separately scoped task and applicable approvals. Historical evidence below is retained; earlier pending statuses are superseded by D073.
 
@@ -690,3 +690,8 @@ No push, CI, Docker/database creation, install, merge or deployment. Prior count
 Owner accepts local artwork changes and requests preparation only. Confirmed clean initial tree, fetched maina0645c5, no open PRs and latest runs successful. Reviewed refreshed-base diff, unchanged workflows, additive cache field, explicit image CSP and logo packaging. Prepared docs/artwork-release-approval.md: expected PR/main two builds/tests, reserves for one corrective pair (max4/4; proposed lifetime15/18), initial/corrective/return-to-pilot max3 deployments (proposed lifetime8). Existing limits remain exhausted until approval.
 
 Added assertions to the existing disposable mocked-Spotify scenario for actual PG artwork persistence, public logo MIME, CSP and export exclusion so approved CI will exercise them. Only syntax/host foundation checks run in preparation; no image/database execution or claim of those new assertions passing against PG. Existing227-test gate remains historical D074 evidence. Real CDN/CORS/performance and Mac/iPhone artwork review remain explicit acceptance gates. No push, merge, secrets/settings change or deployment.
+
+
+## D076 artwork execution preflight
+
+Owner approves artwork release package. Clean initial tree; fetched unchanged maina0645c5, prior runs completed successfully, names-only inventory retains nine expected settings with setup settings absent. No secret values accessed. Current dependency audit checked before publication; no dependency installation or workflow change. Counters begin11/15 builds,14/18 synthetic attempts,5/8 deployments. Preserve exact reviewed initial PR/main sequence and bounded correction/rollback controls.

@@ -1,6 +1,6 @@
 # Artwork release approval package
 
-Status: **prepared, not approved for execution**. D074 permits local artwork implementation; D075 records owner satisfaction and this preparation request only. The accepted D073/D072 production release stays unchanged until explicit execution approval.
+Status: **approved for bounded execution under D076**. Owner explicitly approved this package using included allowance only. Proposed wording below records the approved limits; all exclusions and stop conditions remain binding.
 
 ## Candidate and review
 

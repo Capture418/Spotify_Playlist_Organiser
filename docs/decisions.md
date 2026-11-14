@@ -179,3 +179,8 @@ Owner approves direct artwork loading from Spotify image servers, local implemen
 ## D075 — Artwork accepted locally; release preparation requested
 
 Owner is happy with D074 artwork changes and requests one CI/deployment approval package with build/test allowance and real Mac/iPhone checks. Preparation only; no new execution resources, push, merge or deploy authorised. Proposed bounds and rollback in docs/artwork-release-approval.md remain unapproved until explicit owner acceptance.
+
+
+## D076 — Artwork release execution approved
+
+Owner explicitly approves docs/artwork-release-approval.md using included allowance only: up to four additional builds/four synthetic attempts (lifetime15/18), reviewed initial and bounded corrective PR/merge, and up to three additional deployments (lifetime8) including return to accepted pilot if needed. Existing credentials/settings retained; real Mac/iPhone artwork checks included. Package stop conditions and exclusions remain binding.
