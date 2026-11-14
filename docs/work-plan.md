@@ -6,7 +6,7 @@ Updated: 14 November2026.
 
 D069: owner approved [the remaining release package](release-approval.md). Execute the reviewed release PR, Linux CI and merge-triggered verified-image/setup deployment, then private setup and same-digest normal deployment. User confirms retained token/keys, registered HTTPS callback and included allowance with paid usage blocked.
 
-Current counters: **5/7 candidate builds,8/10 synthetic attempts,1/4 new deploy requests** (D070 extension approved). One successful hosted setup deployment is now verified; normal mode and live library/device checks remain pending. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
+Current counters: **7/7 candidate builds,10/10 synthetic attempts,2/4 new deploy requests** (D070 corrective setup deployed). Initial and corrective hosted setup deployments are verified; normal mode and live library/device checks remain pending. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
 
 ## Existing implementation
 
@@ -547,3 +547,14 @@ Release allowance blocker: lifetime builds5/6 leaves one, but the unchanged requ
 ## D070 corrective release authorised — 14 November 2026
 
 Owner approves the prepared Safari form correction, one extra build and corrective PR/merge/setup deployment. Counters begin5/7 builds,8/10 synthetic attempts,1/4 deploy requests. Remote main remainsb7a9d842605553b64276235682ad0fcd6d94f308; local corrective branch is clean before approval-record edits. Preserve full PR/main quality and image checks; no new credentials/settings or additional retry allowance.
+
+
+## D070 corrective setup deployment succeeded — 14 November 2026
+
+Corrective PR8 head6510a76b3013fe3d8e297e9a37b18f20684ac370 passed Linux CI43602519136, including full quality gate, image/synthetic verification and scoped cleanup. Exact passing head was merged with match-head protection at14:01:27UTC, producing main4af1396ae1eaced89c6a0fc4d91b7d6d813535b3.
+
+Automatic release43602681744 succeeded without a further user security prompt. Release job132470614230 passed quality, image build, synthetic checks, cleanup and verified publication. Corrective image: `ghcr.io/capture418/spotify_playlist_organiser@sha256:daec3941af596382a60394f296fed6965e001182c4240e19d1879aee7a5716fc`. Dependent deployment132470858387 succeeded with Migration complete, Application ready and deployed markers. No raw secret-bearing logs retained or shown.
+
+Live HTTPS verification: /health returned200 with ok status and no-referrer; / returned200 with setup unlock form and corrected `Referrer-Policy: origin`. No real token or OAuth submitted by the agent. User should open the root site afresh and retry the same saved setup token rather than reposting the cached error page. Credentials unchanged.
+
+Counters now7/7 builds,10/10 synthetic attempts,2/4 deployment requests. Build/test limits are exhausted; normal deployment and one corrective normal deployment remain authorised using the **new corrective digest above**, without rebuilding. Pending private owner setup/confirmation, coordinated deletion of both setup secrets, same-digest normal deployment, real import and device review. Evidence commit stays local; no further main push.
