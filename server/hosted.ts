@@ -26,7 +26,7 @@ export async function startHosted(env:NodeJS.ProcessEnv,deps:{pool:(c:PoolConfig
     const app=capacityPool(deps.pool({...config.databases.runtime,options:'-c search_path=public'}));pools.push(app);
     const jp=deps.pool({...config.journalDatabase,options:'-c search_path=public'});pools.push(jp);
     await bounded(controller.signal,async()=>{
-      const supportsGroups=await verifyTagGroupSchema(app);const identity=await verifyAppendJournal(jp);
+      const supportsGroups=await verifyTagGroupSchema(app);if(!supportsGroups)throw Error('Schema 004 required');const identity=await verifyAppendJournal(jp);
       const binding=await app.query('SELECT identity FROM public.hosted_journal_binding');
       if(binding.rows.length!==1||binding.rows[0].identity!==identity)throw Error('Journal binding mismatch');
       const journal=new AppendJournal(jp,new JsonCipher(config.journalKeys,config.snapshots.current,'journal'));

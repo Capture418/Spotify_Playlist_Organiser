@@ -8,7 +8,7 @@ import { createDemoLibrary } from './demo-library.ts';
 test('combined demo preserves eight original playlists and adds six invented albums', () => {
   const library = createDemoLibrary();
   assert.equal(library.items.length, 14);
-  assert.deepEqual(library.tags, fixture.tags);
+  assert.deepEqual(library.tags.map(({ id, name }) => ({ id, name })), fixture.tags);
   for (const original of fixture.playlists) {
     assert.deepEqual(library.items.find(item => item.id === `playlist:${original.id}`), {
       id: `playlist:${original.id}`, kind: 'playlist', title: original.title,
@@ -51,4 +51,15 @@ test('mounts do not share metadata, artist or annotation arrays', () => {
   const a = first.items.find(item => item.kind === 'album');
   const b = second.items.find(item => item.kind === 'album');
   assert.notEqual(a?.artists, b?.artists);
+});
+
+test('moving an ungrouped tag preserves its identity and all item assignments', () => {
+  const library = createDemoLibrary();
+  const tag = library.tags.find(candidate => !candidate.group)!;
+  const edited = applyTagEdit(library, {
+    mode: 'bulk', itemIds: [library.items[0]!.id], tagIds: [], newTags: [],
+    moves: [{ id: tag.id, group: 'Genre' }],
+  });
+  assert.deepEqual(edited.tags.find(candidate => candidate.id === tag.id), { ...tag, group: 'Genre' });
+  assert.deepEqual(edited.annotations, library.annotations);
 });
