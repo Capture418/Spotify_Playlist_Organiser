@@ -2,6 +2,8 @@
 
 Status: **approved for bounded execution under D069**. The owner explicitly approved this package, its build/test extension, reviewed PR/merge and bounded deployments, using included allowance only. Proposal wording below records the now-approved scope. This package supersedes conflicting execution instructions in the older pilot proposal. Hosting authority remains the unchanged [home hosting contract](home-hosting.md).
 
+**D070 amendment approved:** one additional candidate build raises the lifetime build cap to7. Owner approves the prepared setup-form correction PR/merge after CI and its corrective setup deployment. Test cap10 and deploy cap4 stay unchanged; included allowance only. The original table below records D069 bounds before this amendment.
+
 ## Outcome
 
 A working Music Library Organiser at the existing HTTPS site, with the existing owner's playlists and saved albums imported read-only, persistent shared tags usable on Mac and iPhone, and online-only Home Screen installation. No new infrastructure, scopes, account model or product features.

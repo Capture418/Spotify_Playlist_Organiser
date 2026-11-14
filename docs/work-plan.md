@@ -6,7 +6,7 @@ Updated: 14 November2026.
 
 D069: owner approved [the remaining release package](release-approval.md). Execute the reviewed release PR, Linux CI and merge-triggered verified-image/setup deployment, then private setup and same-digest normal deployment. User confirms retained token/keys, registered HTTPS callback and included allowance with paid usage blocked.
 
-Current counters: **5/6 candidate builds,8/10 synthetic attempts,1/4 new deploy requests**. One successful hosted setup deployment is now verified; normal mode and live library/device checks remain pending. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
+Current counters: **5/7 candidate builds,8/10 synthetic attempts,1/4 new deploy requests** (D070 extension approved). One successful hosted setup deployment is now verified; normal mode and live library/device checks remain pending. Count automatically triggered work; no unrelated main pushes. Follow the package for private handoffs, stop conditions and exclusions.
 
 ## Existing implementation
 
@@ -542,3 +542,8 @@ Owner reports generic error immediately after Unlock setup. Safari UI confirms /
 Prepared a minimal correction: HTML setup form pages use origin-only referrer policy; callback/error responses retain no-referrer. Strict canonical Origin rejection, cookie flags, CSRF/session/PKCE and secret-safe error output remain intact. Regression assertions cover form policy, rejection of null Origin before unlock, and callback error privacy. Full `npm run check` passed222 tests, lint/types/frontend/backend builds and project/lockfile checks; whitespace check passed. No image/DB rehearsal or deployment consumed.
 
 Release allowance blocker: lifetime builds5/6 leaves one, but the unchanged required PR verification plus main release needs two builds. Tests8/10 leave the required two attempts. The correction is prepared locally before asking for approval. Proposed narrow amendment: **one extra candidate build (lifetime cap7), one corrective PR/merge, and the already-budgeted corrective setup deployment**; test cap10 and deploy cap4 remain unchanged, included allowance only. No weakening/skipping PR image checks, no credential changes and no push until approved. The normal-mode handoff will use the newly verified corrective digest.
+
+
+## D070 corrective release authorised — 14 November 2026
+
+Owner approves the prepared Safari form correction, one extra build and corrective PR/merge/setup deployment. Counters begin5/7 builds,8/10 synthetic attempts,1/4 deploy requests. Remote main remainsb7a9d842605553b64276235682ad0fcd6d94f308; local corrective branch is clean before approval-record edits. Preserve full PR/main quality and image checks; no new credentials/settings or additional retry allowance.
