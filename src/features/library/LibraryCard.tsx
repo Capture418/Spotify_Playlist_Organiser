@@ -32,7 +32,7 @@ export function LibraryCard({ item, tags, selecting, selected, onSelect, onEdit 
         {!item.available && <p className="unavailable-note">Currently unavailable. Your tags are kept.</p>}
         {tags.length > 0 ? (
           <ul className="card-tags" aria-label={`Tags for ${item.title}`}>
-            {tags.map(tag => <li key={tag.id}>{tag.name}</li>)}
+            {tags.map(tag => <li key={tag.id} data-tag-group={tag.group ?? 'Ungrouped'} title={`${tag.group ?? 'Ungrouped'}: ${tag.name}`}>{tag.name}</li>)}
           </ul>
         ) : <p className="untagged">Not tagged yet</p>}
         {spotifyHref && <a href={spotifyHref} target="_blank" rel="noopener noreferrer" aria-label="View on Spotify"><img className="spotify-attribution" src="/spotify/logo-white.svg" alt="Spotify" width="80" /></a>}

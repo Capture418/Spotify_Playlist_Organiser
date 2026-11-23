@@ -244,3 +244,7 @@ The owner approved the [compatibility release package](tag-group-compatibility-r
 The owner approved the tag groups release package and production migration 004 using included allowance only. Lifetime caps are 25 builds, 28 disposable attempts and 13 deployment requests.
 
 The compatibility image was accepted under D094 after the owner confirmed the iPhone Safari and Home Screen checks passed on schema 003.
+
+## D097 — Tag group colours and release approved
+
+The owner approved muted green Genre, purple Occasion and blue Tempo shading on cards, filters and the tag editor, consistent with the existing dark theme, and requested deployment when ready. Ungrouped tags remain neutral grey. Preserve check marks, pressed semantics and a stronger selected outline. No organisation or schema changes. The requested normal release cycle is bounded to two image builds/two disposable CI attempts and one deployment, using included allowance only; cumulative caps become 27 builds/30 attempts/14 deployment requests (the unused prior rollback slot remains within the deployment cap). No settings, credentials or provisioning changes. Stop rather than retry outside these bounds.

@@ -108,7 +108,7 @@ export function LibraryScreen({ remote, connected = false, onReload, onRefresh, 
           <p className="search-hint" id="search-hint">Every word must match a title, tag or album artist.</p>
           <div className="filter-heading"><h2>Filter by tags</h2><span className="match-rule">Match all selected</span></div>
           <TagGroups tags={library.tags} selected={filterTags} renderTag={tag => (
-              <button key={tag.id} type="button" className="filter-chip" aria-pressed={filterTags.includes(tag.id)} onClick={() => toggleFilter(tag.id)}>
+              <button key={tag.id} type="button" className="filter-chip" data-tag-group={tag.group ?? 'Ungrouped'} title={`${tag.group ?? 'Ungrouped'}: ${tag.name}`} aria-pressed={filterTags.includes(tag.id)} onClick={() => toggleFilter(tag.id)}>
                 {filterTags.includes(tag.id) && <Icon name="check" />}{tag.name}
               </button>
           )} />

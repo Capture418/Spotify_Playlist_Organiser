@@ -125,7 +125,7 @@ export function TagEditor({ mode, items, tags, initialTagIds, returnFocus, onSav
         </div>
       )}
       <TagGroups tags={draftTags} selected={picked} renderTag={tag => (
-          <button key={tag.id} type="button" className="tag-choice" aria-pressed={picked.includes(tag.id)} disabled={busy || !!retry.current} onClick={() => toggleTag(tag.id)}>
+          <button key={tag.id} type="button" className="tag-choice" data-tag-group={tag.group ?? 'Ungrouped'} title={`${tag.group ?? 'Ungrouped'}: ${tag.name}`} aria-pressed={picked.includes(tag.id)} disabled={busy || !!retry.current} onClick={() => toggleTag(tag.id)}>
             {picked.includes(tag.id) && <Icon name="check" />}{tag.name}
           </button>
       )} />
