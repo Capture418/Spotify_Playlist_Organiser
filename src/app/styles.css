@@ -60,9 +60,42 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 .filter-heading h2 { font-size: 13px; font-weight: 600; }
 .match-rule { font-size: 11px; color: var(--muted); }
 .filter-tags { display: flex; flex-wrap: wrap; gap: 8px; }
-.filter-chip, .tag-choice { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: transparent; border: 1px solid #41463e; border-radius: 100px; padding: 9px 16px; min-height: 44px; font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; max-width: 100%; text-align: left; }
-.filter-chip:hover, .tag-choice:hover { background: var(--raised); border-color: #77816d; }
-.filter-chip[aria-pressed="true"], .tag-choice[aria-pressed="true"] { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+/* Group tints are shared by cards, filters and editor choices. */
+[data-tag-group] {
+  --tag-bg: #292c2e;
+  --tag-border: #454a4e;
+  --tag-text: #d8dcdf;
+  --tag-hover: #353a3f;
+  --tag-selected: #4b535a;
+  --tag-selected-border: #bbc4cb;
+}
+[data-tag-group="Genre"] {
+  --tag-bg: #243329;
+  --tag-border: #435d48;
+  --tag-text: #c5dfc5;
+  --tag-hover: #304738;
+  --tag-selected: #3b6047;
+  --tag-selected-border: #9bc6a4;
+}
+[data-tag-group="Occasion"] {
+  --tag-bg: #322a3c;
+  --tag-border: #5b486b;
+  --tag-text: #dfcdee;
+  --tag-hover: #43364f;
+  --tag-selected: #584369;
+  --tag-selected-border: #c9aae2;
+}
+[data-tag-group="Tempo"] {
+  --tag-bg: #25323f;
+  --tag-border: #425d74;
+  --tag-text: #c6ddef;
+  --tag-hover: #304355;
+  --tag-selected: #3a5771;
+  --tag-selected-border: #a0c6e7;
+}
+.filter-chip, .tag-choice { display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: var(--tag-text); background: var(--tag-bg); border: 1px solid var(--tag-border); border-radius: 100px; padding: 9px 16px; min-height: 44px; font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; max-width: 100%; text-align: left; }
+.filter-chip:hover:not(:disabled):not([aria-pressed="true"]), .tag-choice:hover:not(:disabled):not([aria-pressed="true"]) { background: var(--tag-hover); border-color: var(--tag-selected-border); }
+.filter-chip[aria-pressed="true"], .tag-choice[aria-pressed="true"] { color: var(--tag-text); background: var(--tag-selected); border-color: var(--tag-selected-border); box-shadow: inset 0 0 0 1px var(--tag-selected-border); font-weight: 600; }
 .filter-chip .icon, .tag-choice .icon { width: 15px; height: 15px; }
 .results-section { margin-top: 32px; }
 .results-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
@@ -111,7 +144,7 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 .card-content h3 { font-size: 16px; line-height: 1.35; font-weight: 600; letter-spacing: -.3px; overflow-wrap: anywhere; }
 .item-owner { margin: 5px 0 12px; color: var(--muted); font-size: 12px; }
 .card-tags { display: flex; align-content: flex-start; flex-wrap: wrap; gap: 5px; padding: 0; margin: 0 0 14px; list-style: none; min-height: 47px; }
-.card-tags li { background: #292e27; border: 1px solid #363e30; color: #d4ddc9; font-size: 12px; line-height: 1.4; padding: 4px 7px; border-radius: 5px; max-width: 100%; overflow-wrap: anywhere; }
+.card-tags li { background: var(--tag-bg); border: 1px solid var(--tag-border); color: var(--tag-text); font-size: 12px; line-height: 1.4; padding: 4px 7px; border-radius: 5px; max-width: 100%; overflow-wrap: anywhere; }
 .untagged { min-height: 47px; margin-bottom: 14px; color: var(--muted); font-size: 11px; font-style: italic; padding-top: 5px; }
 .card-actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: 0 8px; justify-content: space-between; align-items: center; border-top: 1px solid #343a2f; }
 .edit-button, .spotify-preview { display: inline-flex; align-items: center; gap: 5px; background: transparent; padding: 9px 0; min-height: 44px; font-size: 11px; white-space: nowrap; }
