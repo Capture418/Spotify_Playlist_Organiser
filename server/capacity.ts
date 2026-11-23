@@ -1,10 +1,17 @@
 import type { Pool, PoolClient } from 'pg';
 import { Fault } from './validation.ts';
 const tables='accounts sessions connections items metadata_cache tags assignments mutation_receipts restore_snapshots restore_previews collection_generations deletion_records recovery_guard hosted_journal_binding'.split(' ');
-export const capacitySQL='SELECT sum(bytes)::text AS bytes,sum(rows)::text AS rows FROM ('+tables.map(t=>`SELECT coalesce(sum(octet_length(row_to_json(t)::text)),0) AS bytes,count(*) AS rows FROM public.${t} t`).join(' UNION ALL ')+') sizes';
+export const maxStorageBytes=3*1024*1024;
+export const maxDumpDataBytes=4_000_000;
+export const maxStorageRows=12000;
+// JSON row text overcounts these fixed scalar/JSONB columns. Counting each
+// backslash once more also bounds COPY text escaping; reserve 1 MB for schema,
+// migration records, COPY headers and encryption within the host's 5 MB cap.
+export const capacitySQL='SELECT sum(bytes)::text AS bytes,sum(dump_bytes)::text AS dump_bytes,sum(rows)::text AS rows FROM ('+tables.map(t=>`SELECT coalesce(sum(octet_length(encoded)),0) AS bytes,coalesce(sum(2*octet_length(encoded)-octet_length(replace(encoded,chr(92),''))),0) AS dump_bytes,count(*) AS rows FROM public.${t} t CROSS JOIN LATERAL (SELECT row_to_json(t)::text AS encoded) row_data`).join(' UNION ALL ')+') sizes';
 export async function checkCapacity(client:Pick<PoolClient,'query'>){
-  const r=await client.query(capacitySQL);
-  if(Number(r.rows[0].bytes)>1024*1024||Number(r.rows[0].rows)>12000)throw new Fault(507,'Storage capacity reached; export your organisation and contact the operator');
+  const r=await client.query(capacitySQL),usage=r.rows[0];
+  const values=[Number(usage?.bytes),Number(usage?.dump_bytes),Number(usage?.rows)] as const;
+  if(values.some(value=>!Number.isSafeInteger(value)||value<0)||values[0]>maxStorageBytes||values[1]>maxDumpDataBytes||values[2]>maxStorageRows)throw new Fault(507,'Storage capacity reached; export your organisation and contact the operator');
 }
 /** Serialize application writes and check before commit. Failed capacity checks roll back, never prune. */
 export function capacityPool(pool:Pool):Pool {

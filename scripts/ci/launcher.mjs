@@ -226,17 +226,21 @@ export function launcher(config, execute, save, state = { owner: config.owner, r
     await run(['start',state.db]);await wait(async()=>await health(first.c)===200,pause);
     await stop(first.c);
     const dump=await run(['exec',state.db,'pg_dump','-U','postgres','--clean','--if-exists','-d','music']);
-    assert.match(dump,/PostgreSQL database dump/);assert.ok(Buffer.byteLength(dump)<5*1024*1024,'App dump exceeds host limit');
+    assert.match(dump,/PostgreSQL database dump/);assert.ok(Buffer.byteLength(dump)<5_000_000,'App dump exceeds host limit');
     // Exercise a populated dump near the conservative capacity budget, then restore the empty fixture.
-    await sql('music',"INSERT INTO accounts(id,binding,generation) VALUES('11111111-1111-4111-8111-111111111111','invented-capacity','22222222-2222-4222-8222-222222222222'); INSERT INTO mutation_receipts VALUES('11111111-1111-4111-8111-111111111111','33333333-3333-4333-8333-333333333333','invented',jsonb_build_object('padding',repeat('x',900000)),1)");
+    await sql('music',"INSERT INTO accounts(id,binding,generation) VALUES('11111111-1111-4111-8111-111111111111','invented-capacity','22222222-2222-4222-8222-222222222222'); INSERT INTO mutation_receipts VALUES('11111111-1111-4111-8111-111111111111','33333333-3333-4333-8333-333333333333','invented',jsonb_build_object('padding',repeat('x',3100000)),1)");
     const populated=await run(['exec',state.db,'pg_dump','-U','postgres','--clean','--if-exists','-d','music']);
-    assert.ok(Buffer.byteLength(populated)<5*1024*1024);report(`PASS populated app dump: ${Buffer.byteLength(populated)} bytes with 900000-byte synthetic payload`);
+    assert.ok(Buffer.byteLength(populated)<4_000_000);report(`PASS populated app dump: ${Buffer.byteLength(populated)} bytes with 3100000-byte synthetic payload`);
+    await sql('music',null,dump);
+    await sql('music',"INSERT INTO accounts(id,binding,generation) VALUES('11111111-1111-4111-8111-111111111111','invented-capacity','22222222-2222-4222-8222-222222222222'); INSERT INTO mutation_receipts VALUES('11111111-1111-4111-8111-111111111111','33333333-3333-4333-8333-333333333333','invented',jsonb_build_object('padding',repeat(chr(92),900000)),1)");
+    const escaped=await run(['exec',state.db,'pg_dump','-U','postgres','--clean','--if-exists','-d','music']);
+    assert.ok(Buffer.byteLength(escaped)<4_000_000);report(`PASS COPY-escaped app dump: ${Buffer.byteLength(escaped)} bytes with 900000 synthetic backslashes`);
     await sql('music',null,dump);
     const connected=await create('container',['--name',`${config.owner}-connected`,...constraints,'--network',config.network,
       '-e','CONNECTED_DISPOSABLE=synthetic-only','--mount',`type=bind,src=${resolve(config.root,'scripts/database/connected.mjs')},dst=/app/verification/connected.mjs,readonly`,
       '--entrypoint','node',config.image,'/app/verification/connected.mjs']);
     const scenarios=await run(['start','-a',connected.id]);report(scenarios);assert.equal((await verify(connected)).State.ExitCode,0,'Connected scenarios failed');await remove(connected);
-    const journalDump=await run(['exec',state.db,'pg_dump','-U','postgres','--clean','--if-exists','-d','music_journal']);assert.ok(Buffer.byteLength(journalDump)<5*1024*1024,'Journal dump exceeds host limit');report(`PASS measured dumps: app ${Buffer.byteLength(dump)} bytes; journal ${Buffer.byteLength(journalDump)} bytes`);
+    const journalDump=await run(['exec',state.db,'pg_dump','-U','postgres','--clean','--if-exists','-d','music_journal']);assert.ok(Buffer.byteLength(journalDump)<5_000_000,'Journal dump exceeds host limit');report(`PASS measured dumps: app ${Buffer.byteLength(dump)} bytes; journal ${Buffer.byteLength(journalDump)} bytes`);
     assert.match(await sql('music','SELECT count(*) FROM deletion_records'),/1/);
     await sql('music',null,dump);
     assert.match(await sql('music','SELECT count(*) FROM deletion_records'),/0/);

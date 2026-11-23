@@ -248,3 +248,11 @@ The compatibility image was accepted under D094 after the owner confirmed the iP
 ## D097 — Tag group colours and release approved
 
 The owner approved muted green Genre, purple Occasion and blue Tempo shading on cards, filters and the tag editor, consistent with the existing dark theme, and requested deployment when ready. Ungrouped tags remain neutral grey. Preserve check marks, pressed semantics and a stronger selected outline. No organisation or schema changes. The requested normal release cycle is bounded to two image builds/two disposable CI attempts and one deployment, using included allowance only; cumulative caps become 27 builds/30 attempts/14 deployment requests (the unused prior rollback slot remains within the deployment cap). No settings, credentials or provisioning changes. Stop rather than retry outside these bounds.
+
+## D098 — 3 MiB storage preparation requested
+
+Owner requested increasing the app’s storage limit from 1 MiB to 3 MB. Prepare a 3 MiB (3,145,728-byte) row-data ceiling, retaining 12,000 rows and the host’s 5,000,000-byte backup cap. Add a conservative escaped dump-data ceiling of 4,000,000 bytes to reserve room for schema/encryption overhead. No retention pruning, migrations, credentials or host changes. Actual PostgreSQL 16 verification and release execution require a separate allowance; the colour release allowance is consumed.
+
+## D099 — Storage release and remaining tempo work approved
+
+Owner explicitly approved docs/capacity-release-approval.md using included allowance only: two image builds/two disposable PostgreSQL 16 attempts, reviewed branch/PR/exact-passing-head merge, one planned deployment and one conditional rollback within lifetime caps29/32/15. Complete the previously approved selective tempo assignments only after verification. Package stop conditions, rollback-floor constraint and exclusions remain binding.
