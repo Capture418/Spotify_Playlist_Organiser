@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
 import type {Pool,PoolClient} from 'pg';
 import {hostedConfig,migrationConfig} from './hosted-config.ts';
-import {checkCapacity,capacityPool} from './capacity.ts';
+import {checkCapacity,capacityPool,maxStorageBytes,maxDumpDataBytes,maxStorageRows} from './capacity.ts';
 import {JsonCipher} from './lifecycle.ts';
 import {AppendJournal} from './append-journal.ts';
 import {startHosted} from './hosted.ts';
@@ -31,11 +31,18 @@ test('HTTP requires explicit local entry and exact loopback origin',()=>{
 });
 test('capacity overflow rolls back existing writes and releases the connection',async()=>{
  const calls:string[]=[];
- const client={query:async(sql:string)=>{calls.push(sql);return {rows:[{bytes:1048577,rows:10}]};},release:()=>calls.push('release')};
+ const client={query:async(sql:string)=>{calls.push(sql);return {rows:[{bytes:maxStorageBytes+1,dump_bytes:100,rows:10}]};},release:()=>calls.push('release')};
  const pool=capacityPool({connect:async()=>client} as unknown as Pool);
  await assert.rejects(pool.query('INSERT INTO items VALUES (1)'),/Storage capacity/);
  assert.ok(calls.includes('ROLLBACK'));assert.ok(!calls.includes('COMMIT'));assert.equal(calls.at(-1),'release');
- await assert.rejects(checkCapacity({query:async()=>({rows:[{bytes:10,rows:12001}]})} as unknown as PoolClient));
+ await assert.rejects(checkCapacity({query:async()=>({rows:[{bytes:10,dump_bytes:10,rows:12001}]})} as unknown as PoolClient));
+});
+test('3 MiB storage, escaped dump allowance and row count have independent inclusive limits',async()=>{
+ const usage=(bytes:unknown,dump_bytes:unknown,rows:unknown)=>({query:async()=>({rows:[{bytes,dump_bytes,rows}]})}) as unknown as PoolClient;
+ await checkCapacity(usage(maxStorageBytes,maxDumpDataBytes,maxStorageRows));
+ await checkCapacity(usage(1_500_000,1_600_000,100));
+ for(const values of [[maxStorageBytes+1,100,1],[100,maxDumpDataBytes+1,1],[100,100,maxStorageRows+1],[undefined,100,1],[100,undefined,1],[100,100,undefined],[-1,100,1],['invalid',100,1]])
+  await assert.rejects(checkCapacity(usage(...values as [unknown,unknown,unknown])),/Storage capacity/);
 });
 test('append journal retries immutable inserts without UPDATE or DELETE',async()=>{
  const c=hostedConfig(env),cipher=new JsonCipher(c.journalKeys,'v1','journal'),calls:string[]=[];

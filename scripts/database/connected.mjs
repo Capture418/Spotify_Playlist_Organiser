@@ -5,7 +5,7 @@ import { request } from 'node:http';
 import { Pool } from 'pg';
 import { startHosted } from '../runtime/server/hosted.js';
 import { hostedConfig } from '../runtime/server/hosted-config.js';
-import {capacityPool} from '../runtime/server/capacity.js';
+import {capacityPool,checkCapacity,capacitySQL} from '../runtime/server/capacity.js';
 import { SCOPES } from '../runtime/server/security.js';
 assert.equal(process.env.CONNECTED_DISPOSABLE,'synthetic-only');
 assert.equal(process.getuid(),1000);assert.equal(process.arch,'x64');
@@ -97,7 +97,22 @@ try{
  state=await get('/api/library',b);assert.equal(state.library.tags.length,1);assert.ok(state.library.annotations.every(x=>x.tagIds.length===1));
  const exported=await get('/api/export',a);assert.doesNotMatch(JSON.stringify(exported),/artworkUrl|scdn\.co/);mode='fail';assert.equal((await http('/api/refresh',a,{})).status,503);mode='ok';assert.deepEqual(await get('/api/export',a),exported);await post('/api/refresh',a,{});assert.deepEqual((await get('/api/export',a)).annotations,exported.annotations);
  const old=a;a=await login(a);assert.equal((await http('/api/session',old)).status,401);assert.equal((await http('/api/session',b)).status,200);
- await assert.rejects(capacityPool(runtime).query("UPDATE metadata_cache SET payload=jsonb_build_object('oversized',repeat('x',1100000))"),/Storage capacity/);
+ const capacityTarget=(await runtime.query('SELECT account_id,kind,spotify_id,payload FROM metadata_cache ORDER BY account_id,kind,spotify_id LIMIT 1')).rows[0];
+ const target=[capacityTarget.account_id,capacityTarget.kind,capacityTarget.spotify_id];
+ const update="UPDATE metadata_cache SET payload=jsonb_build_object('invented-padding',repeat($4::text,$5::int)) WHERE account_id=$1 AND kind=$2 AND spotify_id=$3";
+ const guarded=capacityPool(runtime);
+ await guarded.query(update,[...target,'x',1_500_000]);
+ await guarded.query('UPDATE metadata_cache SET payload=$4 WHERE account_id=$1 AND kind=$2 AND spotify_id=$3',[...target,capacityTarget.payload]);
+ await assert.rejects(guarded.query(update,[...target,'x',3_200_000]),/Storage capacity/);
+ // A heavily escaped value fits the 3 MiB row budget but would exceed the dump allowance.
+ const probe=await runtime.connect();
+ try{await probe.query('BEGIN');await probe.query(update,[...target,String.fromCharCode(92),1_400_000]);
+  const usage=(await probe.query(capacitySQL)).rows[0];assert.ok(Number(usage.bytes)<3*1024*1024);assert.ok(Number(usage.dump_bytes)>4_000_000);
+  await assert.rejects(checkCapacity(probe),/Storage capacity/);
+ }finally{await probe.query('ROLLBACK');probe.release();}
+ await assert.rejects(guarded.query(update,[...target,String.fromCharCode(92),1_400_000]),/Storage capacity/);
+ assert.deepEqual((await runtime.query('SELECT payload FROM metadata_cache WHERE account_id=$1 AND kind=$2 AND spotify_id=$3',target)).rows[0].payload,capacityTarget.payload);
+ console.log('PASS 1.5 MB write accepted; row-byte and escaped-dump overflow rolled back');
  assert.deepEqual((await get('/api/export',a)).annotations,exported.annotations);
  console.log('PASS oversized write rolled back without losing organisation');
  console.log('PASS shared playlist/album tags, cross-session conflict, failed refresh preservation and reconnect rotation');
