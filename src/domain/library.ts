@@ -41,7 +41,7 @@ export type Library = Readonly<{
   tags: readonly Tag[];
   annotations: readonly Annotation[];
 }>;
-export type Filters = Readonly<{ query: string; tagIds: readonly string[]; kind?: ItemKind | 'all'; showUnavailable?: boolean }>;
+export type Filters = Readonly<{ query: string; tagIds: readonly string[]; kind?: ItemKind | 'all'; showUnavailable?: boolean; untaggedOnly?: boolean; tagMatch?: 'all' | 'any' }>;
 export type TagEdit = Readonly<{
   mode: 'single' | 'bulk';
   itemIds: readonly string[];
@@ -67,7 +67,7 @@ export function tagsFor(library: Library, itemId: string): readonly Tag[] {
   return library.tags.filter(tag => ids.has(tag.id));
 }
 
-/** Type AND every chip AND every query word; album artists are searchable too. */
+/** Type, availability, tag matching and every query word combine; empty tag selection is unrestricted. */
 export function filterItems(library: Library, filters: Filters): readonly LibraryItem[] {
   const tags = new Map(library.tags.map(tag => [tag.id, normalise(tag.name)]));
   if (filters.tagIds.some(id => !tags.has(id))) return [];
@@ -78,7 +78,13 @@ export function filterItems(library: Library, filters: Filters): readonly Librar
     if (filters.kind && filters.kind !== 'all' && item.kind !== filters.kind) return false;
     if (!filters.showUnavailable && !item.available) return false;
     const attached = annotations.get(item.id) ?? [];
-    if (!filters.tagIds.every(id => attached.includes(id))) return false;
+    if (filters.untaggedOnly && attached.length > 0) return false;
+    if (filters.tagIds.length > 0) {
+      const matches = filters.tagMatch === 'any'
+        ? filters.tagIds.some(id => attached.includes(id))
+        : filters.tagIds.every(id => attached.includes(id));
+      if (!matches) return false;
+    }
     const fields = [normalise(item.title), ...attached.map(id => tags.get(id) ?? ''),
       ...(item.kind === 'album' ? item.artists.map(normalise) : [])];
     return words.every(word => fields.some(field => field.includes(word)));
