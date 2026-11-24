@@ -296,3 +296,62 @@ test('unavailable items retain editable tags and still obey type/search/chip fil
   assert.deepEqual(tagIdsFor(restored, 'album:demo-006'), ['tag-jazz']);
   assert.equal(filterItems(restored, { ...filters, showUnavailable: false }).length, 1);
 });
+
+test('Any tags returns the union across albums and playlists, while All remains the default', () => {
+  const library = createDemoLibrary();
+  const selected = { query: '', tagIds: ['tag-soul', 'tag-dance'] };
+  assert.deepEqual(filterItems(library, selected), []);
+  assert.deepEqual(filterItems(library, { ...selected, tagMatch: 'all' }), []);
+  assert.deepEqual(filterItems(library, { ...selected, tagMatch: 'any' }).map(item => item.id).sort(),
+    ['album:demo-003', 'playlist:demo-002', 'playlist:demo-003', 'playlist:demo-005']);
+});
+
+test('Any tags does not duplicate items matching multiple or repeated selections', () => {
+  const result = filterItems(createDemoLibrary(), { query: '', tagIds: ['tag-evening', 'tag-soul', 'tag-evening'], tagMatch: 'any' });
+  assert.equal(result.filter(item => item.id === 'playlist:demo-002').length, 1);
+  assert.equal(result.length, 6);
+});
+
+test('Any with no selected tags stays unrestricted and never changes the library', () => {
+  const library = createDemoLibrary(), before = structuredClone(library);
+  assert.deepEqual(filterItems(library, { query: '', tagIds: [], tagMatch: 'any' }), filterItems(library, { query: '', tagIds: [] }));
+  assert.deepEqual(library, before);
+});
+
+test('Any tags still rejects unknown selections rather than widening results', () => {
+  assert.deepEqual(filterItems(createDemoLibrary(), { query: '', tagIds: ['tag-soul', 'unknown'], tagMatch: 'any' }), []);
+});
+
+test('Any tags still combines with every search word, type and availability', () => {
+  const library = createDemoLibrary();
+  const filters = { query: 'mira amber', tagIds: ['tag-evening', 'tag-dance'], tagMatch: 'any' as const, kind: 'album' as const };
+  assert.deepEqual(filterItems(library, filters).map(item => item.id), ['album:demo-001', 'album:demo-002']);
+  assert.deepEqual(filterItems(library, { ...filters, kind: 'playlist' }), []);
+  const unavailable = { query: 'mira faded', tagIds: ['tag-soul', 'tag-dance'], tagMatch: 'any' as const };
+  assert.deepEqual(filterItems(library, unavailable), []);
+  assert.deepEqual(filterItems(library, { ...unavailable, showUnavailable: true }).map(item => item.id), ['album:demo-006']);
+});
+
+test('Untagged means no assignments in any group, including absent annotation records', () => {
+  const library = createDemoLibrary();
+  assert.deepEqual(filterItems(library, { query: '', tagIds: [], untaggedOnly: true }).map(item => item.id).sort(), ['album:demo-005', 'playlist:demo-008']);
+  const missing = { ...library, annotations: library.annotations.filter(annotation => annotation.itemId !== 'album:demo-001') };
+  assert.deepEqual(filterItems(missing, { query: '', tagIds: [], untaggedOnly: true }).map(item => item.id).sort(), ['album:demo-001', 'album:demo-005', 'playlist:demo-008']);
+});
+
+test('Untagged combines with text, type and availability without treating ungrouped tags as empty', () => {
+  const library = createDemoLibrary();
+  assert.deepEqual(filterItems(library, { query: 'sunday', tagIds: [], untaggedOnly: true, kind: 'album' }).map(item => item.id), ['album:demo-005']);
+  assert.deepEqual(filterItems(library, { query: 'new', tagIds: [], untaggedOnly: true, kind: 'album' }), []);
+  const untagged = applyTagEdit(library, edit({ itemIds: ['album:demo-006'], tagIds: [] }));
+  const filters = { query: 'faded', tagIds: [], untaggedOnly: true };
+  assert.deepEqual(filterItems(untagged, filters), []);
+  assert.deepEqual(filterItems(untagged, { ...filters, showUnavailable: true }).map(item => item.id), ['album:demo-006']);
+});
+
+test('a newly tagged item leaves the Untagged view while unrelated organisation stays intact', () => {
+  const library = createDemoLibrary();
+  const changed = applyTagEdit(library, edit({ itemIds: ['playlist:demo-008'], tagIds: ['tag-soul'] }));
+  assert.deepEqual(filterItems(changed, { query: '', tagIds: [], untaggedOnly: true }).map(item => item.id), ['album:demo-005']);
+  assert.deepEqual(tagIdsFor(changed, 'playlist:demo-002'), tagIdsFor(library, 'playlist:demo-002'));
+});

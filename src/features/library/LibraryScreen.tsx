@@ -19,14 +19,16 @@ export function LibraryScreen({ remote, connected = false, onReload, onRefresh, 
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState<ItemKind | 'all'>('all');
   const [showUnavailable, setShowUnavailable] = useState(false);
+  const [untaggedOnly, setUntaggedOnly] = useState(false);
+  const [tagMatch, setTagMatch] = useState<'all' | 'any'>('all');
   const [filterTags, setFilterTags] = useState<readonly string[]>([]);
   const [selecting, setSelecting] = useState(false);
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [editor, setEditor] = useState<EditorTarget | null>(null);
   const [feedback, setFeedback] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
-  const visible = filterItems(library, { query, tagIds: filterTags, kind, showUnavailable });
-  const hasFilters = kind !== 'all' || query.trim().length > 0 || filterTags.length > 0;
+  const visible = filterItems(library, { query, tagIds: filterTags, kind, showUnavailable, untaggedOnly, tagMatch });
+  const hasFilters = kind !== 'all' || query.trim().length > 0 || filterTags.length > 0 || untaggedOnly || tagMatch !== 'all';
   const visibleIds = new Set(visible.map(item => item.id));
   const hiddenSelected = selected.filter(id => !visibleIds.has(id)).length;
   const editorItems = editor ? library.items.filter(item => editor.itemIds.includes(item.id)) : [];
@@ -34,11 +36,14 @@ export function LibraryScreen({ remote, connected = false, onReload, onRefresh, 
   function clearFilters() {
     setQuery('');
     setKind('all');
+    setUntaggedOnly(false);
+    setTagMatch('all');
     setFilterTags([]);
     setFeedback('');
   }
 
   function toggleFilter(id: string) {
+    setUntaggedOnly(false);
     setFilterTags(previous => previous.includes(id) ? previous.filter(item => item !== id) : [...previous, id]);
     setFeedback('');
   }
@@ -106,16 +111,36 @@ export function LibraryScreen({ remote, connected = false, onReload, onRefresh, 
             {query && <button type="button" className="icon-button" aria-label="Clear search" onClick={() => { setQuery(''); searchRef.current?.focus(); }}><Icon name="close" /></button>}
           </div>
           <p className="search-hint" id="search-hint">Every word must match a title, tag or album artist.</p>
-          <div className="filter-heading"><h2>Filter by tags</h2><span className="match-rule">Match all selected</span></div>
+          <div className="library-options">
+            <label className="availability-control">
+              <input type="checkbox" checked={untaggedOnly} onChange={event => {
+                setUntaggedOnly(event.target.checked);
+                if (event.target.checked) setFilterTags([]);
+                setFeedback('');
+              }} />
+              Untagged only
+            </label>
+            <label className="availability-control">
+              <input type="checkbox" checked={showUnavailable} onChange={event => setShowUnavailable(event.target.checked)} />
+              Show unavailable ({library.items.filter(item => !item.available).length})
+            </label>
+          </div>
+          <div className="filter-heading">
+            <h2>Filter by tags</h2>
+            <div className="tag-match-switch" role="group" aria-label="Tag matching">
+              {(['all', 'any'] as const).map(value => <button key={value} type="button" className="view-button"
+                aria-pressed={tagMatch === value} onClick={() => { setTagMatch(value); setFeedback(''); }}>
+                {value === 'all' ? 'All (AND)' : 'Any (OR)'}
+              </button>)}
+            </div>
+          </div>
+          <p className="match-rule">{untaggedOnly ? 'Showing items with no tags. Selecting a tag turns this off.' : tagMatch === 'all' ? 'Match all selected tags.' : 'Match any selected tag.'}</p>
           <TagGroups tags={library.tags} selected={filterTags} renderTag={tag => (
               <button key={tag.id} type="button" className="filter-chip" data-tag-group={tag.group ?? 'Ungrouped'} title={`${tag.group ?? 'Ungrouped'}: ${tag.name}`} aria-pressed={filterTags.includes(tag.id)} onClick={() => toggleFilter(tag.id)}>
                 {filterTags.includes(tag.id) && <Icon name="check" />}{tag.name}
               </button>
           )} />
-        <label className="availability-control">
-            <input type="checkbox" checked={showUnavailable} onChange={event => setShowUnavailable(event.target.checked)} />
-            Show unavailable ({library.items.filter(item => !item.available).length})
-          </label>
+
         </section>
         <section aria-labelledby="results-title" className="results-section">
           <div className="results-toolbar">
@@ -146,7 +171,7 @@ export function LibraryScreen({ remote, connected = false, onReload, onRefresh, 
             <div className="empty-state">
               <div className="empty-icon"><Icon name="search" /></div>
               <h3>No items match yet.</h3>
-              <p>Try removing a tag or using fewer words. Selected tags must all match.</p>
+              <p>{untaggedOnly ? 'No untagged items match this view. Try clearing the search or changing the library type.' : tagMatch === 'any' ? 'Try different tags or fewer search words. Any selected tag can match.' : 'Try removing a tag or using fewer words. Selected tags must all match.'}</p>
               <button type="button" className="primary-button" onClick={clearFilters}>Clear all filters</button>
             </div>
           )}

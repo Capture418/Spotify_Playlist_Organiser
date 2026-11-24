@@ -256,3 +256,15 @@ Owner requested increasing the app’s storage limit from 1 MiB to 3 MB. Prepare
 ## D099 — Storage release and remaining tempo work approved
 
 Owner explicitly approved docs/capacity-release-approval.md using included allowance only: two image builds/two disposable PostgreSQL 16 attempts, reviewed branch/PR/exact-passing-head merge, one planned deployment and one conditional rollback within lifetime caps29/32/15. Complete the previously approved selective tempo assignments only after verification. Package stop conditions, rollback-floor constraint and exclusions remain binding.
+
+## D100 — Storage release and tempo tagging accepted — 24 November 2026
+
+Owner explicitly accepted the deployed D099 storage release and completed selective tempo tagging. Detailed release and private-data verification evidence remains local. No additional device checks are inferred. Acceptance does not itself authorise another release.
+
+## D101 — Untagged and All/Any filters requested locally
+
+Owner requested an untagged-items toggle and AND/OR tag matching for albums/playlists. Implement Untagged only (no tag in any group) and All (AND)/Any (OR), defaulting to existing All semantics. Both combine with literal all-word search, item type and availability. Checking Untagged clears tag selections; selecting a tag exits Untagged. Empty tag selection is unrestricted in either mode. Existing sorting and explicit bulk selections stay unchanged. Clear filters resets the new controls. Local implementation and invented-data verification only; no release execution approved.
+
+## D102 — Library filter deployment approved
+
+Owner explicitly requested deployment of the reviewed Untagged only and All/Any controls. Authorised the necessary normal reviewed branch/PR, exact-passing-head merge and main release within included allowance only. Bound this task to two image builds/two disposable PostgreSQL16 attempts and one planned deployment; no extra retry/build without approval. Starting consumption29 builds/32 attempts/14 deployments; cumulative caps31/34/16 retain the existing one conditional rollback reserve without stacking it. Rollback must use the accepted capacity-aware D099 image. No dependency versions, schema, credentials, settings, server provisioning or organisation changes. Stop on failed checks or uncertain integrity.

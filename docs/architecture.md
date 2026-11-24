@@ -10,7 +10,7 @@ This public summary describes the implemented development snapshot. It excludes 
 
 ## Product and interface
 
-One responsive React/TypeScript/Vite app with plain CSS. A dark single-screen library combines playlists and saved albums, keeping editions separate by Spotify identity. Default All view, optional type/availability filters, title ordering, match-all tags and all-word literal search. Album artist names are searchable. Tags are shared across item types; annotations use type-qualified IDs rather than titles.
+One responsive React/TypeScript/Vite app with plain CSS. A dark single-screen library combines playlists and saved albums, keeping editions separate by Spotify identity. Default All view, optional type/availability and Untagged-only filters, title ordering, All (AND) or Any (OR) selected-tag matching and all-word literal search. All is the default; no selected tags is unrestricted in either mode. Untagged means no assignment in any group; enabling it clears selected tags, and selecting a tag turns it off. Text/type/availability still combine with the chosen tag mode. Album artist names are searchable. Tags are shared across item types; annotations use type-qualified IDs rather than titles.
 
 Single edits replace one item's assignments; bulk edits add tags to explicitly selected items and preserve existing tags. Demo state is React memory and resets on reload. The synthetic remote adapter confirms saves only after server acknowledgement, preserves failed drafts and detects revision conflicts. Cancelling does not write; retries retain mutation identity.
 

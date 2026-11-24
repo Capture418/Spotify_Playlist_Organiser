@@ -798,3 +798,23 @@ Full installed-host gate passed 230 tests, lint, type checks, lockfile/project c
 ## D099 — Approved execution preflight
 
 Remote main remains deployed c30dbcb; no open PR or active run was found. Normal setting names are present and setup settings absent; no values were read. Diff self-review and whitespace checks passed. Workflows, dependencies and applied migrations are unchanged. Prior full local gate passed all 230 tests. Starting consumption is27 builds/30 disposable attempts/13 deployments. Owner approved included allowance only and continuation through final tempo verification.
+
+## D100 — Storage release and tempo tagging accepted — 24 November 2026
+
+Owner explicitly accepted the deployed D099 storage release and completed selective tempo tagging. Detailed release and private-data verification evidence remains local. No additional device checks are inferred. Acceptance does not itself authorise another release.
+
+## D101 — Local filter controls
+
+Implement Untagged only and All/Any selected-tag matching in the shared library screen/domain, preserving sorting, group colours, query/type/availability conjunction and explicit bulk targets. Verify OR union/deduplication and empty-selection behaviour, unknown-ID rejection, untagged coverage across groups/missing annotations and disappearance after a saved tag. Review invented desktop/mobile and keyboard behaviour. Files: domain library/types/tests, LibraryScreen, styles and canonical notes. No dependency, storage, network, schema or deployment changes.
+
+## D101 — Local filters verified; review pending
+
+Implemented Untagged only and All (AND)/Any (OR) in the shared demo/connected screen. Untagged covers empty or missing annotations across every group; checking it clears selected chips, and choosing a chip exits Untagged. All remains the default; Any unions selected tags without duplicates, while no selected tags remains unrestricted. Unknown selected IDs still reject results. Search retains all-word literal matching and combines with type/availability. Clear filters resets the new controls. Existing alphabetical ordering and explicit bulk targets are preserved.
+
+Full installed-host gate passed238 tests, lint, types, foundation/lockfile checks and client/server builds. Invented-data browser checks verified two untagged items, then one after saving a tag; focus returned to search after the edited card disappeared. Soul+Dance produced zero results in All and four in Any; text/type further narrowed those results. Untagged cleared chip selections, choosing a chip turned it off, and Clear restored default All matching. Desktop1280 and phone390 CSS-pixel layouts had no horizontal overflow; matching buttons retained44-pixel height and Space activated the switch with a visible3-pixel focus outline. Selecting four OR results, switching to AND and opening the bulk editor preserved exactly those four targets. Cancelled that draft, cleared filters, reset the viewport, closed the temporary browser tab and stopped the demo. No native iPhone, hosted CI, database/container execution, installation, push, merge or deployment was performed.
+
+D100 acceptance was recorded in the main checkout and prior capacity worktree as requested; no unreported device checks were inferred. This local candidate lives on codex/library-filter-options in .work/library-filters. Scoped source changes are also copied into the main checkout only where they match the deployed base, preserving unrelated work. The remaining release reserve is not an allowance for this new feature: any CI/release execution still needs its own approved package.
+
+## D102 — Filter release preflight
+
+Owner requested deployment. Candidate base matches accepted production main; no open PR or active release was found. Normal-mode setting names are unchanged and setup settings absent; values were not read. Self-review confirmed the application diff is limited to shared frontend filtering/UI/styles and its regression tests. Server, applied migrations, workflows and dependency versions are unchanged. Prior local gate passed238 tests and desktop/phone/keyboard review; release CI repeats the gate and disposable PostgreSQL16 verification. Publish only sanitised acceptance/scope notes; detailed operational evidence remains local.
