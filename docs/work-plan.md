@@ -818,3 +818,17 @@ D100 acceptance was recorded in the main checkout and prior capacity worktree as
 ## D102 — Filter release preflight
 
 Owner requested deployment. Candidate base matches accepted production main; no open PR or active release was found. Normal-mode setting names are unchanged and setup settings absent; values were not read. Self-review confirmed the application diff is limited to shared frontend filtering/UI/styles and its regression tests. Server, applied migrations, workflows and dependency versions are unchanged. Prior local gate passed238 tests and desktop/phone/keyboard review; release CI repeats the gate and disposable PostgreSQL16 verification. Publish only sanitised acceptance/scope notes; detailed operational evidence remains local.
+
+
+## D103 — Dynamic tag availability locally verified — 25 November 2026
+
+Implemented a pure shared availability calculation and native disabled filter chips across every tag group, with muted neutral shading and the explanation “Greyed-out tags have no matching items.” All mode uses co-occurrence with selected tags; Any evaluates each candidate within text/type/availability scope to permit broadening. Selected tags remain enabled at zero results. Hypothetical selection exits Untagged consistently with the existing control. Tag editing, metadata, organisation storage and network behaviour are unchanged.
+
+Full installed-host gate passed243 tests, lint, types, foundation/lockfile checks and client/server builds; git diff whitespace check passed. Five new domain tests cover cross-group AND, OR broadening and scope, selected removal at zero results, immutable Untagged choices and unknown-ID/empty-library handling. Invented browser checks verified Evening disables Dance/Upbeat/Focus; adding Soul leaves Slow available; Any re-enables Dance; a nonmatching search disables unselected choices while selected Evening remains removable with Space. The editor kept Dance enabled while its filter chip was disabled. Search/type/availability recalculated Soul for Mira albums, including re-enabling it when unavailable items were shown. Selecting a tag exited Untagged. Desktop1280 and phone390 CSS-pixel layouts had no horizontal overflow; disabled chips retained44-pixel height and visible neutral styling. Browser viewport reset, temporary tab closed and demo stopped.
+
+Candidate: codex/tag-filter-availability, based on the deployed source. No native iPhone check, database/container execution, dependency installation, hosted CI, push, merge or deployment was performed during local implementation. Detailed operational evidence remains local. Release execution was subsequently authorised under D104.
+
+
+## D104 — Tag availability release preflight
+
+Owner requested release. Candidate base still matches production main. No open PR or active release was found. Normal-mode secret names are unchanged and setup secrets absent; values were not read. Self-review confirms only shared frontend filtering/UI/styles, domain regression tests and documentation change; server, workflows, migrations and locked dependencies are unchanged. Prior local quality gate passed243 tests and desktop/phone browser verification. Run existing PostgreSQL16 PR and main checks; merge only the exact passing head and publish the tested image without rebuilding. Keep deployment/device evidence local.

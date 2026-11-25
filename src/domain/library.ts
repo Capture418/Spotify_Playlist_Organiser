@@ -94,6 +94,25 @@ export function filterItems(library: Library, filters: Filters): readonly Librar
   });
 }
 
+/** Available filter choices; selected tags stay removable even when results disappear. */
+export function availableFilterTagIds(library: Library, filters: Filters): ReadonlySet<string> {
+  const known = new Set(library.tags.map(tag => tag.id));
+  const available = new Set(filters.tagIds.filter(id => known.has(id)));
+  if (filters.tagIds.some(id => !known.has(id))) return available;
+  // Selecting a tag exits Untagged. In Any mode, each candidate can broaden the result.
+  const candidates = filterItems(library, {
+    ...filters, untaggedOnly: false,
+    tagIds: filters.tagMatch === 'any' ? [] : filters.tagIds,
+  });
+  const annotations = new Map(library.annotations.map(item => [item.itemId, item.tagIds]));
+  for (const item of candidates) {
+    for (const id of annotations.get(item.id) ?? []) {
+      if (known.has(id)) available.add(id);
+    }
+  }
+  return available;
+}
+
 /** A new tag is only a draft until applyTagEdit commits it. */
 export function prepareTag(
   tags: readonly Tag[],

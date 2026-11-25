@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { LibraryActions } from './LibraryActions.tsx';
 import { Icon } from '../../components/Icon.tsx';
 import { createDemoLibrary } from '../../data/demo-library.ts';
-import { applyTagEdit, filterItems, tagIdsFor, tagsFor } from '../../domain/library.ts';
+import { applyTagEdit, availableFilterTagIds, filterItems, tagIdsFor, tagsFor } from '../../domain/library.ts';
 import type { ItemKind, TagEdit } from '../../domain/library.ts';
 import { LibraryCard } from './LibraryCard.tsx';
 import { TagEditor } from './TagEditor.tsx';
@@ -28,6 +28,7 @@ export function LibraryScreen({ remote, connected = false, onReload, onRefresh, 
   const [feedback, setFeedback] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
   const visible = filterItems(library, { query, tagIds: filterTags, kind, showUnavailable, untaggedOnly, tagMatch });
+  const availableTags = availableFilterTagIds(library, { query, tagIds: filterTags, kind, showUnavailable, untaggedOnly, tagMatch });
   const hasFilters = kind !== 'all' || query.trim().length > 0 || filterTags.length > 0 || untaggedOnly || tagMatch !== 'all';
   const visibleIds = new Set(visible.map(item => item.id));
   const hiddenSelected = selected.filter(id => !visibleIds.has(id)).length;
@@ -135,8 +136,9 @@ export function LibraryScreen({ remote, connected = false, onReload, onRefresh, 
             </div>
           </div>
           <p className="match-rule">{untaggedOnly ? 'Showing items with no tags. Selecting a tag turns this off.' : tagMatch === 'all' ? 'Match all selected tags.' : 'Match any selected tag.'}</p>
+          <p className="filter-availability-hint" id="tag-availability-hint">Greyed-out tags have no matching items.</p>
           <TagGroups tags={library.tags} selected={filterTags} renderTag={tag => (
-              <button key={tag.id} type="button" className="filter-chip" data-tag-group={tag.group ?? 'Ungrouped'} title={`${tag.group ?? 'Ungrouped'}: ${tag.name}`} aria-pressed={filterTags.includes(tag.id)} onClick={() => toggleFilter(tag.id)}>
+              <button key={tag.id} type="button" className="filter-chip" data-tag-group={tag.group ?? 'Ungrouped'} disabled={!availableTags.has(tag.id)} aria-describedby={!availableTags.has(tag.id) ? 'tag-availability-hint' : undefined} title={`${tag.group ?? 'Ungrouped'}: ${tag.name}${availableTags.has(tag.id) ? '' : ' — No matching items'}`} aria-pressed={filterTags.includes(tag.id)} onClick={() => toggleFilter(tag.id)}>
                 {filterTags.includes(tag.id) && <Icon name="check" />}{tag.name}
               </button>
           )} />
