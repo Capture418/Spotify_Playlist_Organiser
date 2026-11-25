@@ -71,3 +71,19 @@ test('album and playlist import retain only the selected validated artwork URL',
   const page=await api.page(kind,0,'fake',signal());assert.equal(page.items[0]!.artworkUrl,url);assert.doesNotMatch(JSON.stringify(page),/private|images|tracks/);
  }
 });
+
+test('album imports map Spotify release dates without extra calls or saving dates on playlists', async () => {
+  const id='A'.repeat(22);
+  for (const date of ['1973', '1973-03', '1973-03-24', undefined, 'invalid']) {
+    let calls=0;
+    const api=new SpotifyTransport(client,callback,async()=>{
+      calls++;
+      return Response.json({offset:0,limit:10,total:1,next:null,items:[{album:{id,name:'Invented edition',artists:[{name:'Invented artist'}],release_date:date,external_urls:{spotify:`https://open.spotify.com/album/${id}`}}}]});
+    });
+    const page=await api.page('album',0,'fake',signal());
+    const item=page.items[0]!;
+    assert.ok(item.kind==='album');
+    assert.equal(item.releaseYear, date?.startsWith('1973') ? '1973' : null);
+    assert.equal(calls,1);
+  }
+});

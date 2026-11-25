@@ -1,3 +1,4 @@
+import { releaseYear } from '../../domain/release-year.ts';
 import { SpotifyArtwork } from '../../components/SpotifyArtwork.tsx';
 import { DemoArtwork } from '../../components/DemoArtwork.tsx';
 import { Icon } from '../../components/Icon.tsx';
@@ -14,6 +15,7 @@ type Props = {
 };
 
 export function LibraryCard({ item, tags, selecting, selected, onSelect, onEdit }: Props) {
+  const year = item.kind === 'album' ? releaseYear(item.releaseYear) : null;
   const spotifyHref = spotifyLink(item);
   return (
     <article className={`item-card${selected ? ' is-selected' : ''}`} aria-labelledby={`title-${item.id}`}>
@@ -28,7 +30,7 @@ export function LibraryCard({ item, tags, selecting, selected, onSelect, onEdit 
       <div className="card-content">
         <p className="item-type">{item.kind === 'album' ? 'Album' : 'Playlist'}{!item.available && ' · Unavailable'}</p>
         <h3 id={`title-${item.id}`}>{item.title}</h3>
-        <p className="item-owner">{item.kind === 'album' ? item.artists.join(', ') : item.ownerLabel}</p>
+        <p className="item-owner">{item.kind === 'album' ? item.artists.join(', ') : item.ownerLabel}{year && <span className="item-year"> · <time dateTime={year}>{year}</time></span>}</p>
         {!item.available && <p className="unavailable-note">Currently unavailable. Your tags are kept.</p>}
         {tags.length > 0 ? (
           <ul className="card-tags" aria-label={`Tags for ${item.title}`}>

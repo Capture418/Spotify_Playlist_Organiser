@@ -103,7 +103,7 @@ export function LibraryScreen({ remote, connected = false, onReload, onRefresh, 
               </button>
             ))}
           </div>
-          <label className="search-label" htmlFor="item-search">Search titles, album artists and tags</label>
+          <label className="search-label" htmlFor="item-search">Search titles, album artists, years and tags</label>
           <div className="search-field">
             <Icon name="search" />
             <input ref={searchRef} id="item-search" type="search" value={query}
@@ -111,7 +111,7 @@ export function LibraryScreen({ remote, connected = false, onReload, onRefresh, 
               aria-describedby="search-hint" onChange={event => { setQuery(event.target.value); setFeedback(''); }} />
             {query && <button type="button" className="icon-button" aria-label="Clear search" onClick={() => { setQuery(''); searchRef.current?.focus(); }}><Icon name="close" /></button>}
           </div>
-          <p className="search-hint" id="search-hint">Every word must match a title, tag or album artist.</p>
+          <p className="search-hint" id="search-hint">Every word must match a title, tag, album artist or year. Try 197 for the 1970s.</p>
           <div className="library-options">
             <label className="availability-control">
               <input type="checkbox" checked={untaggedOnly} onChange={event => {
