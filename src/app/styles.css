@@ -327,3 +327,5 @@ input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
 .move-tag { margin-block: 16px; }
 .move-tag fieldset { display: grid; gap: 8px; border: 0; padding: 0 0 12px; min-width: 0; }
 .tag-editor select { max-width: 100%; min-height: 44px; color: inherit; background: var(--raised); font: inherit; }
+
+.item-year { color: #a0a3a6; font-size: 12px; white-space: nowrap; }

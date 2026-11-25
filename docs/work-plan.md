@@ -832,3 +832,24 @@ Candidate: codex/tag-filter-availability, based on the deployed source. No nativ
 ## D104 — Tag availability release preflight
 
 Owner requested release. Candidate base still matches production main. No open PR or active release was found. Normal-mode secret names are unchanged and setup secrets absent; values were not read. Self-review confirms only shared frontend filtering/UI/styles, domain regression tests and documentation change; server, workflows, migrations and locked dependencies are unchanged. Prior local quality gate passed243 tests and desktop/phone browser verification. Run existing PostgreSQL16 PR and main checks; merge only the exact passing head and publish the tested image without rebuilding. Keep deployment/device evidence local.
+
+
+## D105 — Album year implementation in progress
+
+Approved task: map Spotify release dates into optional album years, preserve them through the metadata cache, show muted year text beside album artists and include years in existing all-word search/faceted filtering. Likely files: domain year helper/model/search, Spotify mapping, store, card/style, invented fixtures and focused regression tests. Verify partial/full dates, malformed/missing/legacy metadata, exact year/decade prefix, artist/tag combinations and desktop/phone layout. No SQL migration, real-data refresh, install, database/container run, push or deployment in this local scope.
+
+
+## D105 — Searchable album years locally verified — 25 November 2026
+
+Implemented optional validated releaseYear metadata for albums. Production Spotify mapping derives it from release_date (year/month/day precision) for the specific edition. Existing metadata JSON writes/reads carry only the four-digit year; old, expired or malformed values yield null. No SQL migration, new API call, scope or dependency. Organisation exports omit Spotify years, and tag edits preserve metadata. Cards show a small12px neutral grey year beside the artist, with semantic time markup; playlists and missing-year albums omit it. Existing all-word search includes validated years and updates tag availability without changing title ordering or All/Any semantics. Search label/hint mention years and197 for the1970s.
+
+Checked Spotify’s saved-albums primary reference: https://developer.spotify.com/documentation/web-api/reference/get-users-saved-albums (release_date and release_date_precision). Six regression tests cover precision/calendar validation, exact/decade/combined artist-tag search, immutable edits/legacy metadata, mocked Spotify mapping/no extra calls and mocked store JSON round-trip/export exclusion. Full installed-host gate passed249 tests, lint, types, foundation/lockfile checks and client/server builds; diff whitespace check passed. Self-review confirmed no schema/workflow/lockfile changes and that the new helper is included by the server build.
+
+Invented-data browser verification:197 showed1973 and1978 albums;1973 mira evening showed one; Playlists plus197 showed none; a missing-year album omitted the year. Desktop1280 and phone390 CSS-pixel checks had no horizontal overflow. Visually reviewed12px grey years beside artists on phone cards. Reset viewport, closed temporary tab and stopped demo; removed temporary dependency symlink. No actual native iPhone, real Spotify refresh, database/container execution, install, CI, push, merge or deployment.
+
+Candidate is codex/album-release-years, based on deployed source. No original-year inference, manual year editing or range controls were added. Detailed operational evidence stays local; D106 subsequently authorises release. After deployment, the owner will use Refresh from Spotify to populate years for older cached albums.
+
+
+## D106 — Album years release preflight
+
+Candidate still matches the deployed base, with no open PR or active release. Normal-mode configuration names are unchanged and setup secrets absent; no values were read. Health is passing over the VPN. Self-review confirms optional validated year mapping/cache/display/search only, plus tests, invented fixture years and docs. No SQL migrations, workflows or dependency versions changed. Prior local gate passed249 tests and desktop/phone invented browser checks. Existing PR and main CI must repeat the quality/image/PostgreSQL16/runtime checks and scoped cleanup; publish the tested image without rebuilding. Owner retains the real catalogue refresh and iPhone review.

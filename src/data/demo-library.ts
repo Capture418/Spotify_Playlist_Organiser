@@ -17,8 +17,8 @@ export function createDemoLibrary(): Library {
         id: itemKey('playlist', id), kind: 'playlist' as const, title, ownerLabel,
         available: true, source: 'demo' as const, spotifyUrl: null, artworkUrl: null,
       })),
-      ...albums.map(({ id, title, artists, available }) => ({
-        id: itemKey('album', id), kind: 'album' as const, title, artists: [...artists],
+      ...albums.map(({ id, title, artists, available, releaseYear }) => ({
+        id: itemKey('album', id), kind: 'album' as const, title, artists: [...artists], releaseYear: releaseYear ?? null,
         available, source: 'demo' as const, spotifyUrl: null, artworkUrl: null,
       })),
     ],

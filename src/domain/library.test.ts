@@ -395,3 +395,25 @@ test('facets fail closed on unknown selections and ignore orphan annotations', (
   }
   assert.equal(availableFilterTagIds({ items: [], tags: library.tags, annotations: library.annotations }, { query: '', tagIds: [] }).size, 0);
 });
+
+test('album years support exact and decade-prefix searches alongside artists and tags', () => {
+  const library = createDemoLibrary();
+  const matches = (query: string) => filterItems(library, { query, tagIds: [] }).map(x => x.id).sort();
+  assert.deepEqual(matches('1973'), ['album:demo-001']);
+  assert.deepEqual(matches('197'), ['album:demo-001', 'album:demo-003']);
+  assert.deepEqual(matches('197 mira evening'), ['album:demo-001']);
+  assert.deepEqual(matches('2023 mira'), ['album:demo-002']);
+  assert.equal(filterItems(library, { query: '197', tagIds: [], kind: 'playlist' }).length, 0);
+  assert.ok(availableFilterTagIds(library, { query: '1973', tagIds: [] }).has('tag-slow'));
+  assert.equal(availableFilterTagIds(library, { query: '1973', tagIds: [] }).has('tag-dance'), false);
+});
+
+test('missing or invalid years do not become searchable or change organisation edits', () => {
+  const library = createDemoLibrary();
+  const old: Library = { ...library, items: library.items.map(item => item.kind === 'album' ? { ...item, releaseYear: undefined } : item) };
+  assert.equal(filterItems(old, { query: '197', tagIds: [] }).length, 0);
+  const invalid: Library = { ...library, items: library.items.map(item => item.kind === 'album' ? { ...item, releaseYear: 'evil1973' } : item) };
+  assert.equal(filterItems(invalid, { query: 'evil1973', tagIds: [] }).length, 0);
+  const edited = applyTagEdit(library, { mode: 'single', itemIds: ['album:demo-001'], tagIds: [], newTags: [] });
+  assert.equal(edited.items, library.items);
+});

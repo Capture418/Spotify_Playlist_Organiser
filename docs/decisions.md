@@ -278,3 +278,13 @@ Owner approved greying out unavailable filter choices across Genre, Occasion, Te
 ## D104 — Dynamic tag availability release approved — 25 November 2026
 
 Owner requested release of the reviewed D103 changes. Authorised the normal branch push/PR, exact-passing-head merge and one normal-mode deployment using included allowance only. Bound execution to two image builds and two disposable PostgreSQL16 CI attempts (PR and main), with locked runner dependencies and scoped cleanup. Cumulative caps33 builds/36 disposable attempts/17 deployment requests retain the single prior conditional rollback reserve without stacking it. No extra retry/rerun, dependency version, schema, credential, settings, server or organisation changes. Rollback must retain the accepted3 MiB capacity; use the previously tested D102 image. Stop on failed checks, unexpected changes or exhausted allowance. Detailed execution evidence remains local.
+
+
+## D105 — Spotify album years approved locally — 25 November 2026
+
+Owner approved displaying Spotify’s album release year in small muted grey text and including it in the existing literal search, so1973 matches that year and197 matches the1970s. Use the date supplied for the specific edition; do not infer an original recording year. Add an optional validated year to existing expiring metadata JSON with no SQL migration or extra Spotify calls/scopes. Missing, old or invalid dates omit the year without blocking the album. Preserve tags, links, IDs, editions and existing search/filter semantics. Local implementation and invented/mocked verification only; deployment remains separately gated.
+
+
+## D106 — Album-year release approved — 25 November 2026
+
+Owner explicitly requested deployment of the reviewed D105 album years using included allowance only. Authorised the necessary branch push/PR, exact-passing-head merge and one normal-mode deployment. Bound execution to two image builds/two disposable PostgreSQL16 CI attempts (PR and main), locked runner dependency installation and scoped cleanup; cumulative caps35 builds/38 attempts/18 deployment requests retain the prior single conditional rollback reserve without stacking it. No extra retry/rerun, schema or dependency version change, credentials, settings, server changes or organisation edits. Retain the tested D104 capacity-aware image as rollback target. Stop on failed checks, exhausted allowance or uncertain integrity. Owner will refresh from Spotify after confirmed deployment; do not refresh their catalogue during this release. Detailed release evidence remains local.

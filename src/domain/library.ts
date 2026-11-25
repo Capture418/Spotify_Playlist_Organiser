@@ -1,3 +1,4 @@
+import { releaseYear } from './release-year.ts';
 /** Prototype data only. This is not the future Spotify/account schema. */
 export const tagGroups = ['Genre', 'Occasion', 'Tempo'] as const;
 export type TagGroup = typeof tagGroups[number];
@@ -15,7 +16,7 @@ export type LibraryItem = Readonly<{
   source: 'demo' | 'spotify';
   spotifyUrl: string | null;
   artworkUrl: string | null;
-} & ({ kind: 'playlist'; ownerLabel: string } | { kind: 'album'; artists: readonly string[] })>;
+} & ({ kind: 'playlist'; ownerLabel: string } | { kind: 'album'; artists: readonly string[]; releaseYear?: string | null })>;
 
 /** Only canonical Spotify destinations matching the item's type-qualified identity. */
 export function spotifyLink(item: LibraryItem): string | null {
@@ -86,7 +87,7 @@ export function filterItems(library: Library, filters: Filters): readonly Librar
       if (!matches) return false;
     }
     const fields = [normalise(item.title), ...attached.map(id => tags.get(id) ?? ''),
-      ...(item.kind === 'album' ? item.artists.map(normalise) : [])];
+      ...(item.kind === 'album' ? [...item.artists.map(normalise), releaseYear(item.releaseYear) ?? ''] : [])];
     return words.every(word => fields.some(field => field.includes(word)));
   }).sort((a, b) => {
     const compare = (left: string, right: string) => left < right ? -1 : left > right ? 1 : 0;
