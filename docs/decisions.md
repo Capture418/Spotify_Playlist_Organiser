@@ -268,3 +268,13 @@ Owner requested an untagged-items toggle and AND/OR tag matching for albums/play
 ## D102 — Library filter deployment approved
 
 Owner explicitly requested deployment of the reviewed Untagged only and All/Any controls. Authorised the necessary normal reviewed branch/PR, exact-passing-head merge and main release within included allowance only. Bound this task to two image builds/two disposable PostgreSQL16 attempts and one planned deployment; no extra retry/build without approval. Starting consumption29 builds/32 attempts/14 deployments; cumulative caps31/34/16 retain the existing one conditional rollback reserve without stacking it. Rollback must use the accepted capacity-aware D099 image. No dependency versions, schema, credentials, settings, server provisioning or organisation changes. Stop on failed checks or uncertain integrity.
+
+
+## D103 — Dynamic tag availability approved locally — 25 November 2026
+
+Owner approved greying out unavailable filter choices across Genre, Occasion, Tempo and Ungrouped. In All(AND), an unselected tag must co-occur with every selected tag within the current search/type/availability scope. In Any(OR), it must independently match within that scope, so valid broadening remains possible. Selected tags always remain removable. Recompute from loaded metadata/annotations; retain visible grey disabled chips and a no-matching-items explanation. Selecting a tag still exits Untagged, and editor choices remain unrestricted. Local implementation and invented-data checks only; no push, CI/release execution, migration or deployment approved.
+
+
+## D104 — Dynamic tag availability release approved — 25 November 2026
+
+Owner requested release of the reviewed D103 changes. Authorised the normal branch push/PR, exact-passing-head merge and one normal-mode deployment using included allowance only. Bound execution to two image builds and two disposable PostgreSQL16 CI attempts (PR and main), with locked runner dependencies and scoped cleanup. Cumulative caps33 builds/36 disposable attempts/17 deployment requests retain the single prior conditional rollback reserve without stacking it. No extra retry/rerun, dependency version, schema, credential, settings, server or organisation changes. Rollback must retain the accepted3 MiB capacity; use the previously tested D102 image. Stop on failed checks, unexpected changes or exhausted allowance. Detailed execution evidence remains local.

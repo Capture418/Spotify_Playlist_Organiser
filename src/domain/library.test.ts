@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import fixture from '../../tests/fixtures/demo-library.json' with { type: 'json' };
 import { createDemoLibrary } from '../data/demo-library.ts';
 import {
-  applyTagEdit, cleanTagName, filterItems, prepareTag, tagIdsFor, tagsFor,
+  applyTagEdit, availableFilterTagIds, cleanTagName, filterItems, prepareTag, tagIdsFor, tagsFor,
 } from './library.ts';
 import type { Library, TagEdit } from './library.ts';
 
@@ -354,4 +354,44 @@ test('a newly tagged item leaves the Untagged view while unrelated organisation 
   const changed = applyTagEdit(library, edit({ itemIds: ['playlist:demo-008'], tagIds: ['tag-soul'] }));
   assert.deepEqual(filterItems(changed, { query: '', tagIds: [], untaggedOnly: true }).map(item => item.id), ['album:demo-005']);
   assert.deepEqual(tagIdsFor(changed, 'playlist:demo-002'), tagIdsFor(library, 'playlist:demo-002'));
+});
+
+
+test('All facets enable only co-occurring tags across groups', () => {
+  const available = availableFilterTagIds(createDemoLibrary(), { query: '', tagIds: ['tag-evening'] });
+  for (const id of ['tag-evening', 'tag-slow', 'tag-soul', 'tag-ambient', 'tag-dinner', 'tag-jazz']) assert.ok(available.has(id), id);
+  for (const id of ['tag-dance', 'tag-upbeat', 'tag-focus']) assert.equal(available.has(id), false, id);
+});
+
+test('Any facets allow broadening but honour query, type and availability', () => {
+  const library = createDemoLibrary();
+  assert.ok(availableFilterTagIds(library, { query: '', tagIds: ['tag-soul'], tagMatch: 'any' }).has('tag-dance'));
+  const scoped = availableFilterTagIds(library, { query: 'mira', kind: 'album', tagIds: [], tagMatch: 'any' });
+  assert.ok(scoped.has('tag-evening'));
+  assert.equal(scoped.has('tag-soul'), false);
+  assert.equal(scoped.has('tag-dance'), false);
+  assert.ok(availableFilterTagIds(library, { query: 'mira', kind: 'album', tagIds: [], showUnavailable: true }).has('tag-soul'));
+});
+
+test('selected facets remain removable with zero results in either mode', () => {
+  for (const tagMatch of ['all', 'any'] as const) {
+    assert.deepEqual([...availableFilterTagIds(createDemoLibrary(), { query: 'no such record', tagIds: ['tag-soul'], tagMatch })], ['tag-soul']);
+  }
+});
+
+test('facet choices can exit Untagged and do not modify the library', () => {
+  const library = createDemoLibrary();
+  const before = structuredClone(library);
+  const available = availableFilterTagIds(library, { query: '', tagIds: [], untaggedOnly: true });
+  assert.equal(available.size, library.tags.length);
+  assert.deepEqual(library, before);
+  assert.equal(availableFilterTagIds(library, { query: 'new finds', tagIds: [], untaggedOnly: true }).size, 0);
+});
+
+test('facets fail closed on unknown selections and ignore orphan annotations', () => {
+  const library = createDemoLibrary();
+  for (const tagMatch of ['all', 'any'] as const) {
+    assert.deepEqual([...availableFilterTagIds(library, { query: '', tagIds: ['missing', 'tag-soul'], tagMatch })], ['tag-soul']);
+  }
+  assert.equal(availableFilterTagIds({ items: [], tags: library.tags, annotations: library.annotations }, { query: '', tagIds: [] }).size, 0);
 });
